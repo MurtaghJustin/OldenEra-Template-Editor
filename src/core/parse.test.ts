@@ -19,4 +19,21 @@ describe("parse", () => {
     expect(text.startsWith("{\n\t")).toBe(true);
     expect(text.endsWith("\n")).toBe(true);
   });
+
+  it("serialize -> parse preserves all content (lossless)", () => {
+    const r = parseTemplate(JSON.stringify(minimal));
+    const round = parseTemplate(serializeTemplate(r));
+    expect(round).toEqual(r);
+  });
+
+  it("preserves unknown/extra fields through serialize", () => {
+    const text = JSON.stringify({ ...minimal, futureUnknownField: { keep: 42 } });
+    const out = JSON.parse(serializeTemplate(parseTemplate(text)));
+    expect(out.futureUnknownField).toEqual({ keep: 42 });
+  });
+
+  it("throws on valid JSON that is not an object", () => {
+    expect(() => parseTemplate("null")).toThrow(/must be a JSON object/);
+    expect(() => parseTemplate("[]")).toThrow(/must be a JSON object/);
+  });
 });
