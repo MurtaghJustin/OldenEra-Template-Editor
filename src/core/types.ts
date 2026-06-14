@@ -92,7 +92,7 @@ export interface GameRules {
   [k: string]: unknown;
 }
 
-export interface GlobalBans { magics: string[]; items: string[]; }
+export interface GlobalBans { magics: string[]; items: string[]; [k: string]: unknown; }
 
 export interface TemplateRoot {
   name: string;

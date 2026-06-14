@@ -25,5 +25,9 @@ function mergeValue(orig: unknown, edit: unknown): unknown {
 }
 
 export function mergeEdits(original: TemplateRoot, edited: TemplateRoot): TemplateRoot {
-  return mergeValue(cloneRaw(original), cloneRaw(edited)) as TemplateRoot;
+  // `edited` is cloned because mergeValue's array/primitive fallback returns the edited
+  // value directly; without cloning, the result would alias the caller's arrays/objects.
+  // `original` is intentionally NOT cloned: mergeValue only reads from it and never places
+  // a reference to it (or its nested values) into the output, so it cannot be mutated.
+  return mergeValue(original, cloneRaw(edited)) as TemplateRoot;
 }
