@@ -582,14 +582,7 @@
     "ultra_rich_buildings_construction"
   ],
   "factions": [
-    "Autumn",
-    "Deathland",
-    "Dirt",
-    "Grass",
-    "Lava",
-    "Nature",
-    "Sand",
-    "Snow"
+    "Nature"
   ],
   "biomes": [
     "Autumn",

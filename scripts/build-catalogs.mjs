@@ -77,7 +77,6 @@ for (const file of collectFiles()) {
     for (const z of v.zones || []) {
       if (z.layout) sets.layouts.add(z.layout);
       addPool(z.guardedContentPool); addPool(z.unguardedContentPool); addPool(z.resourcesContentPool);
-      addSelectorFactions(z.zoneBiome); // biomes captured below explicitly
       for (const sel of [z.zoneBiome, z.contentBiome, z.metaObjectsBiome]) {
         if (sel?.type === "FromList") for (const a of sel.args || []) if (!a.startsWith("differentFrom")) sets.biomes.add(a);
       }
