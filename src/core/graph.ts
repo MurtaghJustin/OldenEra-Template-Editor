@@ -57,3 +57,32 @@ export function extractGraph(root: TemplateRoot, variantIndex: number): Graph {
   }));
   return { nodes, edges };
 }
+
+export function addZone(root: TemplateRoot, vi: number, zone: Zone): void {
+  root.variants[vi].zones.push(zone);
+}
+
+export function removeZone(root: TemplateRoot, vi: number, name: string): void {
+  const v = root.variants[vi];
+  v.zones = v.zones.filter((z) => z.name !== name);
+  v.connections = v.connections.filter((c) => c.from !== name && c.to !== name);
+}
+
+export function renameZone(root: TemplateRoot, vi: number, oldName: string, newName: string): void {
+  const v = root.variants[vi];
+  for (const z of v.zones) if (z.name === oldName) z.name = newName;
+  for (const c of v.connections) {
+    if (c.from === oldName) c.from = newName;
+    if (c.to === oldName) c.to = newName;
+  }
+}
+
+export function addConnection(root: TemplateRoot, vi: number, conn: Connection): void {
+  const c: Connection = { name: conn.name ?? `${conn.from}-${conn.to}`, ...conn };
+  root.variants[vi].connections.push(c);
+}
+
+export function removeConnection(root: TemplateRoot, vi: number, id: string): void {
+  const v = root.variants[vi];
+  v.connections = v.connections.filter((c, i) => (c.name || `${c.from}-${c.to}-${i}`) !== id);
+}
