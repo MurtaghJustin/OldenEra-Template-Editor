@@ -64,7 +64,9 @@ export function autoLayout(g: Graph, variant: Variant): Graph {
     // Anchor angle so zeroAngleZone (or slot 1) sits at the top (-90deg).
     const anchorIdx = sorted.findIndex((n) => n.id === zeroZone);
     const baseIdx = anchorIdx >= 0 ? anchorIdx : 0;
-    const radius = RING_STEP * (maxD === 0 ? 1 : d / 1 + 0.5);
+    // Normalise ring radius to [0.5, 1.5] * RING_STEP by distance, so deeper
+    // graphs stay compact rather than growing unbounded with ring count.
+    const radius = RING_STEP * (maxD === 0 ? 1 : d / maxD + 0.5);
     const count = sorted.length;
     sorted.forEach((n, i) => {
       const k = (i - baseIdx + count) % count;
