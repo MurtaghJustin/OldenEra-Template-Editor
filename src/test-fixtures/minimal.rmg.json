@@ -1,0 +1,38 @@
+{
+  "name": "Minimal",
+  "gameMode": "Classic",
+  "description": "templates_description_minimal",
+  "displayWinCondition": "win_condition_1",
+  "sizeX": 96,
+  "sizeZ": 96,
+  "gameRules": {
+    "heroCountMin": 4,
+    "heroCountMax": 8,
+    "heroCountIncrement": 1,
+    "heroHireBan": false,
+    "encounterHoles": false,
+    "winConditions": { "classic": true, "heroLighting": true, "heroLightingDay": 1 },
+    "bonuses": []
+  },
+  "globalBans": { "magics": [], "items": [] },
+  "variants": [
+    {
+      "orientation": { "mode": "MinimalBoundingSquare", "zeroAngleZone": "Spawn-A", "baseAngleMin": 0, "baseAngleMax": 360, "randomAngleAmplitude": 45, "randomAngleStep": 90 },
+      "border": { "obstaclesWidth": 3, "waterWidth": 0, "waterType": "water grass" },
+      "zones": [
+        { "name": "Spawn-A", "size": 1.0, "layout": "zone_layout_spawns", "guardCutoffValue": 1500, "guardRandomization": 0.05, "guardMultiplier": 1.0, "guardWeeklyIncrement": 0.1, "guardReactionDistribution": [60,20,10,5,2,0], "guardedContentPool": [], "unguardedContentPool": [], "resourcesContentPool": [], "guardedContentValue": 0, "guardedContentValuePerArea": 0, "unguardedContentValue": 0, "unguardedContentValuePerArea": 0, "resourcesValue": 0, "resourcesValuePerArea": 0, "mandatoryContent": [], "contentCountLimits": [], "roads": [], "zoneBiome": { "type": "MatchMainObject", "args": ["0"] }, "contentBiome": { "type": "FromList", "args": [] }, "metaObjectsBiome": { "type": "FromList", "args": [] }, "mainObjects": [ { "type": "Spawn", "spawn": "Player1", "owner": null, "guardChance": 0.0, "guardValue": 0, "removeGuardIfHasOwner": true, "buildingsConstructionSid": "poor_buildings_construction", "faction": { "type": "FromList", "args": [] }, "placement": "Center", "placementArgs": [] } ] },
+        { "name": "Spawn-B", "size": 1.0, "layout": "zone_layout_spawns", "guardCutoffValue": 1500, "guardRandomization": 0.05, "guardMultiplier": 1.0, "guardWeeklyIncrement": 0.1, "guardReactionDistribution": [60,20,10,5,2,0], "guardedContentPool": [], "unguardedContentPool": [], "resourcesContentPool": [], "guardedContentValue": 0, "guardedContentValuePerArea": 0, "unguardedContentValue": 0, "unguardedContentValuePerArea": 0, "resourcesValue": 0, "resourcesValuePerArea": 0, "mandatoryContent": [], "contentCountLimits": [], "roads": [], "zoneBiome": { "type": "MatchMainObject", "args": ["0"] }, "contentBiome": { "type": "FromList", "args": [] }, "metaObjectsBiome": { "type": "FromList", "args": [] }, "mainObjects": [ { "type": "Spawn", "spawn": "Player2", "owner": null, "guardChance": 0.0, "guardValue": 0, "removeGuardIfHasOwner": true, "buildingsConstructionSid": "poor_buildings_construction", "faction": { "type": "FromList", "args": [] }, "placement": "Center", "placementArgs": [] } ] },
+        { "name": "Hub", "size": 1.5, "layout": "zone_layout_center", "guardCutoffValue": 1500, "guardRandomization": 0.1, "guardMultiplier": 1.0, "guardWeeklyIncrement": 0.1, "guardReactionDistribution": [60,20,10,5,2,0], "guardedContentPool": ["classic_template_pool_random_t4_base"], "unguardedContentPool": [], "resourcesContentPool": [], "guardedContentValue": 0, "guardedContentValuePerArea": 2000, "unguardedContentValue": 0, "unguardedContentValuePerArea": 0, "resourcesValue": 0, "resourcesValuePerArea": 0, "mandatoryContent": [], "contentCountLimits": [], "roads": [], "crossroadsPosition": 1, "zoneBiome": { "type": "FromList", "args": [] }, "contentBiome": { "type": "FromList", "args": [] }, "metaObjectsBiome": { "type": "FromList", "args": [] }, "mainObjects": [] }
+      ],
+      "connections": [
+        { "name": "Spawn-A-Hub", "from": "Spawn-A", "to": "Hub", "connectionType": "Direct", "road": true, "guardValue": 3000, "guardWeeklyIncrement": 0.1 },
+        { "name": "Spawn-B-Hub", "from": "Spawn-B", "to": "Hub", "connectionType": "Direct", "road": true, "guardValue": 3000, "guardWeeklyIncrement": 0.1 }
+      ]
+    }
+  ],
+  "zoneLayouts": [],
+  "mandatoryContent": [],
+  "contentCountLimits": [],
+  "contentPools": [],
+  "contentLists": []
+}
