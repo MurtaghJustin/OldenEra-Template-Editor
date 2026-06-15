@@ -141,6 +141,19 @@ describe("layout topology — real templates", () => {
     expect(Math.hypot(center.x - cx, center.y - cy)).toBeLessThan(2); // hub dead-centre
   });
 
+  it("Fair'n Square places its 4 spawns upright (symmetric about the vertical axis)", () => {
+    const out = layoutOf("Fair'n Square.rmg.json");
+    const spawns = out.nodes.filter((n) => n.playerSlot !== undefined);
+    const cx = spawns.reduce((s, n) => s + n.x, 0) / spawns.length;
+    // Every spawn's mirror across the centroid's vertical axis should coincide with a spawn
+    // (itself if on the axis) — i.e. the spawn square sits straight, not tilted.
+    for (const sp of spawns) {
+      const mirrorX = 2 * cx - sp.x;
+      const matched = spawns.some((q) => Math.hypot(mirrorX - q.x, sp.y - q.y) < 3);
+      expect(matched).toBe(true);
+    }
+  });
+
   it("Exodus's 4-cycle is a perfect regular polygon (equal sides)", () => {
     const out = layoutOf("Exodus.rmg.json");
     const p = (id: string) => get(out, id);

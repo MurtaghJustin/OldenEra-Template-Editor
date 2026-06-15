@@ -277,7 +277,50 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
     if (bestCrossings === 0) break; // can't do better than crossing-free
   }
+
+  // Canonical orientation: rotate the whole component so its player spawns are symmetric about the
+  // vertical axis (upright). Force-directed often lands a regular shape at an odd tilt — e.g.
+  // Fair'n Square's spawns form a perfect square rotated ~23°. Rotation preserves the shape and
+  // crossings; it just makes symmetric multi-spawn maps sit straight (spawns at corners/edges of a
+  // square, points of a hexagon, …). Only for 3+ spawns, so 2-spawn rings keep their leveled
+  // orientation and single-spawn components are untouched.
+  const phi = uprightRotation(members, isSpawn, best!);
+  if (phi !== 0) {
+    let cx = 0, cy = 0;
+    for (const m of members) { const p = best!.get(m)!; cx += p.x; cy += p.y; }
+    cx /= count; cy /= count;
+    const c = Math.cos(phi), s = Math.sin(phi);
+    for (const m of members) {
+      const p = best!.get(m)!, dx = p.x - cx, dy = p.y - cy;
+      p.x = cx + dx * c - dy * s; p.y = cy + dx * s + dy * c;
+    }
+  }
   for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
+}
+
+// Rotation (radians) that makes the component's player spawns most symmetric about the vertical
+// axis — i.e. orients a tilted-but-regular spawn arrangement upright. Returns 0 for <3 spawns.
+function uprightRotation(members: number[], isSpawn: boolean[], pos: Map<number, P>): number {
+  const spawns = members.filter((m) => isSpawn[m]);
+  if (spawns.length < 3) return 0;
+  let cx = 0, cy = 0;
+  for (const m of members) { const p = pos.get(m)!; cx += p.x; cy += p.y; }
+  cx /= members.length; cy /= members.length;
+  const sv = spawns.map((m) => ({ x: pos.get(m)!.x - cx, y: pos.get(m)!.y - cy }));
+  let bestPhi = 0, bestScore = Infinity;
+  for (let deg = 0; deg < 180; deg++) {
+    const phi = (deg * Math.PI) / 180, c = Math.cos(phi), s = Math.sin(phi);
+    const rot = sv.map((v) => ({ x: v.x * c - v.y * s, y: v.x * s + v.y * c }));
+    let score = 0;
+    for (const p of rot) {
+      let nearest = Infinity;
+      for (const q of rot) nearest = Math.min(nearest, Math.hypot(-p.x - q.x, p.y - q.y)); // mirror over vertical axis
+      score += nearest;
+    }
+    score += deg * 1e-4; // prefer the smallest rotation among equally-symmetric orientations
+    if (score < bestScore) { bestScore = score; bestPhi = phi; }
+  }
+  return bestPhi;
 }
 
 // Deterministic pseudo-random in [0,1) from integer inputs (no Math.random, so layouts stay
