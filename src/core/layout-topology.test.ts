@@ -114,6 +114,11 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(layoutOf("Blitz.rmg.json"))).toBe(0);
   });
 
+  it("Full Hire (a large grid) lays out near-cleanly via the spectral seed", () => {
+    // A 48-node grid; the spectral seed gives a symmetric near-crossing-free layout.
+    expect(edgeCrossings(layoutOf("Full Hire.rmg.json"))).toBeLessThanOrEqual(2);
+  });
+
   it("Highway (a chain) folds into a compact shape, not a long line", () => {
     const out = layoutOf("Highway.rmg.json");
     const { xRange, yRange } = ranges(out);

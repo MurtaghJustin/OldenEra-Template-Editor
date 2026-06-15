@@ -7,7 +7,7 @@ const KR = 300000;         // repulsion constant (Coulomb)
 const KG = 0.1;            // gravity toward component centroid (general compactness)
 const TUCK_GRAVITY = 8;    // gravity multiplier for pendants that should sit inside a loop
 const ITERATIONS = 400;
-const RESTARTS = 12;       // multi-start attempts; keep the layout with the fewest edge crossings
+const SPECTRAL_ITERS = 500; // power-iteration steps for the spectral (Laplacian eigenvector) seed
 const COMPONENT_GAP = 180; // horizontal gap between disconnected components
 const ORIGIN = 100;        // padding so all coordinates are positive
 const EPS = 0.01;
@@ -167,25 +167,27 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
 
   const radius = L * Math.max(1, Math.sqrt(count));
 
-  // Multi-start: complex graphs (e.g. Blitz) get stuck in tangled local minima from a single seed.
-  // Run the simulation from several deterministic seeds and keep the layout with the fewest edge
-  // crossings. Trial 0 is the structured circle seed above, so clean shapes (rings, crosses,
-  // chains) keep their nice layout (trial 0 wins ties); later trials are pseudo-random restarts.
+  // Two fully deterministic candidate seeds, each refined by the force pass; keep whichever has
+  // the fewest edge crossings. The structured circle seed is first, so it wins ties — preserving
+  // the clean ring/cross/chain layouts. The spectral seed (Laplacian eigenvectors) places nodes by
+  // graph structure, so symmetric/grid graphs (Blitz, Full Hire, Hallway) come out symmetric and
+  // untangled rather than landing in an arbitrary local minimum.
+  const structured = new Map<number, P>();
+  order.forEach((idx, slot) => {
+    const angle = (2 * Math.PI * slot) / count;
+    structured.set(idx, { x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
+  });
+  // Tuck (pulling loop-pendants inside) helps the structured layout but disrupts the spectral one,
+  // which already places nodes by structure (forcing pendants inward there just tangles dense
+  // cores, e.g. Hallway). So tuck applies only to the structured candidate.
+  const candidates: { init: Map<number, P>; tuck: Set<number> }[] = [{ init: structured, tuck }];
+  const spec = spectralSeed(members, compEdges, count);
+  if (spec) candidates.push({ init: spec, tuck: new Set() });
+
   let best: Map<number, P> | null = null;
   let bestCrossings = Infinity;
-  for (let trial = 0; trial < RESTARTS; trial++) {
-    const init = new Map<number, P>();
-    if (trial === 0) {
-      order.forEach((idx, slot) => {
-        const angle = (2 * Math.PI * slot) / count;
-        init.set(idx, { x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
-      });
-    } else {
-      for (const idx of members) {
-        init.set(idx, { x: (rand(idx, trial, 1) * 2 - 1) * radius, y: (rand(idx, trial, 2) * 2 - 1) * radius });
-      }
-    }
-    const result = simulate(members, compEdges, tuck, count, init);
+  for (const cand of candidates) {
+    const result = simulate(members, compEdges, cand.tuck, count, cand.init);
     const crossings = countCrossings(compEdges, result);
     if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
     if (bestCrossings === 0) break; // can't do better than crossing-free
@@ -193,11 +195,40 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
 }
 
-// Deterministic pseudo-random in [0,1) from integer inputs (no Math.random, so layouts stay
-// reproducible across runs — required for a stable preview image).
-function rand(a: number, b: number, c: number): number {
-  const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453;
-  return v - Math.floor(v);
+// Spectral seed: positions from the 2nd & 3rd smallest eigenvectors of the graph Laplacian
+// (smallest is the trivial constant vector). This respects graph structure and symmetry — rings
+// map to circles, grids to grids, symmetric graphs to symmetric layouts — giving force-directed a
+// deterministic, untangled starting point. Eigenvectors via power iteration on B = cI - L (whose
+// largest eigenvectors are L's smallest), deflating the constant vector. Returns null for tiny
+// components where it isn't meaningful.
+function spectralSeed(members: number[], compEdges: [number, number][], count: number): Map<number, P> | null {
+  if (count < 4) return null;
+  const loc = new Map(members.map((m, i) => [m, i]));
+  const ladj: number[][] = members.map(() => []);
+  for (const [a, b] of compEdges) { const la = loc.get(a)!, lb = loc.get(b)!; ladj[la].push(lb); ladj[lb].push(la); }
+  const deg = ladj.map((a) => a.length);
+  const c = 2 * Math.max(...deg) + 1;
+  const dot = (u: number[], v: number[]) => { let s = 0; for (let i = 0; i < count; i++) s += u[i] * v[i]; return s; };
+  const bMul = (v: number[]) => v.map((vi, i) => c * vi - (deg[i] * vi - ladj[i].reduce((s, j) => s + v[j], 0)));
+  const normalize = (v: number[]) => { const m = Math.sqrt(dot(v, v)) || 1; return v.map((x) => x / m); };
+  const orth = (v: number[], basis: number[][]) => {
+    const r = v.slice();
+    for (const u of basis) { const d = dot(r, u); for (let i = 0; i < count; i++) r[i] -= d * u[i]; }
+    return r;
+  };
+  const power = (basis: number[][]) => {
+    let v = normalize(orth(members.map((_, i) => Math.sin(i * 1.7 + 0.3)), basis));
+    for (let it = 0; it < SPECTRAL_ITERS; it++) v = normalize(orth(bMul(v), basis));
+    return v;
+  };
+  const ones = normalize(new Array(count).fill(1));
+  const f1 = power([ones]);
+  const f2 = power([ones, f1]);
+  const span = (a: number[]) => (Math.max(...a) - Math.min(...a)) || 1;
+  const s = L * Math.sqrt(count), sx = span(f1), sy = span(f2);
+  const seed = new Map<number, P>();
+  members.forEach((m, i) => seed.set(m, { x: (f1[i] / sx) * s, y: (f2[i] / sy) * s }));
+  return seed;
 }
 
 // Number of drawn-edge pairs whose segments properly cross (shared endpoints don't count).
