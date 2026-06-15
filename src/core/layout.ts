@@ -100,22 +100,44 @@ function layoutComponent(members: number[], springPairs: [number, number][], all
   let compEdges = springPairs.filter(([a, b]) => inComp.has(a) && inComp.has(b));
   if (compEdges.length === 0) compEdges = allPairs.filter(([a, b]) => inComp.has(a) && inComp.has(b));
 
-  // Seed on a circle (deterministic), ordering members so player spawns are spread as evenly
-  // as possible around it. The even polygon that the forces settle into preserves this cyclic
-  // order, so spawns end up opposite (2 players) or evenly distributed (more), with other zones
-  // between them — rather than clustered together. This is a gentle tie-breaker: where real road
-  // structure exists, the forces override it; it mainly shapes otherwise-symmetric maps.
-  const spawns = members.filter((i) => isSpawn[i]);
-  const others = members.filter((i) => !isSpawn[i]);
-  const order: number[] = new Array(count);
-  const taken = new Array(count).fill(false);
-  spawns.forEach((idx, s) => {
-    let slot = Math.round((s * count) / spawns.length) % count;
-    while (taken[slot]) slot = (slot + 1) % count;
-    taken[slot] = true; order[slot] = idx;
-  });
-  let oi = 0;
-  for (let slot = 0; slot < count; slot++) if (!taken[slot]) order[slot] = others[oi++];
+  // Decide the seed ORDER around the circle (the even polygon the forces settle into preserves
+  // this cyclic order, so a good order yields a clean, crossing-free, symmetric layout).
+  const adj = new Map<number, number[]>(members.map((m) => [m, []]));
+  for (const [a, b] of compEdges) { adj.get(a)!.push(b); adj.get(b)!.push(a); }
+  const rank = new Map<number, number>(members.map((m, i) => [m, i]));
+
+  let order: number[] | null = null;
+
+  // Pure cycle (every zone has exactly two road neighbours, e.g. ring maps like Harmony): walk
+  // the loop so adjacent zones are adjacent on the circle -> a clean symmetric polygon, no
+  // crossings. Deterministic: start at the lowest-id member, break the first fork by id rank.
+  if (count >= 3 && members.every((m) => adj.get(m)!.length === 2)) {
+    const walk = [members[0]]; const visited = new Set(walk);
+    let prev = -1, cur = members[0];
+    while (walk.length < count) {
+      const nbrs = adj.get(cur)!.filter((x) => x !== prev && !visited.has(x));
+      if (!nbrs.length) break;
+      const next = nbrs.reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
+      walk.push(next); visited.add(next); prev = cur; cur = next;
+    }
+    if (walk.length === count) order = walk;
+  }
+
+  // Otherwise spread player spawns evenly and fill the rest between them. A gentle tie-breaker:
+  // where real road structure exists the forces override it; it mainly shapes symmetric hub maps.
+  if (!order) {
+    const spawns = members.filter((i) => isSpawn[i]);
+    const others = members.filter((i) => !isSpawn[i]);
+    order = new Array(count);
+    const taken = new Array(count).fill(false);
+    spawns.forEach((idx, s) => {
+      let slot = Math.round((s * count) / spawns.length) % count;
+      while (taken[slot]) slot = (slot + 1) % count;
+      taken[slot] = true; order![slot] = idx;
+    });
+    let oi = 0;
+    for (let slot = 0; slot < count; slot++) if (!taken[slot]) order![slot] = others[oi++];
+  }
 
   const radius = L * Math.max(1, Math.sqrt(count));
   order.forEach((idx, slot) => {
