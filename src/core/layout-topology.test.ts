@@ -116,6 +116,12 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(layoutOf("Blitz.rmg.json"))).toBe(0);
   });
 
+  it("Hallway (a caterpillar) untangles its leaves to at most one crossing", () => {
+    // Leaf re-placement fans the spawn/side leaves into free gaps, removing the leaf-leaf crossing
+    // (only a single dense-core crossing may remain).
+    expect(edgeCrossings(layoutOf("Hallway.rmg.json"))).toBeLessThanOrEqual(1);
+  });
+
   it("Full Hire (a large grid) lays out near-cleanly via the spectral seed", () => {
     // A 48-node grid; the spectral seed gives a symmetric near-crossing-free layout.
     expect(edgeCrossings(layoutOf("Full Hire.rmg.json"))).toBeLessThanOrEqual(2);
