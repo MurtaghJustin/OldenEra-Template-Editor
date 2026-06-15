@@ -125,6 +125,24 @@ function walkCycle(nodes: number[], cadj: Map<number, number[]>, rank: Map<numbe
   return order.length === nodes.length ? order : null;
 }
 
+// If the component is a single simple path (exactly two degree-1 ends, no node of degree > 2),
+// return its nodes end-to-end; otherwise null. Laid on a regular polygon this becomes a clean ring
+// with one open side (the gap between the two ends) — e.g. Highway's octagon.
+function pathOrder(members: number[], adj: Map<number, number[]>, rank: Map<number, number>): number[] | null {
+  if (members.length < 3) return null;
+  const ends = members.filter((m) => adj.get(m)!.length === 1);
+  if (ends.length !== 2 || members.some((m) => adj.get(m)!.length > 2)) return null;
+  const start = rank.get(ends[0])! <= rank.get(ends[1])! ? ends[0] : ends[1];
+  const order = [start]; const seen = new Set([start]);
+  let prev = -1, cur = start;
+  while (order.length < members.length) {
+    const next = adj.get(cur)!.find((x) => x !== prev && !seen.has(x));
+    if (next === undefined) break;
+    order.push(next); seen.add(next); prev = cur; cur = next;
+  }
+  return order.length === members.length ? order : null;
+}
+
 function layoutComponent(members: number[], springPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
   const count = members.length;
   if (count === 1) { pos[members[0]] = { x: 0, y: 0 }; return; }
@@ -219,21 +237,23 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
       if (ro) { ringOrder = ro; centerNodes = [hub]; }
     }
   }
+  if (!ringOrder) ringOrder = pathOrder(members, adj, rank); // a chain → polygon with one open side
   if (ringOrder) {
     const k = ringOrder.length;
     const R = L / (2 * Math.sin(Math.PI / k));
     const polygon = new Map<number, P>();
     // Orient the ring: by default the first node sits at the top. If the ring carries exactly two
     // player spawns, rotate so they sit LEVEL (same height) — placed symmetric about the vertical
-    // axis by rotating the near-bisector of their directions straight down (Harmony's hexagon/
-    // octagon, Eye of the Storm). Opposite spawns (bisector undefined) go to left/right. Single-
-    // spawn rings (Exodus's diamonds) keep the default orientation.
+    // axis by rotating the near-bisector of their directions to the bottom of the screen (so the
+    // spawns/gap sit low, matching the previews — Highway's octagon, Harmony, Eye of the Storm).
+    // Opposite spawns (bisector undefined) go to left/right. Single-spawn rings (Exodus) keep the
+    // default orientation. (Screen y is inverted, so "bottom" is +y i.e. math angle π/2.)
     let phase = -Math.PI / 2;
     const spawnSlots = ringOrder.map((idx, slot) => (isSpawn[idx] ? slot : -1)).filter((s) => s >= 0);
     if (spawnSlots.length === 2) {
       const a1 = (2 * Math.PI * spawnSlots[0]) / k, a2 = (2 * Math.PI * spawnSlots[1]) / k;
       const bx = Math.cos(a1) + Math.cos(a2), by = Math.sin(a1) + Math.sin(a2);
-      phase = Math.hypot(bx, by) > 1e-6 ? (3 * Math.PI) / 2 - Math.atan2(by, bx) : Math.PI - a1;
+      phase = Math.hypot(bx, by) > 1e-6 ? Math.PI / 2 - Math.atan2(by, bx) : Math.PI - a1;
     }
     ringOrder.forEach((idx, slot) => {
       const angle = (2 * Math.PI * slot) / k + phase;
