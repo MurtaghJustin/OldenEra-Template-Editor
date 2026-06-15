@@ -127,6 +127,15 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(out)).toBe(0);
   });
 
+  it("Exodus's 4-cycle is a perfect regular polygon (equal sides)", () => {
+    const out = layoutOf("Exodus.rmg.json");
+    const p = (id: string) => get(out, id);
+    const ring = ["Spawn-B", "Spawn-B-Treasure-1", "Center-Treasure-B", "Spawn-B-Treasure-2"].map(p);
+    const sides = ring.map((n, i) => dist(n, ring[(i + 1) % ring.length]));
+    const min = Math.min(...sides), max = Math.max(...sides);
+    expect(max - min).toBeLessThan(2); // all sides equal -> regular polygon, not a wonky quad
+  });
+
   it("Exodus tucks a loop's pendant zone inside the loop, not dangling outside", () => {
     const out = layoutOf("Exodus.rmg.json");
     const p = (id: string) => get(out, id);
