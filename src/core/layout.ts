@@ -289,25 +289,14 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     candidates.push({ init, tuck: new Set(), pinned: new Set() });
   }
 
+  // Pick the candidate with the fewest crossings — this chooses the best overall layout (clean
+  // spine/core), NOT one that merely has fixable leaves. Leaf untangling happens afterwards on the
+  // winner, so it can't pull the choice toward a tangled-core layout.
   let best: Map<number, P> | null = null;
   let bestCrossings = Infinity;
   for (const cand of candidates) {
-    let result = simulate(members, compEdges, cand.tuck, count, cand.init, cand.pinned);
-    let crossings = countCrossings(compEdges, result);
-    // Try fanning this candidate's degree-1 leaves into free gaps around their parents; keep it if
-    // it reduces crossings. Run per-candidate so a candidate with a clean CORE but tangled leaves
-    // (the leaf crossings are then fixable) can win over one whose core itself crosses — this is
-    // what untangles caterpillar maps like Hallway. Tuck-pendants are skipped.
-    if (crossings > 0) {
-      const seeded = new Map<number, P>([...result].map(([k, v]) => [k, { x: v.x, y: v.y }]));
-      placeLeaves(members, adj, tuck, seeded, rank);
-      // Settle the re-placed leaves with the rest of the graph pinned: keeps their untangled
-      // angular arrangement but lets repulsion spread them so they don't overlap.
-      const pinnedCore = new Set(members.filter((m) => !(adj.get(m)!.length === 1 && !tuck.has(m))));
-      const trial = simulate(members, compEdges, tuck, count, seeded, pinnedCore);
-      const tc = countCrossings(compEdges, trial);
-      if (tc < crossings && minNodeDist(members, trial) >= 56) { result = trial; crossings = tc; }
-    }
+    const result = simulate(members, compEdges, cand.tuck, count, cand.init, cand.pinned);
+    const crossings = countCrossings(compEdges, result);
     if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
     if (bestCrossings === 0) break; // can't do better than crossing-free
   }
@@ -330,50 +319,6 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     }
   }
   for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
-}
-
-// Smallest distance between any two nodes — used to reject layouts that overlap discs.
-function minNodeDist(members: number[], pos: Map<number, P>): number {
-  let m = Infinity;
-  for (let i = 0; i < members.length; i++) {
-    for (let j = i + 1; j < members.length; j++) {
-      const a = pos.get(members[i])!, b = pos.get(members[j])!;
-      m = Math.min(m, Math.hypot(a.x - b.x, a.y - b.y));
-    }
-  }
-  return m;
-}
-
-// Re-place each degree-1 leaf (excluding tuck pendants) into a free angular gap around its parent
-// — between the parent's other edges, fanned to opposite sides — so caterpillar maps (Hallway)
-// don't tangle their leaves. Mutates `pos`. Caller keeps the result only if it reduces crossings.
-function placeLeaves(members: number[], adj: Map<number, number[]>, tuck: Set<number>, pos: Map<number, P>, rank: Map<number, number>): void {
-  const isLeaf = (m: number) => adj.get(m)!.length === 1 && !tuck.has(m);
-  const byParent = new Map<number, number[]>();
-  for (const m of members) if (isLeaf(m)) {
-    const p = adj.get(m)![0];
-    (byParent.get(p) ?? byParent.set(p, []).get(p)!).push(m);
-  }
-  for (const [p, lvsRaw] of byParent) {
-    const lvs = [...lvsRaw].sort((a, b) => rank.get(a)! - rank.get(b)!);
-    const pp = pos.get(p)!;
-    const occ = adj.get(p)!.filter((x) => !isLeaf(x))
-      .map((x) => { const q = pos.get(x)!; return Math.atan2(q.y - pp.y, q.x - pp.x); }).sort((a, b) => a - b);
-    const angleFor = new Map<number, number>();
-    if (occ.length === 0) {
-      lvs.forEach((lf, i) => angleFor.set(lf, (2 * Math.PI * i) / lvs.length - Math.PI / 2));
-    } else {
-      const gaps = occ.map((a, i) => ({ a, size: (i + 1 < occ.length ? occ[i + 1] : occ[0] + 2 * Math.PI) - a }));
-      gaps.sort((x, y) => y.size - x.size); // largest gaps first
-      const inGap: number[][] = gaps.map(() => []);
-      lvs.forEach((lf, i) => inGap[i % gaps.length].push(lf));
-      gaps.forEach((g, gi) => inGap[gi].forEach((lf, j) => angleFor.set(lf, g.a + (g.size * (j + 1)) / (inGap[gi].length + 1))));
-    }
-    for (const lf of lvs) {
-      const ang = angleFor.get(lf)!;
-      pos.set(lf, { x: pp.x + L * Math.cos(ang), y: pp.y + L * Math.sin(ang) });
-    }
-  }
 }
 
 // Rotation (radians) that makes the component's player spawns most symmetric about the vertical
