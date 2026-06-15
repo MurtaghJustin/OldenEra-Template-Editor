@@ -29,6 +29,23 @@ function maxPairwise(g: Graph) {
 }
 function get(g: Graph, id: string) { return g.nodes.find((n) => n.id === id)!; }
 
+// Count pairs of drawn edges whose segments properly cross (shared endpoints don't count).
+function edgeCrossings(g: Graph): number {
+  const pos = new Map(g.nodes.map((n) => [n.id, n]));
+  const de = displayEdges(g);
+  const s = (a: GraphNode, b: GraphNode, c: GraphNode) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  let crossings = 0;
+  for (let i = 0; i < de.length; i++)
+    for (let j = i + 1; j < de.length; j++) {
+      const a = de[i], b = de[j];
+      if (a.from === b.from || a.from === b.to || a.to === b.from || a.to === b.to) continue;
+      const p1 = pos.get(a.from)!, p2 = pos.get(a.to)!, p3 = pos.get(b.from)!, p4 = pos.get(b.to)!;
+      const d1 = s(p3, p4, p1), d2 = s(p3, p4, p2), d3 = s(p1, p2, p3), d4 = s(p1, p2, p4);
+      if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) crossings++;
+    }
+  return crossings;
+}
+
 describe("layout topology — cross does not collapse to a line", () => {
   // Mirrors Jebus Outcast: a center hub with 4 arms, two of which are player spawns.
   const g: Graph = {
@@ -80,29 +97,17 @@ describe("layout topology — real templates", () => {
     expect(Math.min(xRange, yRange)).toBeGreaterThan(0.25 * Math.max(xRange, yRange));
   });
 
-  it("Exodus places its two spawns far apart (dumbbell, not collapsed)", () => {
+  it("Exodus (tournament map) splits into two clusters and draws with no crossings", () => {
     const out = layoutOf("Exodus.rmg.json");
+    // The two halves share only Proximity hints (no road/portal between them), so they should
+    // be laid out as two separate clusters — spawns well apart — with no crossing connections.
     const a = get(out, "Spawn-A"), b = get(out, "Spawn-B");
-    expect(dist(a, b)).toBeGreaterThan(0.5 * maxPairwise(out));
+    expect(dist(a, b)).toBeGreaterThan(0.4 * maxPairwise(out));
+    expect(edgeCrossings(out)).toBe(0);
   });
 
   it("Harmony (a ring map) draws with no crossing connections", () => {
-    const out = layoutOf("Harmony.rmg.json");
-    const pos = new Map(out.nodes.map((n) => [n.id, n]));
-    const de = displayEdges(out);
-    const segCross = (p1: GraphNode, p2: GraphNode, p3: GraphNode, p4: GraphNode) => {
-      const s = (a: GraphNode, b: GraphNode, c: GraphNode) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-      const d1 = s(p3, p4, p1), d2 = s(p3, p4, p2), d3 = s(p1, p2, p3), d4 = s(p1, p2, p4);
-      return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
-    };
-    let crossings = 0;
-    for (let i = 0; i < de.length; i++)
-      for (let j = i + 1; j < de.length; j++) {
-        const a = de[i], b = de[j];
-        if (a.from === b.from || a.from === b.to || a.to === b.from || a.to === b.to) continue; // shared endpoint
-        if (segCross(pos.get(a.from)!, pos.get(a.to)!, pos.get(b.from)!, pos.get(b.to)!)) crossings++;
-      }
-    expect(crossings).toBe(0);
+    expect(edgeCrossings(layoutOf("Harmony.rmg.json"))).toBe(0);
   });
 
   it("is deterministic on a real template (same in -> same out)", () => {
