@@ -106,8 +106,10 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(out)).toBe(0);
   });
 
-  it("Harmony (a ring map) draws with no crossing connections", () => {
-    expect(edgeCrossings(layoutOf("Harmony.rmg.json"))).toBe(0);
+  it("Harmony (a ring map) is crossing-free with the two spawns level", () => {
+    const out = layoutOf("Harmony.rmg.json");
+    expect(edgeCrossings(out)).toBe(0);
+    expect(Math.abs(get(out, "Spawn-A").y - get(out, "Spawn-B").y)).toBeLessThan(2); // level
   });
 
   it("Blitz (a complex symmetric graph) draws with no crossing connections", () => {

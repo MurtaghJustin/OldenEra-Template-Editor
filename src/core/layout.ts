@@ -223,14 +223,17 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     const k = ringOrder.length;
     const R = L / (2 * Math.sin(Math.PI / k));
     const polygon = new Map<number, P>();
-    // Orient the ring: by default the first node sits at the top. If the ring carries 2+ player
-    // spawns, rotate so the first spawn sits at the left instead — for two opposite spawns (Eye of
-    // the Storm) that puts them level on left/right, the symmetric look the preview shows. Guarded
-    // to 2+ ring spawns so single-spawn rings (Exodus's diamonds) keep their orientation.
+    // Orient the ring: by default the first node sits at the top. If the ring carries exactly two
+    // player spawns, rotate so they sit LEVEL (same height) — placed symmetric about the vertical
+    // axis by rotating the near-bisector of their directions straight down (Harmony's hexagon/
+    // octagon, Eye of the Storm). Opposite spawns (bisector undefined) go to left/right. Single-
+    // spawn rings (Exodus's diamonds) keep the default orientation.
     let phase = -Math.PI / 2;
-    const firstSpawnSlot = ringOrder.findIndex((idx) => isSpawn[idx]);
-    if (firstSpawnSlot >= 0 && ringOrder.filter((idx) => isSpawn[idx]).length >= 2) {
-      phase = Math.PI - (2 * Math.PI * firstSpawnSlot) / k;
+    const spawnSlots = ringOrder.map((idx, slot) => (isSpawn[idx] ? slot : -1)).filter((s) => s >= 0);
+    if (spawnSlots.length === 2) {
+      const a1 = (2 * Math.PI * spawnSlots[0]) / k, a2 = (2 * Math.PI * spawnSlots[1]) / k;
+      const bx = Math.cos(a1) + Math.cos(a2), by = Math.sin(a1) + Math.sin(a2);
+      phase = Math.hypot(bx, by) > 1e-6 ? (3 * Math.PI) / 2 - Math.atan2(by, bx) : Math.PI - a1;
     }
     ringOrder.forEach((idx, slot) => {
       const angle = (2 * Math.PI * slot) / k + phase;
