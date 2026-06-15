@@ -7,16 +7,16 @@ import minimal from "../test-fixtures/minimal.rmg.json";
 beforeEach(() => useEditorStore.getState().loadFromText(JSON.stringify(minimal), "M.rmg.json"));
 
 describe("Toolbar", () => {
-  it("adds a zone of the selected type", () => {
+  it("Compute layout recomputes node positions", () => {
     render(<Toolbar />);
-    fireEvent.click(screen.getByText("Add zone"));
-    const names = useEditorStore.getState().root!.variants[0].zones.map((z) => z.name);
-    expect(names.some((n) => /^zone_/.test(n))).toBe(true);
+    fireEvent.click(screen.getByText("Compute layout"));
+    const positions = useEditorStore.getState().positions;
+    expect(Object.keys(positions).length).toBe(3); // one per zone in the minimal fixture
   });
 
   it("shows a dirty indicator after an edit", () => {
+    useEditorStore.getState().addZoneOfType("Z", "side", {});
     render(<Toolbar />);
-    fireEvent.click(screen.getByText("Add zone"));
     expect(screen.getByText(/unsaved/i)).toBeInTheDocument();
   });
 });

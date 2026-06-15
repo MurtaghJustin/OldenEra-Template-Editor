@@ -42,12 +42,19 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
   // tournament map like Exodus, which share only Proximity hints) come out as separate clusters.
   const seenSpring = new Set<string>();
   const springPairs: [number, number][] = [];
+  // Pairs that exert an actual SPRING FORCE: roads only (excludes Portal as well as Proximity). A
+  // Portal is a teleport — its two ends can sit anywhere on the map, so it must NOT pull the zones
+  // to road-adjacency. Portals stay in `springPairs` (so they keep zones in one connected component
+  // and contribute to ring/shape detection — dropping them entirely shatters portal-linked maps
+  // into scattered islands), but they're excluded here so the force pass never drags them together.
+  const forceKeys = new Set<string>();
   for (const e of g.edges) {
     const a = index.get(e.from), b = index.get(e.to);
     if (a === undefined || b === undefined || a === b) continue;
     if (e.connection.connectionType === "Proximity") continue;
     const key = a < b ? `${a}|${b}` : `${b}|${a}`;
     if (!seenSpring.has(key)) { seenSpring.add(key); springPairs.push([a, b]); }
+    if (e.connection.connectionType !== "Portal") forceKeys.add(key);
   }
 
   // Connected components of the ROAD graph (union-find): each is laid out on its own and packed
@@ -70,7 +77,7 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
   let packX = ORIGIN;
   for (const comp of components) {
     const members = [...comp].sort((a, b) => g.nodes[a].id.localeCompare(g.nodes[b].id));
-    layoutComponent(members, springPairs, isSpawn, pos);
+    layoutComponent(members, springPairs, forceKeys, isSpawn, pos);
 
     // Normalise to positive coords and pack components left-to-right.
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -143,14 +150,18 @@ function pathOrder(members: number[], adj: Map<number, number[]>, rank: Map<numb
   return order.length === members.length ? order : null;
 }
 
-function layoutComponent(members: number[], springPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
+function layoutComponent(members: number[], springPairs: [number, number][], forceKeys: Set<string>, isSpawn: boolean[], pos: P[]): void {
   const count = members.length;
   if (count === 1) { pos[members[0]] = { x: 0, y: 0 }; return; }
 
   const inComp = new Set(members);
-  // Road springs within this component (always non-empty: a multi-node road component is, by
-  // definition, connected by road edges).
+  // All drawn links within this component (roads + portals): used for adjacency/shape detection,
+  // the spectral seed, and crossing counting.
   const compEdges = springPairs.filter(([a, b]) => inComp.has(a) && inComp.has(b));
+  // The subset that exerts spring force — roads only (portals are excluded; see forceKeys above).
+  // The force pass uses this so portals don't pull their endpoints to road-adjacency, while shape
+  // detection / pinning above still treat portals as structure.
+  const forceEdges = compEdges.filter(([a, b]) => forceKeys.has(a < b ? `${a}|${b}` : `${b}|${a}`));
 
   // Decide the seed ORDER around the circle (the even polygon the forces settle into preserves
   // this cyclic order, so a good order yields a clean, crossing-free, symmetric layout).
@@ -295,7 +306,7 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   let best: Map<number, P> | null = null;
   let bestCrossings = Infinity;
   for (const cand of candidates) {
-    const result = simulate(members, compEdges, cand.tuck, count, cand.init, cand.pinned);
+    const result = simulate(members, forceEdges, cand.tuck, count, cand.init, cand.pinned);
     const crossings = countCrossings(compEdges, result);
     if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
     if (bestCrossings === 0) break; // can't do better than crossing-free

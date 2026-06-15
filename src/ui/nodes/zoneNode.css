@@ -1,0 +1,12 @@
+/* The connection handle is a 1px point at the disc centre so React Flow anchors edges dead-centre
+   (it places endpoints at the handle box edge, which for a 1px box is the centre). The grabbable
+   area is provided by a transparent ::before that extends ~23px in every direction, covering the
+   disc — so you can start a connection by dragging anywhere on a node without moving the anchor off
+   centre. getBoundingClientRect ignores the overflowing pseudo, so the measured handle stays 1px. */
+.zone-connect-handle.react-flow__handle::before {
+  content: "";
+  position: absolute;
+  inset: -23px;
+  border-radius: 50%;
+  cursor: crosshair;
+}

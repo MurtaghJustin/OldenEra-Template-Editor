@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { GraphCanvas } from "./GraphCanvas";
 import { useEditorStore } from "../state/store";
 import minimal from "../test-fixtures/minimal.rmg.json";
@@ -27,5 +27,22 @@ describe("GraphCanvas", () => {
     render(<GraphCanvas />);
     expect(screen.getByText("Hub")).toBeInTheDocument();
     expect(screen.getByText("Spawn-A")).toBeInTheDocument();
+  });
+
+  it("Delete removes the selected zone", () => {
+    render(<GraphCanvas />);
+    useEditorStore.getState().select({ kind: "zone", id: "Hub" });
+    fireEvent.keyDown(window, { key: "Delete" });
+    expect(useEditorStore.getState().graph?.nodes.some((n) => n.id === "Hub")).toBe(false);
+  });
+
+  it("Delete is ignored while focus is in a text field", () => {
+    render(<GraphCanvas />);
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    useEditorStore.getState().select({ kind: "zone", id: "Hub" });
+    fireEvent.keyDown(input, { key: "Delete" });
+    expect(useEditorStore.getState().graph?.nodes.some((n) => n.id === "Hub")).toBe(true);
+    input.remove();
   });
 });
