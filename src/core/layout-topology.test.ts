@@ -110,6 +110,10 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(layoutOf("Harmony.rmg.json"))).toBe(0);
   });
 
+  it("Blitz (a complex symmetric graph) draws with no crossing connections", () => {
+    expect(edgeCrossings(layoutOf("Blitz.rmg.json"))).toBe(0);
+  });
+
   it("Highway (a chain) folds into a compact shape, not a long line", () => {
     const out = layoutOf("Highway.rmg.json");
     const { xRange, yRange } = ranges(out);

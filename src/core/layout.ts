@@ -7,6 +7,7 @@ const KR = 300000;         // repulsion constant (Coulomb)
 const KG = 0.1;            // gravity toward component centroid (general compactness)
 const TUCK_GRAVITY = 8;    // gravity multiplier for pendants that should sit inside a loop
 const ITERATIONS = 400;
+const RESTARTS = 12;       // multi-start attempts; keep the layout with the fewest edge crossings
 const COMPONENT_GAP = 180; // horizontal gap between disconnected components
 const ORIGIN = 100;        // padding so all coordinates are positive
 const EPS = 0.01;
@@ -165,36 +166,83 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   }
 
   const radius = L * Math.max(1, Math.sqrt(count));
-  order.forEach((idx, slot) => {
-    const angle = (2 * Math.PI * slot) / count;
-    pos[idx].x = radius * Math.cos(angle);
-    pos[idx].y = radius * Math.sin(angle);
-  });
 
-  // Eades spring-electrical model: Hooke springs (linear, bounded — cannot explode) pull
-  // adjacent nodes toward the natural length L; Coulomb repulsion (KR/d², decays with distance)
-  // spreads all pairs. A per-iteration step cap with multiplicative cooling settles it.
+  // Multi-start: complex graphs (e.g. Blitz) get stuck in tangled local minima from a single seed.
+  // Run the simulation from several deterministic seeds and keep the layout with the fewest edge
+  // crossings. Trial 0 is the structured circle seed above, so clean shapes (rings, crosses,
+  // chains) keep their nice layout (trial 0 wins ties); later trials are pseudo-random restarts.
+  let best: Map<number, P> | null = null;
+  let bestCrossings = Infinity;
+  for (let trial = 0; trial < RESTARTS; trial++) {
+    const init = new Map<number, P>();
+    if (trial === 0) {
+      order.forEach((idx, slot) => {
+        const angle = (2 * Math.PI * slot) / count;
+        init.set(idx, { x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
+      });
+    } else {
+      for (const idx of members) {
+        init.set(idx, { x: (rand(idx, trial, 1) * 2 - 1) * radius, y: (rand(idx, trial, 2) * 2 - 1) * radius });
+      }
+    }
+    const result = simulate(members, compEdges, tuck, count, init);
+    const crossings = countCrossings(compEdges, result);
+    if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
+    if (bestCrossings === 0) break; // can't do better than crossing-free
+  }
+  for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
+}
+
+// Deterministic pseudo-random in [0,1) from integer inputs (no Math.random, so layouts stay
+// reproducible across runs — required for a stable preview image).
+function rand(a: number, b: number, c: number): number {
+  const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+// Number of drawn-edge pairs whose segments properly cross (shared endpoints don't count).
+function countCrossings(edges: [number, number][], pos: Map<number, P>): number {
+  const orient = (a: P, b: P, c: P) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  let n = 0;
+  for (let i = 0; i < edges.length; i++) {
+    for (let j = i + 1; j < edges.length; j++) {
+      const [a1, a2] = edges[i], [b1, b2] = edges[j];
+      if (a1 === b1 || a1 === b2 || a2 === b1 || a2 === b2) continue;
+      const p1 = pos.get(a1)!, p2 = pos.get(a2)!, p3 = pos.get(b1)!, p4 = pos.get(b2)!;
+      const d1 = orient(p3, p4, p1), d2 = orient(p3, p4, p2), d3 = orient(p1, p2, p3), d4 = orient(p1, p2, p4);
+      if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) n++;
+    }
+  }
+  return n;
+}
+
+// Eades spring-electrical relaxation from a given initial layout. Hooke springs (linear, bounded —
+// cannot explode) pull adjacent nodes toward the natural length L; Coulomb repulsion (KR/d²,
+// decays with distance) spreads all pairs; centroid gravity compacts and tucks loop-pendants.
+// A per-iteration step cap with multiplicative cooling settles it. Returns the final positions.
+function simulate(members: number[], compEdges: [number, number][], tuck: Set<number>, count: number, init: Map<number, P>): Map<number, P> {
+  const pos = new Map<number, P>(members.map((i) => [i, { x: init.get(i)!.x, y: init.get(i)!.y }]));
   const disp = new Map<number, P>(members.map((i) => [i, { x: 0, y: 0 }]));
   let step = L;
   for (let iter = 0; iter < ITERATIONS; iter++) {
     for (const d of disp.values()) { d.x = 0; d.y = 0; }
 
-    // Coulomb repulsion between every pair in the component.
     for (let p = 0; p < count; p++) {
       for (let q = p + 1; q < count; q++) {
         const i = members[p], j = members[q];
-        let dx = pos[i].x - pos[j].x, dy = pos[i].y - pos[j].y;
+        const pi = pos.get(i)!, pj = pos.get(j)!;
+        let dx = pi.x - pj.x, dy = pi.y - pj.y;
         let d = Math.hypot(dx, dy);
-        if (d < EPS) { dx = (p - q) * EPS; dy = EPS; d = Math.hypot(dx, dy); } // break exact overlaps deterministically
+        if (d < EPS) { dx = (p - q) * EPS; dy = EPS; d = Math.hypot(dx, dy); }
         const f = KR / (d * d), ux = dx / d, uy = dy / d;
         const di = disp.get(i)!, dj = disp.get(j)!;
         di.x += ux * f; di.y += uy * f;
         dj.x -= ux * f; dj.y -= uy * f;
       }
     }
-    // Hooke attraction along edges (f = ks*(d - L): pulls when stretched, pushes when compressed).
     for (const [a, b] of compEdges) {
-      let dx = pos[a].x - pos[b].x, dy = pos[a].y - pos[b].y;
+      const pa = pos.get(a)!, pb = pos.get(b)!;
+      let dx = pa.x - pb.x, dy = pa.y - pb.y;
       let d = Math.hypot(dx, dy);
       if (d < EPS) d = EPS;
       const f = KS * (d - L), ux = dx / d, uy = dy / d;
@@ -202,28 +250,22 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
       da.x -= ux * f; da.y -= uy * f;
       db.x += ux * f; db.y += uy * f;
     }
-    // Gravity toward the component centroid: pulls loosely-attached nodes (a pendant dangling off
-    // a loop) into the empty interior instead of out to the side, and keeps the whole component
-    // compact so it fits the square the game renders it in. Uniform, so it preserves symmetric
-    // shapes (a ring stays a ring, a cross a cross — just tighter).
     let cx = 0, cy = 0;
-    for (const i of members) { cx += pos[i].x; cy += pos[i].y; }
+    for (const i of members) { const pi = pos.get(i)!; cx += pi.x; cy += pi.y; }
     cx /= count; cy /= count;
     for (const i of members) {
-      const dd = disp.get(i)!;
-      const g = tuck.has(i) ? KG * TUCK_GRAVITY : KG; // pull loop-pendants firmly into the interior
-      dd.x += (cx - pos[i].x) * g;
-      dd.y += (cy - pos[i].y) * g;
+      const pi = pos.get(i)!, dd = disp.get(i)!;
+      const g = tuck.has(i) ? KG * TUCK_GRAVITY : KG;
+      dd.x += (cx - pi.x) * g; dd.y += (cy - pi.y) * g;
     }
-    // Apply displacement, capped by the current step size.
     for (const i of members) {
-      const dd = disp.get(i)!;
+      const pi = pos.get(i)!, dd = disp.get(i)!;
       const len = Math.hypot(dd.x, dd.y);
       if (len < EPS) continue;
       const lim = Math.min(len, step);
-      pos[i].x += (dd.x / len) * lim;
-      pos[i].y += (dd.y / len) * lim;
+      pi.x += (dd.x / len) * lim; pi.y += (dd.y / len) * lim;
     }
     step = Math.max(step * 0.97, 1);
   }
+  return pos;
 }
