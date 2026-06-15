@@ -110,6 +110,14 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(layoutOf("Harmony.rmg.json"))).toBe(0);
   });
 
+  it("Highway (a chain) folds into a compact shape, not a long line", () => {
+    const out = layoutOf("Highway.rmg.json");
+    const { xRange, yRange } = ranges(out);
+    // A straight chain would have one range ~0 (aspect huge); folded ~ square.
+    expect(Math.max(xRange, yRange) / Math.max(1, Math.min(xRange, yRange))).toBeLessThan(1.6);
+    expect(edgeCrossings(out)).toBe(0);
+  });
+
   it("Exodus tucks a loop's pendant zone inside the loop, not dangling outside", () => {
     const out = layoutOf("Exodus.rmg.json");
     const p = (id: string) => get(out, id);
