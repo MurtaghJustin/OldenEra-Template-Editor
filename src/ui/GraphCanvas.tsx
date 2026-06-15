@@ -18,7 +18,7 @@ export function GraphCanvas() {
   })), [graph]);
 
   const edges: Edge[] = useMemo(() => (graph ? displayEdges(graph) : []).map((e) => ({
-    id: e.id, source: e.from, target: e.to,
+    id: e.id, source: e.from, target: e.to, type: "straight",
     style: { stroke: e.connection.connectionType === "Portal" ? "#5b8fb9" : "#caa84a", strokeWidth: 2 },
   })), [graph]);
 
@@ -29,6 +29,7 @@ export function GraphCanvas() {
         onNodeClick={(_, n) => select({ kind: "zone", id: n.id })}
         onEdgeClick={(_, e) => select({ kind: "connection", id: e.id })}
         onConnect={(c: RfConn) => { if (c.source && c.target) addConn({ from: c.source, to: c.target, connectionType: "Direct", road: true }); }}
+        defaultEdgeOptions={{ type: "straight" }}
         fitView
       >
         <Background />
