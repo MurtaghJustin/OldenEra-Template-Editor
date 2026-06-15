@@ -301,6 +301,10 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     if (bestCrossings === 0) break; // can't do better than crossing-free
   }
 
+  // Safe swap refinement: try repositioning pairs of nodes to remove crossings, keeping only swaps
+  // that don't lengthen edges or overlap (so it can't bork the layout).
+  if (bestCrossings > 0) swapRefine(members, compEdges, best!);
+
   // Canonical orientation: rotate the whole component so its player spawns are symmetric about the
   // vertical axis (upright). Force-directed often lands a regular shape at an odd tilt — e.g.
   // Fair'n Square's spawns form a perfect square rotated ~23°. Rotation preserves the shape and
@@ -319,6 +323,50 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     }
   }
   for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
+}
+
+// Smallest distance between any two nodes — used to reject layouts that overlap discs.
+function minNodeDist(members: number[], pos: Map<number, P>): number {
+  let m = Infinity;
+  for (let i = 0; i < members.length; i++)
+    for (let j = i + 1; j < members.length; j++) {
+      const a = pos.get(members[i])!, b = pos.get(members[j])!;
+      m = Math.min(m, Math.hypot(a.x - b.x, a.y - b.y));
+    }
+  return m;
+}
+
+function maxEdgeLength(edges: [number, number][], pos: Map<number, P>): number {
+  let m = 0;
+  for (const [a, b] of edges) { const pa = pos.get(a)!, pb = pos.get(b)!; m = Math.max(m, Math.hypot(pa.x - pb.x, pa.y - pb.y)); }
+  return m;
+}
+
+// General, safe refinement: try swapping the positions of pairs of nodes and keep a swap only if
+// it STRICTLY reduces crossings without lengthening the longest edge or creating an overlap. This
+// can untangle awkward placements on any graph, and the guards make it impossible to trade a
+// crossing for a borked (long-edge / overlapping) layout. Mutates `pos`.
+function swapRefine(members: number[], edges: [number, number][], pos: Map<number, P>): void {
+  let crossings = countCrossings(edges, pos);
+  if (crossings === 0) return;
+  let maxLen = maxEdgeLength(edges, pos);
+  for (let pass = 0; pass < 2 && crossings > 0; pass++) {
+    let improved = false;
+    for (let i = 0; i < members.length; i++) {
+      for (let j = i + 1; j < members.length; j++) {
+        const a = members[i], b = members[j];
+        const pa = pos.get(a)!, pb = pos.get(b)!;
+        pos.set(a, pb); pos.set(b, pa); // tentatively swap positions
+        const nc = countCrossings(edges, pos);
+        if (nc < crossings && maxEdgeLength(edges, pos) <= maxLen + 1e-6 && minNodeDist(members, pos) >= 56) {
+          crossings = nc; maxLen = maxEdgeLength(edges, pos); improved = true;
+        } else {
+          pos.set(a, pa); pos.set(b, pb); // revert
+        }
+      }
+    }
+    if (!improved) break;
+  }
 }
 
 // Rotation (radians) that makes the component's player spawns most symmetric about the vertical

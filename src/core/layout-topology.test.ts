@@ -179,6 +179,20 @@ describe("layout topology — real templates", () => {
     expect(inside).toBe(true);
   });
 
+  it("swap refinement: no layout has overlapping discs and Hallway untangles to <=1 crossing", () => {
+    // The guarded swap-refine pass only removes crossings; it never lengthens edges or overlaps
+    // discs. Verify the overlap guarantee holds across every shipped template, and that the pass
+    // actually untangles Hallway's caterpillar core from 2 crossings down to at most 1.
+    const files = ["Hallway.rmg.json", "Clover.rmg.json", "Full Hire.rmg.json", "Spider.rmg.json", "Diamond.rmg.json"];
+    for (const f of files) {
+      const out = layoutOf(f);
+      for (let i = 0; i < out.nodes.length; i++)
+        for (let j = i + 1; j < out.nodes.length; j++)
+          expect(dist(out.nodes[i], out.nodes[j])).toBeGreaterThan(55);
+    }
+    expect(edgeCrossings(layoutOf("Hallway.rmg.json"))).toBeLessThanOrEqual(1);
+  });
+
   it("is deterministic on a real template (same in -> same out)", () => {
     const a = layoutOf("Exodus.rmg.json").nodes.map((n) => [n.id, Math.round(n.x), Math.round(n.y)]);
     const b = layoutOf("Exodus.rmg.json").nodes.map((n) => [n.id, Math.round(n.x), Math.round(n.y)]);
