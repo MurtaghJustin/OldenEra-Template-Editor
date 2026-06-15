@@ -4,6 +4,8 @@ import type { Variant } from "./types";
 const L = 160;             // natural spring length (ideal edge length)
 const KS = 0.08;           // spring stiffness (Hooke attraction)
 const KR = 300000;         // repulsion constant (Coulomb)
+const KG = 0.1;            // gravity toward component centroid (general compactness)
+const TUCK_GRAVITY = 8;    // gravity multiplier for pendants that should sit inside a loop
 const ITERATIONS = 400;
 const COMPONENT_GAP = 180; // horizontal gap between disconnected components
 const ORIGIN = 100;        // padding so all coordinates are positive
@@ -85,6 +87,23 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
   return g;
 }
 
+// The 2-core: nodes remaining after iteratively stripping degree-1 nodes — i.e. those that lie
+// on a cycle. Empty for trees/stars/chains.
+function twoCore(members: number[], adj: Map<number, number[]>): Set<number> {
+  const deg = new Map(members.map((m) => [m, adj.get(m)!.length]));
+  const removed = new Set<number>();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const m of members) {
+      if (removed.has(m) || deg.get(m)! > 1) continue;
+      removed.add(m); changed = true;
+      for (const nb of adj.get(m)!) if (!removed.has(nb)) deg.set(nb, deg.get(nb)! - 1);
+    }
+  }
+  return new Set(members.filter((m) => !removed.has(m)));
+}
+
 function layoutComponent(members: number[], springPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
   const count = members.length;
   if (count === 1) { pos[members[0]] = { x: 0, y: 0 }; return; }
@@ -99,6 +118,13 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   const adj = new Map<number, number[]>(members.map((m) => [m, []]));
   for (const [a, b] of compEdges) { adj.get(a)!.push(b); adj.get(b)!.push(a); }
   const rank = new Map<number, number>(members.map((m, i) => [m, i]));
+
+  // "Tuck-in" pendants: a degree-1 zone hanging off a node that's part of a cycle (the 2-core).
+  // These dangle outward under plain force-directed but should sit INSIDE the loop to use space
+  // and fit the rectangle. Star arms (Jebus) are degree-1 too, but their hub is NOT in any cycle
+  // (empty 2-core), so they're correctly excluded and stay spread out.
+  const core = twoCore(members, adj);
+  const tuck = new Set<number>(members.filter((m) => adj.get(m)!.length === 1 && core.has(adj.get(m)![0])));
 
   let order: number[];
   const isStar = members.some((m) => adj.get(m)!.length === count - 1);
@@ -173,6 +199,19 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
       const da = disp.get(a)!, db = disp.get(b)!;
       da.x -= ux * f; da.y -= uy * f;
       db.x += ux * f; db.y += uy * f;
+    }
+    // Gravity toward the component centroid: pulls loosely-attached nodes (a pendant dangling off
+    // a loop) into the empty interior instead of out to the side, and keeps the whole component
+    // compact so it fits the square the game renders it in. Uniform, so it preserves symmetric
+    // shapes (a ring stays a ring, a cross a cross — just tighter).
+    let cx = 0, cy = 0;
+    for (const i of members) { cx += pos[i].x; cy += pos[i].y; }
+    cx /= count; cy /= count;
+    for (const i of members) {
+      const dd = disp.get(i)!;
+      const g = tuck.has(i) ? KG * TUCK_GRAVITY : KG; // pull loop-pendants firmly into the interior
+      dd.x += (cx - pos[i].x) * g;
+      dd.y += (cy - pos[i].y) * g;
     }
     // Apply displacement, capped by the current step size.
     for (const i of members) {

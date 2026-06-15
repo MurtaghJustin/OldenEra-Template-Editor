@@ -110,6 +110,22 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(layoutOf("Harmony.rmg.json"))).toBe(0);
   });
 
+  it("Exodus tucks a loop's pendant zone inside the loop, not dangling outside", () => {
+    const out = layoutOf("Exodus.rmg.json");
+    const p = (id: string) => get(out, id);
+    // The A-half is a 4-cycle (diamond) with Center-SuperTreasure-A hanging off one corner.
+    const poly = [p("Spawn-A"), p("Spawn-A-Treasure-1"), p("Center-Treasure-A"), p("Spawn-A-Treasure-2")];
+    const pt = p("Center-SuperTreasure-A");
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      if (((poly[i].y > pt.y) !== (poly[j].y > pt.y)) &&
+          (pt.x < ((poly[j].x - poly[i].x) * (pt.y - poly[i].y)) / (poly[j].y - poly[i].y) + poly[i].x)) {
+        inside = !inside;
+      }
+    }
+    expect(inside).toBe(true);
+  });
+
   it("is deterministic on a real template (same in -> same out)", () => {
     const a = layoutOf("Exodus.rmg.json").nodes.map((n) => [n.id, Math.round(n.x), Math.round(n.y)]);
     const b = layoutOf("Exodus.rmg.json").nodes.map((n) => [n.id, Math.round(n.x), Math.round(n.y)]);
