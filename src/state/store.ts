@@ -53,7 +53,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   loadFromText(text, fileName) {
     const root = parseTemplate(text);
-    set({ original: cloneRaw(root), root, fileName, variantIndex: 0, dirty: false, selection: null });
+    set({ original: cloneRaw(root), root, fileName, variantIndex: 0, dirty: false, selection: null, issues: [] });
     get().refresh();
   },
 
@@ -61,9 +61,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   refresh() {
     const { root, variantIndex } = get();
-    if (!root) return;
+    if (!root || !root.variants[variantIndex]) return;
     const graph = autoLayout(extractGraph(root, variantIndex), root.variants[variantIndex]);
-    set({ graph, issues: validateTemplate(root, variantIndex) });
+    // Bump the `root` reference (shallow clone) so components subscribing to `s.root`
+    // re-render after in-place mutations. Every mutation path funnels through refresh(),
+    // including the inspector panels that mutate root directly. Nested data is shared, so
+    // serializeForSave's mergeEdits still sees the edits; `original` stays a separate clone.
+    set({ root: { ...root }, graph, issues: validateTemplate(root, variantIndex) });
   },
 
   addZoneOfType(name, typeId, overrides) {
@@ -100,7 +104,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   updateZone(name, patch) {
     const { root, variantIndex } = get(); if (!root) return;
     const z = root.variants[variantIndex].zones.find((zz) => zz.name === name);
-    if (z) Object.assign(z, patch);
+    // Renames must go through renameZoneById (it also rewrites connection endpoints);
+    // strip any `name` from the patch so updateZone can't silently break the graph.
+    if (z) { const { name: _ignore, ...safe } = patch; Object.assign(z, safe); }
     set({ dirty: true }); get().refresh();
   },
 
