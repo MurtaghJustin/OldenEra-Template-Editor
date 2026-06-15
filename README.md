@@ -15,7 +15,7 @@ On localhost, Open/Save use the File System Access API where supported.
 cd editor
 npm run build
 ```
-Open `dist/index.html` directly in a browser (`file://`). Loading uses a file picker; Save and Export PNG download files.
+This produces a **single self-contained `dist/index.html`** (JS + CSS inlined via `vite-plugin-singlefile`). Open it directly in a browser by double-clicking (`file://`) — no server needed; external module scripts are blocked over `file://`, so inlining is what makes double-click work. Loading uses a file picker; Save and Export PNG download files.
 
 ## Regenerate catalogs
 ```
