@@ -8,6 +8,7 @@ const KG = 0.1;            // gravity toward component centroid (general compact
 const TUCK_GRAVITY = 8;    // gravity multiplier for pendants that should sit inside a loop
 const ITERATIONS = 400;
 const SPECTRAL_ITERS = 500; // power-iteration steps for the spectral (Laplacian eigenvector) seed
+const RANDOM_RESTARTS = 16;  // deterministic random fallback seeds for graphs the seeds can't untangle
 const COMPONENT_GAP = 180; // horizontal gap between disconnected components
 const ORIGIN = 100;        // padding so all coordinates are positive
 const EPS = 0.01;
@@ -183,6 +184,14 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   const candidates: { init: Map<number, P>; tuck: Set<number> }[] = [{ init: structured, tuck }];
   const spec = spectralSeed(members, compEdges, count);
   if (spec) candidates.push({ init: spec, tuck: new Set() });
+  // Deterministic random restarts as a FALLBACK (tried after the structured & spectral seeds, so
+  // those win ties and keep their symmetric layouts). These rescue graphs neither seed untangles
+  // — e.g. Clover, whose broken 4-fold symmetry defeats the spectral embedding.
+  for (let t = 1; t <= RANDOM_RESTARTS; t++) {
+    const init = new Map<number, P>();
+    for (const idx of members) init.set(idx, { x: (rand(idx, t, 1) * 2 - 1) * radius, y: (rand(idx, t, 2) * 2 - 1) * radius });
+    candidates.push({ init, tuck: new Set() });
+  }
 
   let best: Map<number, P> | null = null;
   let bestCrossings = Infinity;
@@ -193,6 +202,13 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
     if (bestCrossings === 0) break; // can't do better than crossing-free
   }
   for (const idx of members) { pos[idx].x = best!.get(idx)!.x; pos[idx].y = best!.get(idx)!.y; }
+}
+
+// Deterministic pseudo-random in [0,1) from integer inputs (no Math.random, so layouts stay
+// reproducible across runs — required for a stable preview image).
+function rand(a: number, b: number, c: number): number {
+  const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453;
+  return v - Math.floor(v);
 }
 
 // Spectral seed: positions from the 2nd & 3rd smallest eigenvectors of the graph Laplacian
