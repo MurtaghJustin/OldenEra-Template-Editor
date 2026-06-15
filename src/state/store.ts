@@ -7,7 +7,7 @@ import {
   addZone,
   removeZone,
   addConnection,
-  removeConnection,
+  removeConnectionsForPair,
   renameZone,
   type Graph,
 } from "../core/graph";
@@ -98,7 +98,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   removeConn(id) {
     const { root, variantIndex } = get(); if (!root) return;
-    removeConnection(root, variantIndex, id);
+    removeConnectionsForPair(root, variantIndex, id);
     set({ dirty: true, selection: null }); get().refresh();
   },
 

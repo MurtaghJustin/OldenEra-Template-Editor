@@ -1,4 +1,4 @@
-import type { Graph, TreasureTier } from "./graph";
+import { displayEdges, type Graph, type TreasureTier } from "./graph";
 
 export const PREVIEW_SIZE = 512;
 const DISC_R = 26;
@@ -34,8 +34,8 @@ export function renderPreview(ctx: CanvasRenderingContext2D, g: Graph, opt: Prev
   const tx = (x: number) => ox + (x - b.minX) * scale;
   const ty = (y: number) => oy + (y - b.minY) * scale;
 
-  // Edges first.
-  for (const e of g.edges) {
+  // Edges first (deduped road links only — see displayEdges).
+  for (const e of displayEdges(g)) {
     const a = g.nodes.find((n) => n.id === e.from), c = g.nodes.find((n) => n.id === e.to);
     if (!a || !c) continue;
     ctx.strokeStyle = e.connection.connectionType === "Portal"

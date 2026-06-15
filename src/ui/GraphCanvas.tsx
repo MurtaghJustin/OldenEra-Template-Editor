@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { ReactFlow, Background, Controls, type Node, type Edge, type Connection as RfConn } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useEditorStore } from "../state/store";
+import { displayEdges } from "../core/graph";
 import { ZoneNode } from "./nodes/ZoneNode";
 
 const nodeTypes = { zone: ZoneNode };
@@ -16,7 +17,7 @@ export function GraphCanvas() {
     data: { label: n.id, playerSlot: n.playerSlot, hasTown: n.hasTown, tier: n.tier },
   })), [graph]);
 
-  const edges: Edge[] = useMemo(() => (graph?.edges ?? []).map((e) => ({
+  const edges: Edge[] = useMemo(() => (graph ? displayEdges(graph) : []).map((e) => ({
     id: e.id, source: e.from, target: e.to,
     style: { stroke: e.connection.connectionType === "Portal" ? "#5b8fb9" : "#caa84a", strokeWidth: 2 },
   })), [graph]);
