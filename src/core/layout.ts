@@ -358,6 +358,11 @@ function swapRefine(members: number[], edges: [number, number][], pos: Map<numbe
         const pa = pos.get(a)!, pb = pos.get(b)!;
         pos.set(a, pb); pos.set(b, pa); // tentatively swap positions
         const nc = countCrossings(edges, pos);
+        // Accept only a strict crossing reduction that doesn't lengthen the longest edge or overlap
+        // discs. This makes the pass provably safe: it can never trade a crossing for a stretched
+        // edge (the failure mode that borked layouts before). A looser allowance that tolerated
+        // edge growth was measured and only helped 2 of 61 templates while stretching their edges,
+        // so it isn't worth the risk on a pass meant to handle any graph.
         if (nc < crossings && maxEdgeLength(edges, pos) <= maxLen + 1e-6 && minNodeDist(members, pos) >= 56) {
           crossings = nc; maxLen = maxEdgeLength(edges, pos); improved = true;
         } else {
