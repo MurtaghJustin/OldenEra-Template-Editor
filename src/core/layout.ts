@@ -124,7 +124,9 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   // and fit the rectangle. Star arms (Jebus) are degree-1 too, but their hub is NOT in any cycle
   // (empty 2-core), so they're correctly excluded and stay spread out.
   const core = twoCore(members, adj);
-  const tuck = new Set<number>(members.filter((m) => adj.get(m)!.length === 1 && core.has(adj.get(m)![0])));
+  // Player spawns are excluded: they're player starts and belong on the periphery, never sucked
+  // into a loop interior (e.g. Christmas Tree's apex spawn hangs off a dense grid with no room).
+  const tuck = new Set<number>(members.filter((m) => !isSpawn[m] && adj.get(m)!.length === 1 && core.has(adj.get(m)![0])));
 
   let order: number[];
   const isStar = members.some((m) => adj.get(m)!.length === count - 1);
