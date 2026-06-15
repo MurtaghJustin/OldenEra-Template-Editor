@@ -30,6 +30,7 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
 
   const index = new Map<string, number>();
   g.nodes.forEach((nd, i) => index.set(nd.id, i));
+  const isSpawn = g.nodes.map((nd) => nd.playerSlot !== undefined);
 
   // Two deduped, undirected, self-loop-free pair sets:
   //  - springPairs: only the drawn ROAD graph (everything except Proximity). These are the
@@ -70,7 +71,7 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
   let packX = ORIGIN;
   for (const comp of components) {
     const members = [...comp].sort((a, b) => g.nodes[a].id.localeCompare(g.nodes[b].id));
-    layoutComponent(members, springPairs, allPairs, pos);
+    layoutComponent(members, springPairs, allPairs, isSpawn, pos);
 
     // Normalise to positive coords and pack components left-to-right.
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -89,7 +90,7 @@ export function autoLayout(g: Graph, _variant?: Variant): Graph {
   return g;
 }
 
-function layoutComponent(members: number[], springPairs: [number, number][], allPairs: [number, number][], pos: P[]): void {
+function layoutComponent(members: number[], springPairs: [number, number][], allPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
   const count = members.length;
   if (count === 1) { pos[members[0]] = { x: 0, y: 0 }; return; }
 
@@ -99,12 +100,28 @@ function layoutComponent(members: number[], springPairs: [number, number][], all
   let compEdges = springPairs.filter(([a, b]) => inComp.has(a) && inComp.has(b));
   if (compEdges.length === 0) compEdges = allPairs.filter(([a, b]) => inComp.has(a) && inComp.has(b));
 
-  // Seed on a circle (deterministic), radius scaled by component size.
+  // Seed on a circle (deterministic), ordering members so player spawns are spread as evenly
+  // as possible around it. The even polygon that the forces settle into preserves this cyclic
+  // order, so spawns end up opposite (2 players) or evenly distributed (more), with other zones
+  // between them — rather than clustered together. This is a gentle tie-breaker: where real road
+  // structure exists, the forces override it; it mainly shapes otherwise-symmetric maps.
+  const spawns = members.filter((i) => isSpawn[i]);
+  const others = members.filter((i) => !isSpawn[i]);
+  const order: number[] = new Array(count);
+  const taken = new Array(count).fill(false);
+  spawns.forEach((idx, s) => {
+    let slot = Math.round((s * count) / spawns.length) % count;
+    while (taken[slot]) slot = (slot + 1) % count;
+    taken[slot] = true; order[slot] = idx;
+  });
+  let oi = 0;
+  for (let slot = 0; slot < count; slot++) if (!taken[slot]) order[slot] = others[oi++];
+
   const radius = L * Math.max(1, Math.sqrt(count));
-  members.forEach((i, p) => {
-    const angle = (2 * Math.PI * p) / count;
-    pos[i].x = radius * Math.cos(angle);
-    pos[i].y = radius * Math.sin(angle);
+  order.forEach((idx, slot) => {
+    const angle = (2 * Math.PI * slot) / count;
+    pos[idx].x = radius * Math.cos(angle);
+    pos[idx].y = radius * Math.sin(angle);
   });
 
   // Eades spring-electrical model: Hooke springs (linear, bounded — cannot explode) pull
