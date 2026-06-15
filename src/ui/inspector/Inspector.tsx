@@ -3,6 +3,7 @@ import { ZonePanel } from "./ZonePanel";
 import { ConnectionPanel } from "./ConnectionPanel";
 import { GameRulesPanel } from "./GameRulesPanel";
 import { GlobalBansPanel } from "./GlobalBansPanel";
+import { NodeTypesPanel } from "./NodeTypesPanel";
 
 export function Inspector() {
   const selection = useEditorStore((s) => s.selection);
@@ -12,5 +13,6 @@ export function Inspector() {
     case "connection": return <div style={{ padding: 12 }}><ConnectionPanel key={selection.id} connId={selection.id} /></div>;
     case "gameRules": return <div style={{ padding: 12 }}><GameRulesPanel /></div>;
     case "globalBans": return <div style={{ padding: 12 }}><GlobalBansPanel /></div>;
+    case "nodeTypes": return <div style={{ padding: 12 }}><NodeTypesPanel /></div>;
   }
 }

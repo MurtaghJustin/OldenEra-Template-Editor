@@ -21,6 +21,7 @@ export type Selection =
   | { kind: "connection"; id: string }
   | { kind: "gameRules" }
   | { kind: "globalBans" }
+  | { kind: "nodeTypes" }
   | null;
 
 interface EditorState {

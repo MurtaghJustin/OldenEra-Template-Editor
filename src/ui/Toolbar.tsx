@@ -47,6 +47,7 @@ export function Toolbar() {
       <button onClick={onAddZone}>Add zone</button>
       <button onClick={() => select({ kind: "gameRules" })}>Game rules</button>
       <button onClick={() => select({ kind: "globalBans" })}>Global bans</button>
+      <button onClick={() => select({ kind: "nodeTypes" })}>Node types</button>
       <span style={{ marginLeft: "auto", opacity: 0.7 }}>
         {fileName}{dirty ? " • unsaved" : ""}
       </span>
