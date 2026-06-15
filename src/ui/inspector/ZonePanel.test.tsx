@@ -18,7 +18,7 @@ describe("ZonePanel", () => {
   it("renames a zone", () => {
     render(<ZonePanel zoneName="Hub" />);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Center" } });
-    fireEvent.blur(screen.getByLabelText("Name"));
+    fireEvent.click(screen.getByText("Apply name"));
     expect(useEditorStore.getState().root!.variants[0].zones.some((z) => z.name === "Center")).toBe(true);
   });
 });
