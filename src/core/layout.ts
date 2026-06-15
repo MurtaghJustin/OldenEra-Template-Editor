@@ -106,6 +106,26 @@ function twoCore(members: number[], adj: Map<number, number[]>): Set<number> {
   return new Set(members.filter((m) => !removed.has(m)));
 }
 
+// If the 2-core is a single simple cycle (every core node has exactly two core neighbours, all in
+// one loop), return the nodes in cycle order; otherwise null. Used to pin the loop on a perfect
+// regular polygon. Deterministic: start at the lowest-id node, break the first fork by id rank.
+function simpleCycleOrder(core: Set<number>, adj: Map<number, number[]>, rank: Map<number, number>): number[] | null {
+  if (core.size < 3) return null;
+  const cadj = new Map<number, number[]>();
+  for (const m of core) cadj.set(m, adj.get(m)!.filter((x) => core.has(x)));
+  for (const m of core) if (cadj.get(m)!.length !== 2) return null;
+  const start = [...core].reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
+  const order = [start]; const seen = new Set([start]);
+  let prev = -1, cur = start;
+  while (order.length < core.size) {
+    const cand = cadj.get(cur)!.filter((x) => x !== prev && !seen.has(x));
+    if (!cand.length) break;
+    const next = cand.reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
+    order.push(next); seen.add(next); prev = cur; cur = next;
+  }
+  return order.length === core.size ? order : null;
+}
+
 function layoutComponent(members: number[], springPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
   const count = members.length;
   if (count === 1) { pos[members[0]] = { x: 0, y: 0 }; return; }
@@ -173,30 +193,57 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   // the clean ring/cross/chain layouts. The spectral seed (Laplacian eigenvectors) places nodes by
   // graph structure, so symmetric/grid graphs (Blitz, Full Hire, Hallway) come out symmetric and
   // untangled rather than landing in an arbitrary local minimum.
+  // Tuck (pulling loop-pendants inside) helps the structured layout but disrupts the spectral one,
+  // which already places nodes by structure (forcing pendants inward there just tangles dense
+  // cores, e.g. Hallway). So tuck applies only to the structured/polygon candidates.
+  const candidates: { init: Map<number, P>; tuck: Set<number>; pinned: Set<number> }[] = [];
+
+  // If the cycle core is a single simple loop (Exodus's 4-cycle, Harmony's 8-cycle), PIN those
+  // nodes on a perfect regular polygon — exactly even edges & angles, instead of the slightly
+  // irregular, slightly-tilted approximation force-directed produces (which reads as "wonky").
+  // Pendants/branches then settle around the fixed polygon (loop-pendants tuck to the centre).
+  const cycleOrder = simpleCycleOrder(core, adj, rank);
+  if (cycleOrder) {
+    const k = cycleOrder.length;
+    const R = L / (2 * Math.sin(Math.PI / k));
+    const polygon = new Map<number, P>();
+    cycleOrder.forEach((idx, slot) => {
+      const angle = (2 * Math.PI * slot) / k - Math.PI / 2; // first node at top (deterministic)
+      polygon.set(idx, { x: R * Math.cos(angle), y: R * Math.sin(angle) });
+    });
+    let o = 0.1;
+    for (const m of members) {
+      if (polygon.has(m)) continue;
+      const cn = adj.get(m)!.filter((x) => polygon.has(x)); // seed near its attachment on the ring
+      let bx = 0, by = 0;
+      if (cn.length) { for (const nb of cn) { bx += polygon.get(nb)!.x; by += polygon.get(nb)!.y; } bx /= cn.length; by /= cn.length; }
+      polygon.set(m, { x: bx + Math.cos(o), y: by + Math.sin(o) });
+      o += 1.7;
+    }
+    candidates.push({ init: polygon, tuck, pinned: new Set(cycleOrder) });
+  }
+
   const structured = new Map<number, P>();
   order.forEach((idx, slot) => {
     const angle = (2 * Math.PI * slot) / count;
     structured.set(idx, { x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
   });
-  // Tuck (pulling loop-pendants inside) helps the structured layout but disrupts the spectral one,
-  // which already places nodes by structure (forcing pendants inward there just tangles dense
-  // cores, e.g. Hallway). So tuck applies only to the structured candidate.
-  const candidates: { init: Map<number, P>; tuck: Set<number> }[] = [{ init: structured, tuck }];
+  candidates.push({ init: structured, tuck, pinned: new Set() });
+
   const spec = spectralSeed(members, compEdges, count);
-  if (spec) candidates.push({ init: spec, tuck: new Set() });
-  // Deterministic random restarts as a FALLBACK (tried after the structured & spectral seeds, so
-  // those win ties and keep their symmetric layouts). These rescue graphs neither seed untangles
-  // — e.g. Clover, whose broken 4-fold symmetry defeats the spectral embedding.
+  if (spec) candidates.push({ init: spec, tuck: new Set(), pinned: new Set() });
+  // Deterministic random restarts as a FALLBACK (tried after the seeds above, so those win ties and
+  // keep their clean layouts). These rescue graphs none of the seeds untangle — e.g. Clover.
   for (let t = 1; t <= RANDOM_RESTARTS; t++) {
     const init = new Map<number, P>();
     for (const idx of members) init.set(idx, { x: (rand(idx, t, 1) * 2 - 1) * radius, y: (rand(idx, t, 2) * 2 - 1) * radius });
-    candidates.push({ init, tuck: new Set() });
+    candidates.push({ init, tuck: new Set(), pinned: new Set() });
   }
 
   let best: Map<number, P> | null = null;
   let bestCrossings = Infinity;
   for (const cand of candidates) {
-    const result = simulate(members, compEdges, cand.tuck, count, cand.init);
+    const result = simulate(members, compEdges, cand.tuck, count, cand.init, cand.pinned);
     const crossings = countCrossings(compEdges, result);
     if (crossings < bestCrossings) { bestCrossings = crossings; best = result; }
     if (bestCrossings === 0) break; // can't do better than crossing-free
@@ -267,7 +314,8 @@ function countCrossings(edges: [number, number][], pos: Map<number, P>): number 
 // cannot explode) pull adjacent nodes toward the natural length L; Coulomb repulsion (KR/d²,
 // decays with distance) spreads all pairs; centroid gravity compacts and tucks loop-pendants.
 // A per-iteration step cap with multiplicative cooling settles it. Returns the final positions.
-function simulate(members: number[], compEdges: [number, number][], tuck: Set<number>, count: number, init: Map<number, P>): Map<number, P> {
+// `pinned` nodes still exert forces but never move (used to hold a cycle on a fixed polygon).
+function simulate(members: number[], compEdges: [number, number][], tuck: Set<number>, count: number, init: Map<number, P>, pinned: Set<number>): Map<number, P> {
   const pos = new Map<number, P>(members.map((i) => [i, { x: init.get(i)!.x, y: init.get(i)!.y }]));
   const disp = new Map<number, P>(members.map((i) => [i, { x: 0, y: 0 }]));
   let step = L;
@@ -306,6 +354,7 @@ function simulate(members: number[], compEdges: [number, number][], tuck: Set<nu
       dd.x += (cx - pi.x) * g; dd.y += (cy - pi.y) * g;
     }
     for (const i of members) {
+      if (pinned.has(i)) continue; // held fixed (e.g. on a regular polygon)
       const pi = pos.get(i)!, dd = disp.get(i)!;
       const len = Math.hypot(dd.x, dd.y);
       if (len < EPS) continue;
