@@ -127,6 +127,18 @@ describe("layout topology — real templates", () => {
     expect(edgeCrossings(out)).toBe(0);
   });
 
+  it("Eye of the Storm (a wheel) is a regular hexagon with level, symmetric spawns", () => {
+    const out = layoutOf("Eye of the Storm.rmg.json");
+    const rim = ["Side-A1", "Side-B1", "Spawn-B", "Side-B2", "Side-A2", "Spawn-A"].map((id) => get(out, id));
+    const sides = rim.map((n, i) => dist(n, rim[(i + 1) % rim.length]));
+    expect(Math.max(...sides) - Math.min(...sides)).toBeLessThan(2); // regular hexagon
+    const a = get(out, "Spawn-A"), b = get(out, "Spawn-B");
+    expect(Math.abs(a.y - b.y)).toBeLessThan(2); // spawns level (same height)
+    const center = get(out, "Center");
+    const cx = rim.reduce((s, n) => s + n.x, 0) / rim.length, cy = rim.reduce((s, n) => s + n.y, 0) / rim.length;
+    expect(Math.hypot(center.x - cx, center.y - cy)).toBeLessThan(2); // hub dead-centre
+  });
+
   it("Exodus's 4-cycle is a perfect regular polygon (equal sides)", () => {
     const out = layoutOf("Exodus.rmg.json");
     const p = (id: string) => get(out, id);

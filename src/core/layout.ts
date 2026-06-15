@@ -106,24 +106,23 @@ function twoCore(members: number[], adj: Map<number, number[]>): Set<number> {
   return new Set(members.filter((m) => !removed.has(m)));
 }
 
-// If the 2-core is a single simple cycle (every core node has exactly two core neighbours, all in
-// one loop), return the nodes in cycle order; otherwise null. Used to pin the loop on a perfect
-// regular polygon. Deterministic: start at the lowest-id node, break the first fork by id rank.
-function simpleCycleOrder(core: Set<number>, adj: Map<number, number[]>, rank: Map<number, number>): number[] | null {
-  if (core.size < 3) return null;
-  const cadj = new Map<number, number[]>();
-  for (const m of core) cadj.set(m, adj.get(m)!.filter((x) => core.has(x)));
-  for (const m of core) if (cadj.get(m)!.length !== 2) return null;
-  const start = [...core].reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
+// If `nodes` form a single simple cycle under the given within-set adjacency (every node has
+// exactly two neighbours, all in one loop), return them in cycle order; otherwise null. Used to
+// pin a ring on a perfect regular polygon. Deterministic: start at the lowest-id node, break the
+// first fork by id rank.
+function walkCycle(nodes: number[], cadj: Map<number, number[]>, rank: Map<number, number>): number[] | null {
+  if (nodes.length < 3) return null;
+  for (const m of nodes) if ((cadj.get(m)?.length ?? 0) !== 2) return null;
+  const start = nodes.reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
   const order = [start]; const seen = new Set([start]);
   let prev = -1, cur = start;
-  while (order.length < core.size) {
+  while (order.length < nodes.length) {
     const cand = cadj.get(cur)!.filter((x) => x !== prev && !seen.has(x));
     if (!cand.length) break;
     const next = cand.reduce((a, b) => (rank.get(a)! <= rank.get(b)! ? a : b));
     order.push(next); seen.add(next); prev = cur; cur = next;
   }
-  return order.length === core.size ? order : null;
+  return order.length === nodes.length ? order : null;
 }
 
 function layoutComponent(members: number[], springPairs: [number, number][], isSpawn: boolean[], pos: P[]): void {
@@ -198,19 +197,46 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
   // cores, e.g. Hallway). So tuck applies only to the structured/polygon candidates.
   const candidates: { init: Map<number, P>; tuck: Set<number>; pinned: Set<number> }[] = [];
 
-  // If the cycle core is a single simple loop (Exodus's 4-cycle, Harmony's 8-cycle), PIN those
-  // nodes on a perfect regular polygon — exactly even edges & angles, instead of the slightly
-  // irregular, slightly-tilted approximation force-directed produces (which reads as "wonky").
-  // Pendants/branches then settle around the fixed polygon (loop-pendants tuck to the centre).
-  const cycleOrder = simpleCycleOrder(core, adj, rank);
-  if (cycleOrder) {
-    const k = cycleOrder.length;
+  // Pin a recognizable ring on a perfect regular polygon (exactly even edges & angles), instead of
+  // the slightly-irregular, slightly-tilted approximation force-directed produces (which reads as
+  // "wonky"). Two cases:
+  //  (a) the cycle core is itself a single simple loop (Exodus's 4-cycle, Harmony's 8-cycle);
+  //  (b) a WHEEL — one hub joined to every other node, the rest forming a ring (Eye of the Storm):
+  //      the rim becomes the polygon and the hub is pinned dead-centre.
+  // Remaining pendants/branches settle around the fixed ring (loop-pendants tuck to the centre).
+  let ringOrder: number[] | null = null;
+  let centerNodes: number[] = [];
+  const coreNodes = [...core];
+  const coreAdj = new Map(coreNodes.map((m) => [m, adj.get(m)!.filter((x) => core.has(x))]));
+  ringOrder = walkCycle(coreNodes, coreAdj, rank);
+  if (!ringOrder) {
+    const hub = members.find((m) => adj.get(m)!.length === count - 1);
+    if (hub !== undefined) {
+      const rim = members.filter((m) => m !== hub);
+      const rimSet = new Set(rim);
+      const rimAdj = new Map(rim.map((m) => [m, adj.get(m)!.filter((x) => rimSet.has(x))]));
+      const ro = walkCycle(rim, rimAdj, rank);
+      if (ro) { ringOrder = ro; centerNodes = [hub]; }
+    }
+  }
+  if (ringOrder) {
+    const k = ringOrder.length;
     const R = L / (2 * Math.sin(Math.PI / k));
     const polygon = new Map<number, P>();
-    cycleOrder.forEach((idx, slot) => {
-      const angle = (2 * Math.PI * slot) / k - Math.PI / 2; // first node at top (deterministic)
+    // Orient the ring: by default the first node sits at the top. If the ring carries 2+ player
+    // spawns, rotate so the first spawn sits at the left instead — for two opposite spawns (Eye of
+    // the Storm) that puts them level on left/right, the symmetric look the preview shows. Guarded
+    // to 2+ ring spawns so single-spawn rings (Exodus's diamonds) keep their orientation.
+    let phase = -Math.PI / 2;
+    const firstSpawnSlot = ringOrder.findIndex((idx) => isSpawn[idx]);
+    if (firstSpawnSlot >= 0 && ringOrder.filter((idx) => isSpawn[idx]).length >= 2) {
+      phase = Math.PI - (2 * Math.PI * firstSpawnSlot) / k;
+    }
+    ringOrder.forEach((idx, slot) => {
+      const angle = (2 * Math.PI * slot) / k + phase;
       polygon.set(idx, { x: R * Math.cos(angle), y: R * Math.sin(angle) });
     });
+    for (const h of centerNodes) polygon.set(h, { x: 0, y: 0 });
     let o = 0.1;
     for (const m of members) {
       if (polygon.has(m)) continue;
@@ -220,7 +246,7 @@ function layoutComponent(members: number[], springPairs: [number, number][], isS
       polygon.set(m, { x: bx + Math.cos(o), y: by + Math.sin(o) });
       o += 1.7;
     }
-    candidates.push({ init: polygon, tuck, pinned: new Set(cycleOrder) });
+    candidates.push({ init: polygon, tuck, pinned: new Set([...ringOrder, ...centerNodes]) });
   }
 
   const structured = new Map<number, P>();
