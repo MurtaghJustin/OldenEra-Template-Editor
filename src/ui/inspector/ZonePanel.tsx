@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
-import { NumberField, SelectField, TextField } from "./fields";
+import { NumberField, SelectField, TextField, ReferenceListField } from "./fields";
 
 export function ZonePanel({ zoneName }: { zoneName: string }) {
   const root = useEditorStore((s) => s.root);
@@ -38,6 +38,13 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
         onChange={(n) => updateZone(zoneName, { guardRandomization: n })} />
       <NumberField label="Guarded value / area" value={zone.guardedContentValuePerArea ?? 0}
         onChange={(n) => updateZone(zoneName, { guardedContentValuePerArea: n })} />
+
+      <ReferenceListField label="Mandatory content" values={zone.mandatoryContent ?? []}
+        options={catalogs.mandatoryContentNames ?? []}
+        onChange={(next) => updateZone(zoneName, { mandatoryContent: next })} />
+      <ReferenceListField label="Content count limits" values={zone.contentCountLimits ?? []}
+        options={catalogs.countLimitNames ?? []}
+        onChange={(next) => updateZone(zoneName, { contentCountLimits: next })} />
 
       <button style={{ marginTop: 12, color: "#e88" }} onClick={() => removeZoneById(zoneName)}>Delete zone</button>
     </div>

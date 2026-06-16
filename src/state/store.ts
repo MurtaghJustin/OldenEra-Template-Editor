@@ -12,7 +12,7 @@ import {
   type Graph,
 } from "../core/graph";
 import { autoLayout } from "../core/layout";
-import { BUILTIN_NODE_TYPES, resolveZone, type NodeType } from "../core/nodeTypes";
+import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from "../core/nodeTypes";
 import { validateTemplate, type Issue } from "../core/validate";
 import type { Connection } from "../core/types";
 
@@ -68,7 +68,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   loadFromText(text, fileName) {
     const root = parseTemplate(text);
-    set({ original: cloneRaw(root), root, fileName, variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [] });
+    // Adopt the template's own zone settings as the palette defaults, so adding e.g. a player spawn
+    // copies what the existing spawns already use.
+    const nodeTypes = deriveNodeTypes(root.variants[0]?.zones ?? []);
+    set({ original: cloneRaw(root), root, fileName, variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [], nodeTypes });
     get().computeLayout(); // seed canvas positions from a fresh auto-layout
   },
 
@@ -90,7 +93,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }],
       zoneLayouts: [], mandatoryContent: [], contentCountLimits: [], contentPools: [], contentLists: [],
     };
-    set({ original: cloneRaw(root), root, fileName: "untitled.rmg.json", variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [] });
+    set({ original: cloneRaw(root), root, fileName: "untitled.rmg.json", variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [], nodeTypes: BUILTIN_NODE_TYPES });
     get().computeLayout();
   },
 
