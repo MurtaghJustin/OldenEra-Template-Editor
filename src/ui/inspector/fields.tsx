@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { Combobox } from "../Combobox";
 
 export function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void; }) {
   const id = useId();
@@ -34,12 +35,11 @@ export function SelectField({ label, value, options, onChange }: { label: string
 }
 
 // A list of string references (e.g. a zone's mandatoryContent group names): current entries shown
-// as removable pills, with a combo-box (type-to-search input backed by a datalist) to add a known
-// name. `onAddNew` (creating a brand-new group) is stubbed for now — the button is disabled until
-// that authoring flow lands. `minWidth: 0` throughout keeps long names from widening the panel.
+// as removable pills, with a combo-box (type-to-search) to add a known name. `onAddNew` (creating a
+// brand-new group) is disabled until a handler is supplied. `minWidth: 0` throughout keeps long
+// names from widening the panel.
 export function ReferenceListField({ label, values, options, onChange, onAddNew, onOpen }:
   { label: string; values: string[]; options: string[]; onChange: (next: string[]) => void; onAddNew?: () => void; onOpen?: (name: string) => void; }) {
-  const id = useId(); const listId = id + "-list";
   const [draft, setDraft] = useState("");
   const available = options.filter((o) => !values.includes(o));
   const tryAdd = (v: string) => { if (available.includes(v)) { onChange([...values, v]); setDraft(""); } };
@@ -61,12 +61,9 @@ export function ReferenceListField({ label, values, options, onChange, onAddNew,
           ))}
         </div>
       )}
-      <div style={{ display: "flex", gap: 4, minWidth: 0 }}>
-        <input id={id} list={listId} aria-label={`Add ${label}`} placeholder="Type to search…"
-          value={draft} style={{ flex: 1, minWidth: 0 }}
-          onChange={(e) => { setDraft(e.target.value); tryAdd(e.target.value); }}
-          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); tryAdd(draft); } }} />
-        <datalist id={listId}>{available.map((o) => <option key={o} value={o} />)}</datalist>
+      <div style={{ display: "flex", gap: 4, minWidth: 0, alignItems: "stretch" }}>
+        <Combobox value={draft} options={available} ariaLabel={`Add ${label}`} placeholder="Type to search…"
+          onChange={(v) => { setDraft(v); tryAdd(v); }} onSelect={tryAdd} />
         <button type="button" disabled={!onAddNew} title={onAddNew ? "Create a new definition" : "Creating new — coming soon"}
           onClick={onAddNew} style={{ flexShrink: 0 }}>+ New</button>
       </div>

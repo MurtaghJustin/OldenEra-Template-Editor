@@ -1,6 +1,7 @@
-import { Fragment, useId } from "react";
+import { Fragment } from "react";
 import { catalogs } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
+import { Combobox } from "../Combobox";
 import type { ContentDef, ContentKind } from "../../core/content";
 
 type ContentEntry = { sid?: string; weight?: number; variant?: number };
@@ -16,7 +17,7 @@ function NumberRow({ values, onChange, fixedLen }: { values: number[]; onChange:
     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", alignItems: "center" }}>
       {values.map((v, i) => (
         <span key={i} style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
-          <input type="number" style={{ width: 72, padding: "3px 5px", background: "#222", color: "#ddd", border: "1px solid #3a3a3a", borderRadius: 4 }}
+          <input type="number" style={{ width: 72 }}
             value={Number.isFinite(v) ? v : ""} onChange={(e) => onChange(values.map((x, j) => (j === i ? (num(e.target.value) ?? 0) : x)))} />
           {!fixedLen && <button className="ct-iconbtn" aria-label="Remove" onClick={() => onChange(values.filter((_, j) => j !== i))}>✕</button>}
         </span>
@@ -31,7 +32,6 @@ function NumberRow({ values, onChange, fixedLen }: { values: number[]; onChange:
 // list editor via onOpenRef.
 export function PoolEditor({ draft, onChange, onOpenRef }:
   { draft: ContentDef; onChange: (d: ContentDef) => void; onOpenRef: (kind: ContentKind, name: string) => void }) {
-  const sidsList = useId();
   const groups = (draft.groups as Group[] | undefined) ?? [];
   const bans = (draft.bans as Ban[] | undefined) ?? [];
   const vd = draft.valueDistribution as ValueDist | undefined;
@@ -79,7 +79,8 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
               const patchContent = (p: Partial<ContentEntry>) => setGroup(i, { content: (g.content ?? []).map((x, m) => (m === k ? { ...x, ...p } : x)) });
               return (
                 <Fragment key={k}>
-                  <input list={sidsList} value={c.sid ?? ""} onChange={(e) => patchContent({ sid: e.target.value })} />
+                  <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="search SIDs…"
+                    onChange={(v) => patchContent({ sid: v })} />
                   <input type="number" value={c.weight ?? ""} onChange={(e) => patchContent({ weight: num(e.target.value) })} />
                   <input type="number" value={c.variant ?? ""} placeholder="none" onChange={(e) => patchContent({ variant: num(e.target.value) })} />
                   <button className="ct-iconbtn" aria-label="Remove object" onClick={() => setGroup(i, { content: (g.content ?? []).filter((_, m) => m !== k) })}>✕</button>
@@ -97,13 +98,13 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
         <div className="ct-head">Banned SID</div><div />
         {bans.map((b, i) => (
           <Fragment key={i}>
-            <input list={sidsList} value={b.sid ?? ""} onChange={(e) => setBans(bans.map((x, j) => (j === i ? { sid: e.target.value } : x)))} />
+            <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Banned SID"
+              onChange={(v) => setBans(bans.map((x, j) => (j === i ? { sid: v } : x)))} />
             <button className="ct-iconbtn" aria-label="Remove ban" onClick={() => setBans(bans.filter((_, j) => j !== i))}>✕</button>
           </Fragment>
         ))}
       </div>
       <button className="ct-addbtn" onClick={() => setBans([...bans, { sid: "" }])}>+ Add ban</button>
-      <datalist id={sidsList}>{(catalogs.sids ?? []).map((s) => <option key={s} value={s} />)}</datalist>
     </div>
   );
 }

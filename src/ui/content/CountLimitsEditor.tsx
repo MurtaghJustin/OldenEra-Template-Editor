@@ -1,5 +1,6 @@
-import { Fragment, useId } from "react";
+import { Fragment } from "react";
 import { catalogs } from "../../core/catalogs";
+import { Combobox } from "../Combobox";
 import type { ContentDef } from "../../core/content";
 
 type Limit = { sid?: string; variant?: number; maxCount?: number };
@@ -8,7 +9,6 @@ const num = (v: string): number | undefined => { const n = parseFloat(v); return
 
 // Editor for a contentCountLimits cap-set: optional player-count gating + a table of per-SID caps.
 export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onChange: (d: ContentDef) => void }) {
-  const sidsList = useId();
   const limits = (draft.limits as Limit[] | undefined) ?? [];
   const setLimits = (next: Limit[]) => onChange({ ...draft, limits: next });
   const setLimit = (i: number, patch: Partial<Limit>) => setLimits(limits.map((l, j) => (j === i ? { ...l, ...patch } : l)));
@@ -30,14 +30,14 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
         <div className="ct-head">Object SID</div><div className="ct-head">Variant</div><div className="ct-head">Max</div><div />
         {limits.map((l, i) => (
           <Fragment key={i}>
-            <input list={sidsList} value={l.sid ?? ""} placeholder="search SIDs…" onChange={(e) => setLimit(i, { sid: e.target.value })} />
+            <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="search SIDs…"
+              onChange={(v) => setLimit(i, { sid: v })} />
             <input type="number" value={l.variant ?? ""} placeholder="any" onChange={(e) => setLimit(i, { variant: num(e.target.value) })} />
             <input type="number" value={l.maxCount ?? ""} onChange={(e) => setLimit(i, { maxCount: num(e.target.value) })} />
             <button className="ct-iconbtn" aria-label="Remove limit" onClick={() => setLimits(limits.filter((_, j) => j !== i))}>✕</button>
           </Fragment>
         ))}
       </div>
-      <datalist id={sidsList}>{(catalogs.sids ?? []).map((s) => <option key={s} value={s} />)}</datalist>
       <button className="ct-addbtn" onClick={() => setLimits([...limits, { sid: "", maxCount: 1 }])}>+ Add limit</button>
     </div>
   );

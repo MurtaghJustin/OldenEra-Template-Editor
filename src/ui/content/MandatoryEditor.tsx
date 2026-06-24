@@ -1,6 +1,7 @@
-import { Fragment, useId } from "react";
+import { Fragment } from "react";
 import { catalogs } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
+import { Combobox } from "../Combobox";
 import type { ContentDef, ContentKind } from "../../core/content";
 
 type Rule = { type?: string; args?: string[]; targetMin?: number; targetMax?: number; weight?: number };
@@ -70,7 +71,6 @@ function RulesEditor({ rules, onChange }: { rules: Rule[]; onChange: (r: Rule[])
 // from content lists, with guarding/mine/solo flags and placement rules.
 export function MandatoryEditor({ draft, onChange, onOpenRef }:
   { draft: ContentDef; onChange: (d: ContentDef) => void; onOpenRef: (kind: ContentKind, name: string) => void }) {
-  const sidsList = useId();
   const items = (draft.content as Item[] | undefined) ?? [];
   const setItems = (next: Item[]) => onChange({ ...draft, content: next });
   const setItem = (i: number, patch: Partial<Item>) => setItems(items.map((it, j) => (j === i ? { ...it, ...patch } : it)));
@@ -81,14 +81,14 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
       {items.map((it, i) => (
         <div className="content-row" key={i}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-            <label className="ct-field" style={{ flex: "1 1 160px" }}>Object SID
-              <input list={sidsList} value={it.sid ?? ""} placeholder="(or use include lists)" onChange={(e) => setItem(i, { sid: e.target.value || undefined })} /></label>
+            <div className="ct-field" style={{ flex: "1 1 160px" }}>Object SID
+              <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="(or use include lists)"
+                onChange={(v) => setItem(i, { sid: v || undefined })} /></div>
             <label className="ct-field">Variant
               <input type="number" value={it.variant ?? ""} placeholder="none" onChange={(e) => setItem(i, { variant: num(e.target.value) })} /></label>
             <label className="ct-field">Guarding
               <select value={it.isGuarded === undefined ? "" : it.isGuarded ? "yes" : "no"}
-                onChange={(e) => setItem(i, { isGuarded: e.target.value === "" ? undefined : e.target.value === "yes" })}
-                style={{ padding: "4px", background: "#222", color: "#ddd", border: "1px solid #3a3a3a", borderRadius: 4 }}>
+                onChange={(e) => setItem(i, { isGuarded: e.target.value === "" ? undefined : e.target.value === "yes" })}>
                 <option value="">Default</option><option value="yes">Guarded</option><option value="no">Unguarded</option>
               </select></label>
           </div>
@@ -104,7 +104,6 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
         </div>
       ))}
       <button className="ct-addbtn" onClick={() => setItems([...items, { sid: "" }])}>+ Add item</button>
-      <datalist id={sidsList}>{(catalogs.sids ?? []).map((s) => <option key={s} value={s} />)}</datalist>
     </div>
   );
 }

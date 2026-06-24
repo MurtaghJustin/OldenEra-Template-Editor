@@ -8,17 +8,23 @@
 @keyframes drawer-slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .drawer-panel { animation: none; } }
 
+/* One consistent field style for EVERY input/select in the drawer, so all editors match (no
+   ad-hoc per-field styling drifting out of sync). Checkboxes keep their native look. */
+.drawer-panel input:not([type="checkbox"]), .drawer-panel select {
+  padding: 4px 6px; background: #222; color: #ddd; border: 1px solid #3a3a3a;
+  border-radius: 4px; box-sizing: border-box; min-width: 0; font: inherit;
+}
+.drawer-panel input:disabled, .drawer-panel select:disabled { opacity: 0.4; }
+
 /* Columnar editor: column headers shown once, each item is a dense inline row — fits a desktop
    tool far better than stacked label-over-input cards repeated per item. */
 .ct-grid { display: grid; gap: 5px 8px; align-items: center; }
-.ct-grid > input, .ct-grid > select { width: 100%; min-width: 0; box-sizing: border-box; padding: 4px 6px;
-  background: #222; color: #ddd; border: 1px solid #3a3a3a; border-radius: 4px; }
-.ct-grid > input:disabled { opacity: 0.4; }
+.ct-grid > input, .ct-grid > select { width: 100%; }
 .ct-head { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.55; }
 .ct-iconbtn { border: none; background: transparent; color: #e88; cursor: pointer; font-size: 13px; padding: 0; }
 .ct-playerrow { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
 .ct-field { display: grid; gap: 2px; font-size: 11px; opacity: 0.8; }
-.ct-field > input { width: 90px; padding: 4px 6px; background: #222; color: #ddd; border: 1px solid #3a3a3a; border-radius: 4px; }
+.ct-field > input { width: 90px; }
 .ct-addbtn { margin-top: 8px; }
 .drawer-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #333; }
 .drawer-body { flex: 1; overflow: auto; padding: 12px; min-width: 0; }
