@@ -23,13 +23,16 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   const [hi, setHi] = useState(-1);
   const [rect, setRect] = useState<{ left: number; top: number; width: number } | null>(null);
   const [editing, setEditing] = useState(false);
+  const [typed, setTyped] = useState(false);
   const [query, setQuery] = useState("");
 
-  // In label mode the input shows the search query while focused, otherwise the value's name.
-  const shown = labelFor ? (editing ? query : (value ? labelFor(value) : "")) : value;
+  // Until the user actually types, show the FULL option list (and keep the current selection
+  // visible in the input) — so clicking an already-filled field reveals everything that belongs
+  // there, not just the current value. Typing then filters.
+  const shown = labelFor ? (editing && typed ? query : (value ? labelFor(value) : "")) : value;
   const q = (labelFor ? query : value).toLowerCase();
   const matches = (o: string) => o.toLowerCase().includes(q) || (!!labelFor && labelFor(o).toLowerCase().includes(q));
-  const all = q ? options.filter(matches) : options;
+  const all = typed && q ? options.filter(matches) : options;
   const filtered = all.slice(0, 100);
 
   const reposition = () => {
@@ -47,15 +50,15 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
     return () => { window.removeEventListener("scroll", onScroll, true); window.removeEventListener("resize", onScroll); };
   }, [open]);
 
-  const choose = (v: string) => { (onSelect ?? onChange)(v); setEditing(false); setQuery(""); setOpen(false); setHi(-1); };
+  const choose = (v: string) => { (onSelect ?? onChange)(v); setEditing(false); setTyped(false); setQuery(""); setOpen(false); setHi(-1); };
   // Closing without an explicit pick: free-text value is already live; label mode reverts to the name.
-  const close = () => { setEditing(false); setQuery(""); setOpen(false); setHi(-1); };
+  const close = () => { setEditing(false); setTyped(false); setQuery(""); setOpen(false); setHi(-1); };
 
   return (
     <div ref={wrap} style={{ position: "relative", width: "100%", minWidth: 0 }}>
       <input ref={inputRef} aria-label={ariaLabel} placeholder={placeholder} value={shown} style={{ width: "100%" }}
-        onFocus={() => { setEditing(true); setQuery(""); setOpen(true); }}
-        onChange={(e) => { if (labelFor) setQuery(e.target.value); else onChange(e.target.value); setOpen(true); setHi(-1); }}
+        onFocus={() => { setEditing(true); setTyped(false); setQuery(""); setOpen(true); }}
+        onChange={(e) => { if (labelFor) setQuery(e.target.value); else onChange(e.target.value); setTyped(true); setOpen(true); setHi(-1); }}
         onBlur={close}
         onKeyDown={(e) => {
           if (e.key === "Escape") { close(); inputRef.current?.blur(); }

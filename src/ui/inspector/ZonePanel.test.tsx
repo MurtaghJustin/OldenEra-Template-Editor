@@ -23,6 +23,18 @@ describe("ZonePanel", () => {
     expect(useEditorStore.getState().root!.variants[0].zones.some((z) => z.name === "Center")).toBe(true);
   });
 
+  it("adds a town (City main object) to a zone and configures its win-condition flag", () => {
+    render(<ZonePanel zoneName="Hub" />);
+    const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
+    expect((zone().mainObjects ?? []).length).toBe(0);
+    fireEvent.click(screen.getByText("+ Add object")); // defaults to a City (town)
+    const main = zone().mainObjects!;
+    expect(main).toHaveLength(1);
+    expect(main[0].type).toBe("City");
+    fireEvent.click(screen.getByLabelText("Hold-city win condition"));
+    expect(zone().mainObjects![0].holdCityWinCon).toBe(true);
+  });
+
   it("'+ New' on a pool picker opens a draft that references back to the zone on Accept", () => {
     render(<ZonePanel zoneName="Hub" />);
     // The guarded-pool picker's New button creates a draft and a referenceBack callback.

@@ -28,7 +28,7 @@ export default function App() {
         <div style={{ flex: 1, minWidth: 0 }}>
           {root ? <GraphCanvas /> : <div style={{ padding: 24, opacity: 0.6 }}>Click <b>New</b> to start a blank template, or <b>Open</b> a .rmg.json.</div>}
         </div>
-        <div style={{ width: 320, borderLeft: "1px solid #333", display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div style={{ width: 380, borderLeft: "1px solid #333", display: "flex", flexDirection: "column", minHeight: 0 }}>
           <NodeTypePalette />
           <InteractionHints />
           <div style={{ flex: 1, overflow: "auto" }}>

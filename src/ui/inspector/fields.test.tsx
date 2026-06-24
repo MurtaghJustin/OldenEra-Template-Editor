@@ -10,7 +10,7 @@ describe("fields", () => {
     expect(onChange).toHaveBeenCalledWith(2.5);
   });
 
-  it("SelectField lists options and allows custom entry via datalist", () => {
+  it("SelectField lists options and allows custom typed entry", () => {
     const onChange = vi.fn();
     render(<SelectField label="Layout" value="a" options={["a", "b"]} onChange={onChange} />);
     fireEvent.change(screen.getByLabelText("Layout"), { target: { value: "b" } });

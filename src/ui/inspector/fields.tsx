@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Combobox } from "../Combobox";
+import { SELECTOR_TYPES, type Selector } from "../../core/types";
 
 export function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void; }) {
   const id = useId();
@@ -22,15 +23,14 @@ export function TextField({ label, value, onChange }: { label: string; value: st
   );
 }
 
-// Editable dropdown: a text input backed by a datalist so users can pick or type a custom value.
+// Editable dropdown: a type-to-search combo-box that lets users pick a known value or type a custom
+// one. Uses the shared Combobox so opening an already-filled field shows the full option list.
 export function SelectField({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (s: string) => void; }) {
-  const id = useId(); const listId = id + "-list";
   return (
-    <label htmlFor={id} style={{ display: "grid", gap: 2, marginBottom: 6 }}>
+    <div style={{ display: "grid", gap: 2, marginBottom: 6 }}>
       <span style={{ fontSize: 12, opacity: 0.7 }}>{label}</span>
-      <input id={id} aria-label={label} list={listId} value={value} onChange={(e) => onChange(e.target.value)} />
-      <datalist id={listId}>{options.map((o) => <option key={o} value={o} />)}</datalist>
-    </label>
+      <Combobox value={value} options={options} onChange={onChange} ariaLabel={label} />
+    </div>
   );
 }
 
@@ -67,6 +67,49 @@ export function ReferenceListField({ label, values, options, onChange, onAddNew,
         <button type="button" disabled={!onAddNew} title={onAddNew ? "Create a new definition" : "Creating new — coming soon"}
           onClick={onAddNew} style={{ flexShrink: 0 }}>+ New</button>
       </div>
+    </div>
+  );
+}
+
+// A closed-set native dropdown (no free typing) — for enums like player slot, placement, type.
+export function EnumField({ label, value, options, onChange, allowNone }:
+  { label: string; value: string; options: readonly string[]; onChange: (v: string) => void; allowNone?: boolean; }) {
+  const id = useId();
+  return (
+    <label htmlFor={id} style={{ display: "grid", gap: 2, marginBottom: 6 }}>
+      <span style={{ fontSize: 12, opacity: 0.7 }}>{label}</span>
+      <select id={id} aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+        {allowNone && <option value="">(none)</option>}
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </label>
+  );
+}
+
+// A Selector ({type, args}) editor: a type dropdown plus a free, add/removable list of string args
+// (faction names, indices, zone names…). `argOptions` provides type-ahead suggestions for the args.
+export function SelectorField({ label, value, onChange, argOptions }:
+  { label: string; value?: Selector; onChange: (s: Selector) => void; argOptions?: string[]; }) {
+  const id = useId(); const listId = id + "-args";
+  const sel: Selector = value ?? { type: "FromList", args: [] };
+  const setArgs = (args: string[]) => onChange({ ...sel, args });
+  return (
+    <div style={{ display: "grid", gap: 2, marginBottom: 6 }}>
+      <span style={{ fontSize: 12, opacity: 0.7 }}>{label}</span>
+      <div style={{ display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>
+        <select aria-label={`${label} type`} value={sel.type} onChange={(e) => onChange({ ...sel, type: e.target.value as Selector["type"] })} style={{ flex: "0 0 140px" }}>
+          {SELECTOR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+        {sel.args.map((a, i) => (
+          <span key={i} style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
+            <input list={listId} value={a} style={{ width: 110 }} onChange={(e) => setArgs(sel.args.map((x, j) => (j === i ? e.target.value : x)))} />
+            <button aria-label="Remove arg" onClick={() => setArgs(sel.args.filter((_, j) => j !== i))}
+              style={{ border: "none", background: "transparent", color: "#e88", cursor: "pointer", padding: 0 }}>✕</button>
+          </span>
+        ))}
+        <button type="button" onClick={() => setArgs([...sel.args, ""])}>+ arg</button>
+      </div>
+      <datalist id={listId}>{(argOptions ?? []).map((o) => <option key={o} value={o} />)}</datalist>
     </div>
   );
 }

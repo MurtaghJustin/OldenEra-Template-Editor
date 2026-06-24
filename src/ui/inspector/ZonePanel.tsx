@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
 import { NumberField, SelectField, TextField, ReferenceListField } from "./fields";
+import { MainObjectsEditor } from "./MainObjectsEditor";
 import type { ContentKind } from "../../core/content";
-import type { Zone } from "../../core/types";
+import type { Zone, MainObject } from "../../core/types";
 
 export function ZonePanel({ zoneName }: { zoneName: string }) {
   const root = useEditorStore((s) => s.root);
@@ -59,6 +60,9 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
         onChange={(n) => updateZone(zoneName, { guardRandomization: n })} />
       <NumberField label="Guarded value / area" value={zone.guardedContentValuePerArea ?? 0}
         onChange={(n) => updateZone(zoneName, { guardedContentValuePerArea: n })} />
+
+      <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []}
+        onChange={(next) => updateZone(zoneName, { mainObjects: next })} />
 
       {refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [])}
       {refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [])}

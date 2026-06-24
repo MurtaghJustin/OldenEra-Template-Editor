@@ -32,4 +32,15 @@ describe("Combobox label mode", () => {
     rerender(<Combobox value={stored} options={["tree_of_abundance", "mine_wood"]} labelFor={objectName} ariaLabel="Object" onChange={(v) => { stored = v; }} />);
     expect((screen.getByLabelText("Object") as HTMLInputElement).value).toBe("Sawmill");
   });
+
+  it("shows the full option list (not just the current value) when an already-filled field is opened", () => {
+    render(
+      <Combobox value="mine_wood" options={["tree_of_abundance", "mine_wood", "mine_gold"]} labelFor={objectName}
+        ariaLabel="Object" onChange={() => {}} />
+    );
+    fireEvent.focus(screen.getByLabelText("Object"));
+    // All options visible despite mine_wood being selected — not pre-filtered to the selection.
+    expect(screen.getByText("Arborcopia", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText("Gold Mine", { exact: false })).toBeInTheDocument();
+  });
 });
