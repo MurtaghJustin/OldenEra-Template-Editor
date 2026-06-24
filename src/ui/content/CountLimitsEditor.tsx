@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { catalogs } from "../../core/catalogs";
+import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
 import type { ContentDef } from "../../core/content";
 
@@ -27,10 +27,10 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
 
       <div className="content-section-label">Limits</div>
       <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 72px 72px 22px" }}>
-        <div className="ct-head">Object SID</div><div className="ct-head">Variant</div><div className="ct-head">Max</div><div />
+        <div className="ct-head">Object</div><div className="ct-head">Variant</div><div className="ct-head">Max</div><div />
         {limits.map((l, i) => (
           <Fragment key={i}>
-            <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="search SIDs…"
+            <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setLimit(i, { sid: v })} />
             <input type="number" value={l.variant ?? ""} placeholder="any" onChange={(e) => setLimit(i, { variant: num(e.target.value) })} />
             <input type="number" value={l.maxCount ?? ""} onChange={(e) => setLimit(i, { maxCount: num(e.target.value) })} />

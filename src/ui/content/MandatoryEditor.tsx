@@ -1,5 +1,5 @@
-import { Fragment } from "react";
-import { catalogs } from "../../core/catalogs";
+import { Fragment, useState } from "react";
+import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
 import type { ContentDef, ContentKind } from "../../core/content";
@@ -24,18 +24,27 @@ const bandFor = (min?: number, max?: number) => BANDS.find((b) => near(b.min, mi
 const num = (v: string): number | undefined => { const n = parseFloat(v); return Number.isFinite(n) ? n : undefined; };
 
 function RulesEditor({ rules, onChange }: { rules: Rule[]; onChange: (r: Rule[]) => void }) {
+  // Which rows are pinned to "Custom" mode. The preset is otherwise derived from min/max, so a row
+  // whose band matches a preset still needs this to stay in custom mode when the user picks it.
+  const [customRows, setCustomRows] = useState<Set<number>>(() => new Set());
   const setRule = (i: number, patch: Partial<Rule>) => onChange(rules.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const applyPreset = (i: number, label: string) => {
-    if (label === "custom") return; // keep current min/max; advanced inputs appear
+    if (label === "custom") { setCustomRows((s) => new Set(s).add(i)); return; }
+    setCustomRows((s) => { const n = new Set(s); n.delete(i); return n; });
     const b = BANDS.find((x) => x.label === label)!;
     setRule(i, { targetMin: b.min, targetMax: b.max });
+  };
+  const removeRule = (i: number) => {
+    onChange(rules.filter((_, j) => j !== i));
+    setCustomRows((s) => { const n = new Set<number>(); s.forEach((x) => { if (x < i) n.add(x); else if (x > i) n.add(x - 1); }); return n; });
   };
   return (
     <div>
       <div className="ct-grid" style={{ gridTemplateColumns: "110px 70px 110px 60px 22px" }}>
         <div className="ct-head">Frame</div><div className="ct-head">Main obj #</div><div className="ct-head">Distance</div><div className="ct-head">Weight</div><div />
         {rules.map((r, i) => {
-          const preset = bandFor(r.targetMin, r.targetMax);
+          // A row is custom if the user chose Custom, or its stored band doesn't match any preset.
+          const custom = customRows.has(i) || bandFor(r.targetMin, r.targetMax) === "custom";
           return (
             <Fragment key={i}>
               <select value={r.type ?? "MainObject"} onChange={(e) => setRule(i, { type: e.target.value })}>
@@ -43,13 +52,13 @@ function RulesEditor({ rules, onChange }: { rules: Rule[]; onChange: (r: Rule[])
               </select>
               <input type="number" disabled={!!r.type && r.type !== "MainObject"} value={r.args?.[0] ?? ""}
                 onChange={(e) => setRule(i, { args: [e.target.value] })} />
-              <select value={preset} onChange={(e) => applyPreset(i, e.target.value)}>
+              <select aria-label="Distance preset" value={custom ? "custom" : bandFor(r.targetMin, r.targetMax)} onChange={(e) => applyPreset(i, e.target.value)}>
                 {BANDS.map((b) => <option key={b.label} value={b.label}>{b.label}</option>)}
                 <option value="custom">Custom…</option>
               </select>
               <input type="number" value={r.weight ?? ""} onChange={(e) => setRule(i, { weight: num(e.target.value) })} />
-              <button className="ct-iconbtn" aria-label="Remove rule" onClick={() => onChange(rules.filter((_, j) => j !== i))}>✕</button>
-              {preset === "custom" && (
+              <button className="ct-iconbtn" aria-label="Remove rule" onClick={() => removeRule(i)}>✕</button>
+              {custom && (
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 10, padding: "0 0 6px", fontSize: 11, opacity: 0.85, alignItems: "center" }}>
                   <label style={{ display: "flex", gap: 4, alignItems: "center" }}>target min
                     <input type="number" step="0.05" style={{ width: 64 }} value={r.targetMin ?? ""} onChange={(e) => setRule(i, { targetMin: num(e.target.value) })} /></label>
@@ -81,8 +90,8 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
       {items.map((it, i) => (
         <div className="content-row" key={i}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-            <div className="ct-field" style={{ flex: "1 1 160px" }}>Object SID
-              <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="(or use include lists)"
+            <div className="ct-field" style={{ flex: "1 1 160px" }}>Object
+              <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="(or use include lists)"
                 onChange={(v) => setItem(i, { sid: v || undefined })} /></div>
             <label className="ct-field">Variant
               <input type="number" value={it.variant ?? ""} placeholder="none" onChange={(e) => setItem(i, { variant: num(e.target.value) })} /></label>

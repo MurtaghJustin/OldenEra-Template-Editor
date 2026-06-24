@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { catalogs } from "../../core/catalogs";
+import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
 import type { ContentDef, ContentKind } from "../../core/content";
@@ -74,12 +74,12 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
             onChange={(next) => setGroup(i, { includeLists: next })} onOpen={(name) => onOpenRef("lists", name)} />
           <div className="ct-head" style={{ marginTop: 4 }}>Inline objects</div>
           <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 64px 64px 22px" }}>
-            <div className="ct-head">SID</div><div className="ct-head">Weight</div><div className="ct-head">Variant</div><div />
+            <div className="ct-head">Object</div><div className="ct-head">Weight</div><div className="ct-head">Variant</div><div />
             {(g.content ?? []).map((c, k) => {
               const patchContent = (p: Partial<ContentEntry>) => setGroup(i, { content: (g.content ?? []).map((x, m) => (m === k ? { ...x, ...p } : x)) });
               return (
                 <Fragment key={k}>
-                  <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="search SIDs…"
+                  <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
                     onChange={(v) => patchContent({ sid: v })} />
                   <input type="number" value={c.weight ?? ""} onChange={(e) => patchContent({ weight: num(e.target.value) })} />
                   <input type="number" value={c.variant ?? ""} placeholder="none" onChange={(e) => patchContent({ variant: num(e.target.value) })} />
@@ -95,10 +95,10 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
 
       <div className="content-section-label">Bans</div>
       <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 22px" }}>
-        <div className="ct-head">Banned SID</div><div />
+        <div className="ct-head">Banned object</div><div />
         {bans.map((b, i) => (
           <Fragment key={i}>
-            <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Banned SID"
+            <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Banned object"
               onChange={(v) => setBans(bans.map((x, j) => (j === i ? { sid: v } : x)))} />
             <button className="ct-iconbtn" aria-label="Remove ban" onClick={() => setBans(bans.filter((_, j) => j !== i))}>✕</button>
           </Fragment>

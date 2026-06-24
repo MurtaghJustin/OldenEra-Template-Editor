@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { catalogs } from "../../core/catalogs";
+import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
 import type { ContentDef } from "../../core/content";
 
@@ -17,10 +17,10 @@ export function ListEditor({ draft, onChange }: { draft: ContentDef; onChange: (
     <div>
       <div className="content-section-label">Objects</div>
       <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 64px 64px 120px 22px" }}>
-        <div className="ct-head">Object SID</div><div className="ct-head">Weight</div><div className="ct-head">Variant</div><div className="ct-head">Biome</div><div />
+        <div className="ct-head">Object</div><div className="ct-head">Weight</div><div className="ct-head">Variant</div><div className="ct-head">Biome</div><div />
         {content.map((e, i) => (
           <Fragment key={i}>
-            <Combobox value={e.sid ?? ""} options={catalogs.sids ?? []} ariaLabel="Object SID" placeholder="search SIDs…"
+            <Combobox value={e.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setEntry(i, { sid: v })} />
             <input type="number" value={e.weight ?? ""} onChange={(ev) => setEntry(i, { weight: num(ev.target.value) })} />
             <input type="number" value={e.variant ?? ""} placeholder="none" onChange={(ev) => setEntry(i, { variant: num(ev.target.value) })} />

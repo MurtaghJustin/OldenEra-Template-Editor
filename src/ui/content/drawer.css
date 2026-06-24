@@ -8,15 +8,9 @@
 @keyframes drawer-slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .drawer-panel { animation: none; } }
 
-/* One consistent field style for EVERY input/select in the drawer, so all editors match (no
-   ad-hoc per-field styling drifting out of sync). Checkboxes keep their native look. */
-.drawer-panel input:not([type="checkbox"]), .drawer-panel select {
-  padding: 4px 6px; background: #222; color: #ddd; border: 1px solid #3a3a3a;
-  border-radius: 4px; box-sizing: border-box; min-width: 0; font: inherit;
-}
-.drawer-panel input:disabled, .drawer-panel select:disabled { opacity: 0.4; }
+/* Field styling is global (see index.css). Below: layout-only rules for the columnar editors.
 
-/* Columnar editor: column headers shown once, each item is a dense inline row — fits a desktop
+   Columnar editor: column headers shown once, each item is a dense inline row — fits a desktop
    tool far better than stacked label-over-input cards repeated per item. */
 .ct-grid { display: grid; gap: 5px 8px; align-items: center; }
 .ct-grid > input, .ct-grid > select { width: 100%; }

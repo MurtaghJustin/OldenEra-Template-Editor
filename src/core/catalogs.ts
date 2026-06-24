@@ -4,7 +4,10 @@ import {
   ORIENTATION_MODES, SELECTOR_TYPES, PLAYER_SLOTS,
 } from "./types";
 
-export const catalogs = data as Record<string, string[]>;
+const raw = data as Record<string, unknown>;
+export const catalogs = raw as unknown as Record<string, string[]>;
+// Documented object display names (SID → name), built from Documentation/05 at catalog-build time.
+export const sidNames = (raw.sidNames as Record<string, string> | undefined) ?? {};
 
 const ENUMS: Record<string, readonly string[]> = {
   gameMode: GAME_MODES,
@@ -27,4 +30,11 @@ export function sidDisplayName(sid: string): string {
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+// Human-readable name for an object SID: the documented name when known (e.g. tree_of_abundance →
+// "Arborcopia"), otherwise a title-cased fallback derived from the SID.
+export function objectName(sid: string): string {
+  if (!sid) return "";
+  return sidNames[sid] || sidDisplayName(sid);
 }

@@ -49,6 +49,18 @@ describe("ContentDrawer", () => {
     expect(grp.content).toHaveLength(1);
   });
 
+  it("mandatory placement rule: choosing Custom reveals the raw min/max inputs", () => {
+    useEditorStore.getState().openContentDrawer("mandatory");
+    render(<ContentDrawer />);
+    fireEvent.click(screen.getByText("+ New"));
+    fireEvent.click(screen.getByText("+ Add item"));
+    fireEvent.click(screen.getByText("+ Add rule"));
+    expect(screen.queryByLabelText("target min")).toBeNull(); // hidden under a preset
+    fireEvent.change(screen.getByLabelText("Distance preset"), { target: { value: "custom" } });
+    expect(screen.getByLabelText("target min")).toBeInTheDocument();
+    expect(screen.getByLabelText("target max")).toBeInTheDocument();
+  });
+
   it("discards an in-progress edit on Cancel", () => {
     useEditorStore.getState().upsertContentDef("lists", { name: "keep_me", content: [] });
     useEditorStore.getState().openContentDrawer("lists", "keep_me");

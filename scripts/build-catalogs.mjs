@@ -90,6 +90,23 @@ for (const file of collectFiles()) {
 
 function merge(name) { return Array.from(new Set([...(SEED[name] || []), ...sets[name]])).sort(); }
 
+// Documented SID → display name, parsed from the clean two-column table rows in
+// Documentation/05-id-reference.md (e.g. `tree_of_abundance` → "Arborcopia"). Rows that are ranges
+// or prose ("…", "/", "–") are skipped — the editor derives a title-case name for those at runtime.
+function buildSidNames() {
+  const path = join(ROOT, "Documentation", "05-id-reference.md");
+  const out = {};
+  if (!existsSync(path)) return out;
+  for (const line of readFileSync(path, "utf-8").split(/\r?\n/)) {
+    const m = /^\|\s*`([a-z0-9_]+)`\s*\|\s*(.+?)\s*\|\s*$/.exec(line);
+    if (!m) continue;
+    const name = m[2].replace(/\*+/g, "").replace(/\s*\([^)]*\)/g, "").trim();
+    if (!name || /[/…–]/.test(name) || name.toLowerCase() === "name") continue;
+    out[m[1]] = name;
+  }
+  return out;
+}
+
 const catalogs = {
   layouts: merge("layouts"),
   pools: Array.from(sets.pools).sort(),
@@ -104,9 +121,10 @@ const catalogs = {
   bonusSids: merge("bonusSids"),
   mandatoryContentNames: Array.from(sets.mandatoryContentNames).sort(),
   countLimitNames: Array.from(sets.countLimitNames).sort(),
+  sidNames: buildSidNames(),
 };
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(catalogs, null, 2) + "\n");
 console.log("Wrote", OUT);
-for (const [k, v] of Object.entries(catalogs)) console.log(`  ${k}: ${v.length}`);
+for (const [k, v] of Object.entries(catalogs)) console.log(`  ${k}: ${Array.isArray(v) ? v.length : Object.keys(v).length}`);
