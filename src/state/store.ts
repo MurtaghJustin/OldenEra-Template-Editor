@@ -70,12 +70,32 @@ interface EditorState {
   removeConn(id: string): void;
   updateZone(name: string, patch: Partial<Zone>): void;
   serializeForSave(): string;
+  // Custom node-type authoring (persisted in localStorage; merged into nodeTypes alongside builtins).
+  createCustomType(fromId?: string): string; // returns the new type's id
+  updateCustomType(id: string, patch: { label?: string; zone?: NodeType["zone"] }): void;
+  removeCustomType(id: string): void;
 }
+
+// Custom node types are an editor convenience, not part of the .rmg.json — they persist in the
+// browser (localStorage) so they survive reloads and follow you across templates. Built-ins are
+// derived from the open template; customs are appended.
+const CUSTOM_TYPES_KEY = "rmg.nodeTypes.custom";
+function loadCustomTypes(): NodeType[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_TYPES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter((t) => t && t.builtin === false && typeof t.id === "string") : [];
+  } catch { return []; }
+}
+function saveCustomTypes(types: NodeType[]): void {
+  try { localStorage.setItem(CUSTOM_TYPES_KEY, JSON.stringify(types.filter((t) => !t.builtin))); } catch { /* e.g. storage disabled */ }
+}
+function withCustoms(builtins: NodeType[]): NodeType[] { return [...builtins, ...loadCustomTypes()]; }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   original: null, root: null, fileName: "untitled.rmg.json",
   variantIndex: 0, graph: null, positions: {}, selection: null, dirty: false, issues: [],
-  nodeTypes: BUILTIN_NODE_TYPES, connectMode: "none", contentDrawer: null,
+  nodeTypes: withCustoms(BUILTIN_NODE_TYPES), connectMode: "none", contentDrawer: null,
 
   setConnectMode(m) { if (get().connectMode !== m) set({ connectMode: m }); },
 
@@ -111,7 +131,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const root = parseTemplate(text);
     // Adopt the template's own zone settings as the palette defaults, so adding e.g. a player spawn
     // copies what the existing spawns already use.
-    const nodeTypes = deriveNodeTypes(root.variants[0]?.zones ?? []);
+    const nodeTypes = withCustoms(deriveNodeTypes(root.variants[0]?.zones ?? []));
     set({ original: cloneRaw(root), root, fileName, variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [], nodeTypes });
     get().computeLayout(); // seed canvas positions from a fresh auto-layout
   },
@@ -134,7 +154,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }],
       zoneLayouts: [], mandatoryContent: [], contentCountLimits: [], contentPools: [], contentLists: [],
     };
-    set({ original: cloneRaw(root), root, fileName: "untitled.rmg.json", variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [], nodeTypes: BUILTIN_NODE_TYPES });
+    set({ original: cloneRaw(root), root, fileName: "untitled.rmg.json", variantIndex: 0, positions: {}, dirty: false, selection: null, issues: [], nodeTypes: withCustoms(BUILTIN_NODE_TYPES) });
     get().computeLayout();
   },
 
@@ -241,5 +261,31 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!root) return "";
     const merged = original ? mergeEdits(original, root) : root;
     return serializeTemplate(merged);
+  },
+
+  createCustomType(fromId) {
+    const { nodeTypes } = get();
+    const ids = new Set(nodeTypes.map((t) => t.id));
+    let n = 1; while (ids.has(`custom_${n}`)) n++;
+    const id = `custom_${n}`;
+    const base = nodeTypes.find((t) => t.id === fromId) ?? nodeTypes.find((t) => t.id === "side") ?? nodeTypes[0];
+    const label = base && fromId ? `${base.label} copy` : "Custom type";
+    const type: NodeType = { id, label, builtin: false, zone: structuredClone(base!.zone) };
+    const next = [...nodeTypes, type];
+    set({ nodeTypes: next }); saveCustomTypes(next);
+    return id;
+  },
+
+  updateCustomType(id, patch) {
+    const next = get().nodeTypes.map((t) =>
+      t.id === id && !t.builtin
+        ? { ...t, ...(patch.label !== undefined ? { label: patch.label } : {}), ...(patch.zone !== undefined ? { zone: patch.zone } : {}) }
+        : t);
+    set({ nodeTypes: next }); saveCustomTypes(next);
+  },
+
+  removeCustomType(id) {
+    const next = get().nodeTypes.filter((t) => !(t.id === id && !t.builtin));
+    set({ nodeTypes: next }); saveCustomTypes(next);
   },
 }));

@@ -45,6 +45,19 @@ describe("store", () => {
     expect(after.positions["Spawn-A"]).toEqual({ x: 50, y: 50 });
   });
 
+  it("creates, edits, and removes a custom node type and persists it to localStorage", () => {
+    localStorage.clear();
+    const s = useEditorStore.getState();
+    const id = s.createCustomType();
+    expect(useEditorStore.getState().nodeTypes.some((t) => t.id === id && !t.builtin)).toBe(true);
+    s.updateCustomType(id, { label: "My Town Type" });
+    expect(useEditorStore.getState().nodeTypes.find((t) => t.id === id)!.label).toBe("My Town Type");
+    expect(JSON.parse(localStorage.getItem("rmg.nodeTypes.custom")!).some((t: { id: string }) => t.id === id)).toBe(true);
+    s.removeCustomType(id);
+    expect(useEditorStore.getState().nodeTypes.some((t) => t.id === id)).toBe(false);
+    localStorage.clear();
+  });
+
   it("upserts, renames and removes content definitions; opens/closes the drawer", () => {
     const s = useEditorStore.getState();
     s.upsertContentDef("pools", { name: "my_pool", groups: [] });
