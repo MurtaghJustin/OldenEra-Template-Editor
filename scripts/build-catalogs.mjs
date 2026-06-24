@@ -94,8 +94,15 @@ function merge(name) { return Array.from(new Set([...(SEED[name] || []), ...sets
 // Documentation/05-id-reference.md (e.g. `tree_of_abundance` → "Arborcopia"). Rows that are ranges
 // or prose ("…", "/", "–") are skipped — the editor derives a title-case name for those at runtime.
 function buildSidNames() {
+  // Names for SIDs the doc only documents as ranges/prose (so the table parser can't reach them),
+  // but which appear in real templates. Parsed table rows below take precedence over these.
+  const out = {
+    random_hire_1: "Random Hire Tier 1", random_hire_2: "Random Hire Tier 2",
+    random_hire_3: "Random Hire Tier 3", random_hire_4: "Random Hire Tier 4",
+    random_hire_5: "Random Hire Tier 5", random_hire_6: "Random Hire Tier 6",
+    random_hire_7: "Random Hire Tier 7",
+  };
   const path = join(ROOT, "Documentation", "05-id-reference.md");
-  const out = {};
   if (!existsSync(path)) return out;
   for (const line of readFileSync(path, "utf-8").split(/\r?\n/)) {
     const m = /^\|\s*`([a-z0-9_]+)`\s*\|\s*(.+?)\s*\|\s*$/.exec(line);

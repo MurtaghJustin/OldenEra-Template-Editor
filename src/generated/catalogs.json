@@ -825,6 +825,13 @@
     "content_limits_yellow"
   ],
   "sidNames": {
+    "random_hire_1": "Random Hire Tier 1",
+    "random_hire_2": "Random Hire Tier 2",
+    "random_hire_3": "Random Hire Tier 3",
+    "random_hire_4": "Random Hire Tier 4",
+    "random_hire_5": "Random Hire Tier 5",
+    "random_hire_6": "Random Hire Tier 6",
+    "random_hire_7": "Random Hire Tier 7",
     "win_condition_1": "Standard",
     "win_condition_2": "Capital Capture",
     "win_condition_3": "Lost Starting City",
