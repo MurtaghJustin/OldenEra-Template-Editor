@@ -23,6 +23,21 @@ describe("ZonePanel", () => {
     expect(useEditorStore.getState().root!.variants[0].zones.some((z) => z.name === "Center")).toBe(true);
   });
 
+  it("'+ New' on a pool picker opens a draft that references back to the zone on Accept", () => {
+    render(<ZonePanel zoneName="Hub" />);
+    // The guarded-pool picker's New button creates a draft and a referenceBack callback.
+    const newButtons = screen.getAllByText("+ New");
+    fireEvent.click(newButtons[0]); // first picker = Guarded content pool
+    const draft = useEditorStore.getState().contentDrawer;
+    expect(draft?.kind).toBe("pools");
+    expect(draft?.createNew).toBe(true);
+    // Simulate the drawer committing the new def and calling referenceBack.
+    useEditorStore.getState().upsertContentDef("pools", { name: "fresh_pool", groups: [] });
+    draft!.referenceBack!("fresh_pool");
+    const zone = useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
+    expect((zone.guardedContentPool as string[]) ?? []).toContain("fresh_pool");
+  });
+
   it("adds and removes a mandatory content reference via the store", () => {
     render(<ZonePanel zoneName="Hub" />);
     const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;

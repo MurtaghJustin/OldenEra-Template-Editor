@@ -2,6 +2,7 @@ import { Toolbar } from "./Toolbar";
 import { GraphCanvas } from "./GraphCanvas";
 import { NodeTypePalette } from "./NodeTypePalette";
 import { InteractionHints } from "./InteractionHints";
+import { ContentDrawer } from "./content/ContentDrawer";
 import { Inspector } from "./inspector/Inspector";
 import { useEditorStore } from "../state/store";
 
@@ -36,6 +37,7 @@ export default function App() {
         </div>
       </div>
       <IssuesBanner />
+      <ContentDrawer />
     </div>
   );
 }

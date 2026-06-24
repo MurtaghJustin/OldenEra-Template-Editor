@@ -14,6 +14,7 @@ import {
 import { autoLayout } from "../core/layout";
 import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from "../core/nodeTypes";
 import { validateTemplate, type Issue } from "../core/validate";
+import { CONTENT_ROOT_FIELD, type ContentKind, type ContentDef } from "../core/content";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -43,6 +44,18 @@ interface EditorState {
   // "direct"/"portal" = drag draws a connection of that type (Shift = direct, Alt = portal).
   connectMode: "none" | "direct" | "portal";
   setConnectMode(m: "none" | "direct" | "portal"): void;
+  // The content-library slide-out. null = closed; itemName present = open straight to that
+  // definition (e.g. from a zone reference), absent = open the browse list for the kind.
+  contentDrawer: { kind: ContentKind; itemName?: string; createNew?: boolean; referenceBack?: (name: string) => void } | null;
+  openContentDrawer(kind: ContentKind, itemName?: string): void;
+  // Open the drawer straight into a NEW draft. referenceBack (if given) runs when that draft is
+  // accepted — used by zone pickers so "+ New" creates a definition and references it on the zone.
+  createContentDraft(kind: ContentKind, referenceBack?: (name: string) => void): void;
+  closeContentDrawer(): void;
+  // Commit a content definition (add, or replace by name). originalName handles a rename — the old
+  // entry is dropped so the rename doesn't leave a duplicate.
+  upsertContentDef(kind: ContentKind, def: ContentDef, originalName?: string): void;
+  removeContentDef(kind: ContentKind, name: string): void;
 
   loadFromText(text: string, fileName: string): void;
   newTemplate(): void;
@@ -62,9 +75,37 @@ interface EditorState {
 export const useEditorStore = create<EditorState>((set, get) => ({
   original: null, root: null, fileName: "untitled.rmg.json",
   variantIndex: 0, graph: null, positions: {}, selection: null, dirty: false, issues: [],
-  nodeTypes: BUILTIN_NODE_TYPES, connectMode: "none",
+  nodeTypes: BUILTIN_NODE_TYPES, connectMode: "none", contentDrawer: null,
 
   setConnectMode(m) { if (get().connectMode !== m) set({ connectMode: m }); },
+
+  openContentDrawer(kind, itemName) { set({ contentDrawer: { kind, itemName } }); },
+  createContentDraft(kind, referenceBack) { set({ contentDrawer: { kind, createNew: true, referenceBack } }); },
+  closeContentDrawer() { set({ contentDrawer: null }); },
+
+  upsertContentDef(kind, def, originalName) {
+    const { root } = get(); if (!root) return;
+    const field = CONTENT_ROOT_FIELD[kind];
+    const r = root as Record<string, unknown>;
+    const arr = (Array.isArray(r[field]) ? r[field] : []) as ContentDef[];
+    if (originalName && originalName !== def.name) {
+      const j = arr.findIndex((d) => d.name === originalName);
+      if (j >= 0) arr.splice(j, 1);
+    }
+    const i = arr.findIndex((d) => d.name === def.name);
+    if (i >= 0) arr[i] = def; else arr.push(def);
+    r[field] = arr;
+    set({ dirty: true }); get().refresh();
+  },
+
+  removeContentDef(kind, name) {
+    const { root } = get(); if (!root) return;
+    const field = CONTENT_ROOT_FIELD[kind];
+    const r = root as Record<string, unknown>;
+    const arr = (Array.isArray(r[field]) ? r[field] : []) as ContentDef[];
+    r[field] = arr.filter((d) => d.name !== name);
+    set({ dirty: true }); get().refresh();
+  },
 
   loadFromText(text, fileName) {
     const root = parseTemplate(text);

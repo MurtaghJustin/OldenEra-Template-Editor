@@ -45,6 +45,21 @@ describe("store", () => {
     expect(after.positions["Spawn-A"]).toEqual({ x: 50, y: 50 });
   });
 
+  it("upserts, renames and removes content definitions; opens/closes the drawer", () => {
+    const s = useEditorStore.getState();
+    s.upsertContentDef("pools", { name: "my_pool", groups: [] });
+    expect(useEditorStore.getState().root!.contentPools).toEqual([{ name: "my_pool", groups: [] }]);
+    // rename via originalName: old entry dropped, not duplicated
+    s.upsertContentDef("pools", { name: "renamed_pool", groups: [] }, "my_pool");
+    expect((useEditorStore.getState().root!.contentPools as { name: string }[]).map((d) => d.name)).toEqual(["renamed_pool"]);
+    s.openContentDrawer("pools", "renamed_pool");
+    expect(useEditorStore.getState().contentDrawer).toEqual({ kind: "pools", itemName: "renamed_pool" });
+    s.removeContentDef("pools", "renamed_pool");
+    expect(useEditorStore.getState().root!.contentPools).toEqual([]);
+    s.closeContentDrawer();
+    expect(useEditorStore.getState().contentDrawer).toBeNull();
+  });
+
   it("serializeForSave applies round-trip merge", () => {
     useEditorStore.getState().addZoneOfType("Z", "side", {});
     const text = useEditorStore.getState().serializeForSave();

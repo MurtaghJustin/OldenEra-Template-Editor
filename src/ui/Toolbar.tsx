@@ -43,6 +43,11 @@ export function Toolbar() {
       <button onClick={() => select({ kind: "gameRules" })}>Game rules</button>
       <button onClick={() => select({ kind: "globalBans" })}>Global bans</button>
       <button onClick={() => select({ kind: "nodeTypes" })}>Node types</button>
+      <span style={{ width: 8 }} />
+      <button onClick={() => useEditorStore.getState().openContentDrawer("pools")} disabled={!root}>Pools</button>
+      <button onClick={() => useEditorStore.getState().openContentDrawer("lists")} disabled={!root}>Lists</button>
+      <button onClick={() => useEditorStore.getState().openContentDrawer("mandatory")} disabled={!root}>Mandatory</button>
+      <button onClick={() => useEditorStore.getState().openContentDrawer("countLimits")} disabled={!root}>Limits</button>
       <span style={{ marginLeft: "auto", opacity: 0.7 }}>
         {fileName}{dirty ? " • unsaved" : ""}
       </span>
