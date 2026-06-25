@@ -16,6 +16,16 @@ function uniqueZoneName(typeId: string, taken: Set<string>): string {
   for (let i = 1; ; i++) { const name = `${typeId}-${i}`; if (!taken.has(name)) return name; }
 }
 
+const DISC_R = 26; // half the 52px disc — node positions are top-left, edges run centre-to-centre
+const INSERT_THRESHOLD = 30; // how close (flow units) a dropped node must be to a line to split it
+
+// Distance from point P to segment A–B.
+function distToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+  const dx = bx - ax, dy = by - ay; const len2 = dx * dx + dy * dy || 1;
+  let t = ((px - ax) * dx + (py - ay) * dy) / len2; t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+
 function Flow() {
   const graph = useEditorStore((s) => s.graph);
   const select = useEditorStore((s) => s.select);
@@ -118,7 +128,24 @@ function Flow() {
         nodesDraggable={connectMode === "none"}    // default: drag moves a node...
         nodesConnectable={connectMode !== "none"}  // ...Shift/Alt: drag draws a connection
         onNodesChange={onNodesChange}
-        onNodeDragStop={(_, n) => setNodePosition(n.id, n.position.x, n.position.y)}
+        onNodeDragStop={(_, n) => {
+          setNodePosition(n.id, n.position.x, n.position.y);
+          // If an UNCONNECTED node is dropped onto a road connection, split it: A↔B → A↔node↔B.
+          const g = useEditorStore.getState().graph; if (!g) return;
+          const hasRoad = g.edges.some((e) => e.connection.connectionType !== "Proximity" && (e.from === n.id || e.to === n.id));
+          if (hasRoad) return;
+          const cx = n.position.x + DISC_R, cy = n.position.y + DISC_R;
+          const center = (id: string) => { const nn = g.nodes.find((x) => x.id === id); return nn ? { x: nn.x + DISC_R, y: nn.y + DISC_R } : null; };
+          let best: string | null = null, bestD = INSERT_THRESHOLD;
+          for (const e of displayEdges(g)) {
+            const t = e.connection.connectionType;
+            if ((t !== "Direct" && t !== "Default") || e.from === n.id || e.to === n.id) continue; // road only
+            const a = center(e.from), b = center(e.to); if (!a || !b) continue;
+            const d = distToSegment(cx, cy, a.x, a.y, b.x, b.y);
+            if (d < bestD) { bestD = d; best = e.id; }
+          }
+          if (best) useEditorStore.getState().insertNodeOnConnection(n.id, best);
+        }}
         onNodeClick={(_, n) => select({ kind: "zone", id: n.id })}
         onEdgeClick={(_, e) => select({ kind: "connection", id: e.id })}
         onConnect={(c: RfConn) => {

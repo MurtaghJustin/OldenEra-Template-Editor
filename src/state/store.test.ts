@@ -58,6 +58,19 @@ describe("store", () => {
     localStorage.clear();
   });
 
+  it("inserting a node on a connection splits it and copies the guard to both halves", () => {
+    const s = useEditorStore.getState();
+    s.addZoneOfType("Mid", "side", {}); // an unconnected zone
+    s.insertNodeOnConnection("Mid", "Spawn-A-Hub"); // minimal has Spawn-A↔Hub @ guardValue 3000
+    const conns = useEditorStore.getState().root!.variants[0].connections;
+    const pair = (a: string, b: string) => conns.find((c) => (c.from === a && c.to === b) || (c.from === b && c.to === a));
+    expect(pair("Spawn-A", "Hub")).toBeUndefined();             // original split out
+    expect(pair("Spawn-A", "Mid")).toBeTruthy();                // A↔Mid
+    expect(pair("Mid", "Hub")).toBeTruthy();                    // Mid↔Hub
+    expect(pair("Spawn-A", "Mid")!.guardValue).toBe(3000);      // guard copied to both halves
+    expect(pair("Mid", "Hub")!.guardValue).toBe(3000);
+  });
+
   it("makes a custom type from an existing zone (settings copied, roads cleared, persisted)", () => {
     localStorage.clear();
     const s = useEditorStore.getState();

@@ -69,6 +69,9 @@ interface EditorState {
   renameZoneById(oldName: string, newName: string): void;
   addConn(conn: Connection): void;
   removeConn(id: string): void;
+  // Split a connection by inserting a node between its endpoints: A↔B becomes A↔node↔B, with the
+  // original connection's properties (guard, type, road) copied to both halves.
+  insertNodeOnConnection(nodeName: string, edgeId: string): void;
   updateZone(name: string, patch: Partial<Zone>): void;
   serializeForSave(): string;
   // Custom node-type authoring (persisted in localStorage; merged into nodeTypes alongside builtins).
@@ -278,6 +281,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const { root, variantIndex } = get(); if (!root) return;
     removeConnectionsForPair(root, variantIndex, id);
     set({ dirty: true, selection: null }); get().refresh();
+  },
+
+  insertNodeOnConnection(nodeName, edgeId) {
+    const { root, variantIndex } = get(); if (!root) return;
+    const v = root.variants[variantIndex];
+    const target = v.connections.find((c, i) => (c.name || `${c.from}-${c.to}-${i}`) === edgeId);
+    if (!target || target.from === nodeName || target.to === nodeName) return;
+    const a = target.from, b = target.to;
+    const { from: _f, to: _t, name: _n, ...rest } = target; // copy guard/type/road to both halves
+    removeConnectionsForPair(root, variantIndex, edgeId);
+    addConnection(root, variantIndex, { ...structuredClone(rest), from: a, to: nodeName });
+    addConnection(root, variantIndex, { ...structuredClone(rest), from: nodeName, to: b });
+    set({ dirty: true, selection: { kind: "zone", id: nodeName } }); get().refresh();
   },
 
   updateZone(name, patch) {
