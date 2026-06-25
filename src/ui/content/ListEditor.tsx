@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { VariantField } from "../inspector/fields";
 import { ColHead } from "./ColHead";
 import type { ContentDef } from "../../core/content";
 
@@ -28,7 +29,7 @@ export function ListEditor({ draft, onChange }: { draft: ContentDef; onChange: (
             <Combobox value={e.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setEntry(i, { sid: v })} />
             <input type="number" value={e.weight ?? ""} onChange={(ev) => setEntry(i, { weight: num(ev.target.value) })} />
-            <input type="number" value={e.variant ?? ""} placeholder="none" onChange={(ev) => setEntry(i, { variant: num(ev.target.value) })} />
+            <VariantField sid={e.sid} value={e.variant} ariaLabel="Variant" onChange={(v) => setEntry(i, { variant: v })} />
             <Combobox value={e.biome ?? ""} options={catalogs.biomes ?? []} ariaLabel="Biome" placeholder="any"
               onChange={(v) => setEntry(i, { biome: v || undefined })} />
             <button className="ct-iconbtn" aria-label="Remove object" onClick={() => setContent(content.filter((_, j) => j !== i))}>✕</button>

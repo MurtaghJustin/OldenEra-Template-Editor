@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { VariantField } from "../inspector/fields";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef } from "../../core/content";
 
@@ -36,7 +37,7 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
           <Fragment key={i}>
             <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setLimit(i, { sid: v })} />
-            <input type="number" value={l.variant ?? ""} placeholder="any" onChange={(e) => setLimit(i, { variant: num(e.target.value) })} />
+            <VariantField sid={l.sid} value={l.variant} ariaLabel="Variant" onChange={(v) => setLimit(i, { variant: v })} />
             <input type="number" value={l.maxCount ?? ""} onChange={(e) => setLimit(i, { maxCount: num(e.target.value) })} />
             <button className="ct-iconbtn" aria-label="Remove limit" onClick={() => setLimits(limits.filter((_, j) => j !== i))}>✕</button>
           </Fragment>

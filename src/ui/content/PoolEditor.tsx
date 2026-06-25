@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
-import { ReferenceListField } from "../inspector/fields";
+import { ReferenceListField, VariantField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
@@ -86,7 +86,7 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
                   <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
                     onChange={(v) => patchContent({ sid: v })} />
                   <input type="number" value={c.weight ?? ""} onChange={(e) => patchContent({ weight: num(e.target.value) })} />
-                  <input type="number" value={c.variant ?? ""} placeholder="none" onChange={(e) => patchContent({ variant: num(e.target.value) })} />
+                  <VariantField sid={c.sid} value={c.variant} ariaLabel="Variant" onChange={(v) => patchContent({ variant: v })} />
                   <button className="ct-iconbtn" aria-label="Remove object" onClick={() => setGroup(i, { content: (g.content ?? []).filter((_, m) => m !== k) })}>✕</button>
                 </Fragment>
               );

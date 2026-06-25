@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { VariantField } from "./fields";
 import { ColHead } from "../content/ColHead";
 
 // Root valueOverrides: per-object guard-value overrides applied wherever that object spawns.
@@ -21,7 +22,7 @@ export function ValueOverridesEditor({ overrides, onChange }: { overrides: Overr
           <Fragment key={i}>
             <Combobox value={o.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Override object" placeholder="search objects…"
               onChange={(v) => set(i, { sid: v })} />
-            <input type="number" value={o.variant ?? ""} onChange={(e) => set(i, { variant: num(e.target.value) })} />
+            <VariantField sid={o.sid} value={o.variant} ariaLabel="Override variant" onChange={(v) => set(i, { variant: v })} />
             <input type="number" value={o.guardValue ?? ""} onChange={(e) => set(i, { guardValue: num(e.target.value) })} />
             <button className="ct-iconbtn" aria-label="Remove override" onClick={() => onChange(overrides.filter((_, j) => j !== i))}>✕</button>
           </Fragment>

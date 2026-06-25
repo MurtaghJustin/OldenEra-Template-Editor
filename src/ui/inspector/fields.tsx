@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { Combobox } from "../Combobox";
 import { SELECTOR_TYPES, type Selector } from "../../core/types";
+import { variantsFor } from "../../core/variants";
 
 // A field label with an optional info marker — hover the ⓘ for a documentation-sourced tooltip.
 // The marker is aria-hidden so it never alters a control's accessible name (tests/screen readers).
@@ -146,6 +147,27 @@ export function ReactionDistributionField({ label, value, onChange, hint }:
         ))}
       </div>
     </div>
+  );
+}
+
+// Variant picker for an object. When the object has named variants (dragon utopia, pandora box,
+// monty hall) it's a dropdown of "Any / 0: Name / …"; otherwise a plain number input. An existing
+// value outside the known set (e.g. pandora variant 45) is preserved as an "(unknown)" option.
+export function VariantField({ sid, value, onChange, ariaLabel }: { sid?: string; value?: number; onChange: (v: number | undefined) => void; ariaLabel?: string }) {
+  const opts = variantsFor(sid);
+  if (opts.length === 0) {
+    return <input type="number" aria-label={ariaLabel} value={value ?? ""} placeholder="none"
+      onChange={(e) => { const n = parseInt(e.target.value, 10); onChange(Number.isFinite(n) ? n : undefined); }} />;
+  }
+  const known = new Set(opts.map((o) => o.value));
+  return (
+    <select aria-label={ariaLabel} value={value === undefined ? "" : String(value)}
+      onChange={(e) => onChange(e.target.value === "" ? undefined : parseInt(e.target.value, 10))}>
+      <option value="">(none)</option>
+      <option value="-1">Any</option>
+      {value !== undefined && value !== -1 && !known.has(value) && <option value={value}>{value}: (unknown)</option>}
+      {opts.map((o) => <option key={o.value} value={o.value}>{o.value}: {o.label}</option>)}
+    </select>
   );
 }
 

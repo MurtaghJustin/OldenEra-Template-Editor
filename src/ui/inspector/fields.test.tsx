@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { NumberField, SelectField, TextField } from "./fields";
+import { NumberField, SelectField, TextField, VariantField } from "./fields";
 
 describe("fields", () => {
   it("NumberField calls onChange with a number", () => {
@@ -15,6 +15,16 @@ describe("fields", () => {
     render(<SelectField label="Layout" value="a" options={["a", "b"]} onChange={onChange} />);
     fireEvent.change(screen.getByLabelText("Layout"), { target: { value: "b" } });
     expect(onChange).toHaveBeenCalledWith("b");
+  });
+
+  it("VariantField: named dropdown for known objects, number input for the rest", () => {
+    const { rerender } = render(<VariantField sid="dragon_utopia" value={1} onChange={() => {}} ariaLabel="V" />);
+    const sel = screen.getByLabelText("V");
+    expect(sel.tagName).toBe("SELECT");
+    expect(sel).toHaveValue("1");
+    expect(screen.getByText("2: Large Guard")).toBeInTheDocument();
+    rerender(<VariantField sid="the_gorge" value={2} onChange={() => {}} ariaLabel="V" />);
+    expect(screen.getByLabelText("V").tagName).toBe("INPUT");
   });
 
   it("TextField round-trips strings", () => {

@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
-import { ReferenceListField } from "../inspector/fields";
+import { ReferenceListField, VariantField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
@@ -98,8 +98,8 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
             <div className="ct-field" style={{ flex: "1 1 160px" }}>Object<HintMark hint="Object guaranteed in the zone — or leave blank and use include lists." />
               <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="(or use include lists)"
                 onChange={(v) => setItem(i, { sid: v || undefined })} /></div>
-            <label className="ct-field">Variant<HintMark hint="Variant index; -1 = random/any; blank = none." />
-              <input type="number" value={it.variant ?? ""} placeholder="none" onChange={(e) => setItem(i, { variant: num(e.target.value) })} /></label>
+            <label className="ct-field">Variant<HintMark hint="Object sub-type; named for utopias/pandora/etc., -1 = any, blank = none." />
+              <VariantField sid={it.sid} value={it.variant} ariaLabel="Variant" onChange={(v) => setItem(i, { variant: v })} /></label>
             <label className="ct-field">Guarding<HintMark hint="Force this item guarded or unguarded (Default = the pool decides)." />
               <select value={it.isGuarded === undefined ? "" : it.isGuarded ? "yes" : "no"}
                 onChange={(e) => setItem(i, { isGuarded: e.target.value === "" ? undefined : e.target.value === "yes" })}>
