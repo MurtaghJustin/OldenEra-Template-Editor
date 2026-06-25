@@ -1,7 +1,7 @@
 import { useEditorStore } from "../../state/store";
 import { catalogs, winConditionName } from "../../core/catalogs";
 import { GAME_MODES } from "../../core/types";
-import { NumberField, SelectField, CheckboxField } from "./fields";
+import { NumberField, SelectField, CheckboxField, TextField } from "./fields";
 import { TournamentRounds } from "./TournamentRounds";
 import { BonusesEditor } from "./BonusesEditor";
 import { ValueOverridesEditor } from "./ValueOverridesEditor";
@@ -27,6 +27,10 @@ export function GameRulesPanel() {
       <h3>Game Rules</h3>
       <div style={grid}>
         {head("Match")}
+        <div style={span}>
+          <TextField label="Map name" value={(root.name as string) ?? ""} onChange={(v) => setRoot({ name: v })}
+            hint="The generated map's name — what the game uses to identify the template. Edit it here instead of hand-editing the file." />
+        </div>
         <SelectField label="Game mode" value={root.gameMode} options={[...GAME_MODES]} onChange={(v) => setRoot({ gameMode: v })}
           hint="Classic (multiple heroes per player) or SingleHero (one hero each)." />
         <SelectField label="Win condition" value={root.displayWinCondition ?? ""} options={catalogs.winConditions} labelFor={winConditionName}
