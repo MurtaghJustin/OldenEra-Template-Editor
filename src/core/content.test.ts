@@ -19,6 +19,10 @@ describe("content definitions", () => {
     expect(newContentDef("lists", "l")).toEqual({ name: "l", content: [] });
     expect(newContentDef("mandatory", "m")).toEqual({ name: "m", content: [] });
     expect(newContentDef("countLimits", "c")).toEqual({ name: "c", playerMin: null, playerMax: null, limits: [] });
+    const layout = newContentDef("layouts", "z") as Record<string, unknown>;
+    expect(layout.name).toBe("z");
+    expect(layout.obstaclesFill).toBe(0.5);
+    expect(Array.isArray(layout.elevationModes)).toBe(true);
   });
 
   it("generates unique names against existing definitions", () => {

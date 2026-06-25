@@ -61,6 +61,19 @@ describe("ContentDrawer", () => {
     expect(screen.getByLabelText("target max")).toBeInTheDocument();
   });
 
+  it("zone layout editor: New, add an elevation mode, Accept commits to zoneLayouts", () => {
+    useEditorStore.getState().openContentDrawer("layouts");
+    render(<ContentDrawer />);
+    expect(screen.getByText("Zone layouts")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("+ New"));
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "zone_layout_test" } });
+    fireEvent.click(screen.getByText("+ Add mode"));
+    fireEvent.click(screen.getByText("Accept"));
+    const layout = (useEditorStore.getState().root!.zoneLayouts as Record<string, unknown>[]).find((d) => d.name === "zone_layout_test")!;
+    expect(layout.obstaclesFill).toBe(0.5);                       // skeleton default
+    expect(layout.elevationModes as unknown[]).toHaveLength(2);   // 1 default + 1 added
+  });
+
   it("discards an in-progress edit on Cancel", () => {
     useEditorStore.getState().upsertContentDef("lists", { name: "keep_me", content: [] });
     useEditorStore.getState().openContentDrawer("lists", "keep_me");

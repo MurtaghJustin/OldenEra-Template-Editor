@@ -48,6 +48,7 @@ export function Toolbar() {
       <button onClick={() => useEditorStore.getState().openContentDrawer("lists")} disabled={!root}>Lists</button>
       <button onClick={() => useEditorStore.getState().openContentDrawer("mandatory")} disabled={!root}>Mandatory</button>
       <button onClick={() => useEditorStore.getState().openContentDrawer("countLimits")} disabled={!root}>Limits</button>
+      <button onClick={() => useEditorStore.getState().openContentDrawer("layouts")} disabled={!root}>Zone layouts</button>
       <span style={{ marginLeft: "auto", opacity: 0.7 }}>
         {fileName}{dirty ? " • unsaved" : ""}
       </span>

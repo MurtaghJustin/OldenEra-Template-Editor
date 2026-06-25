@@ -2,13 +2,14 @@ import type { TemplateRoot } from "./types";
 
 // The four root-level content definition collections a template can author. Each is an array of
 // named definitions that zones reference by name. Shapes follow Documentation/04.
-export type ContentKind = "pools" | "lists" | "mandatory" | "countLimits";
+export type ContentKind = "pools" | "lists" | "mandatory" | "countLimits" | "layouts";
 
 export const CONTENT_ROOT_FIELD: Record<ContentKind, string> = {
   pools: "contentPools",
   lists: "contentLists",
   mandatory: "mandatoryContent",
   countLimits: "contentCountLimits",
+  layouts: "zoneLayouts",
 };
 
 export const CONTENT_KIND_LABEL: Record<ContentKind, string> = {
@@ -16,6 +17,7 @@ export const CONTENT_KIND_LABEL: Record<ContentKind, string> = {
   lists: "Content lists",
   mandatory: "Mandatory content",
   countLimits: "Content count limits",
+  layouts: "Zone layouts",
 };
 
 // Loosely typed: definitions carry many optional/nested fields (see Documentation/04). Only `name`
@@ -35,6 +37,12 @@ export function newContentDef(kind: ContentKind, name: string): ContentDef {
     case "lists": return { name, content: [] };
     case "mandatory": return { name, content: [] };
     case "countLimits": return { name, playerMin: null, playerMax: null, limits: [] };
+    case "layouts": return {
+      name, obstaclesFill: 0.5, obstaclesFillVoid: 0.5, lakesFill: 0.3, minLakeArea: 10,
+      elevationClusterScale: 0.128, elevationModes: [{ weight: 1, minElevatedFraction: 0, maxElevatedFraction: 0 }],
+      roadClusterArea: 128, guardedEncounterResourceFractions: { countBounds: [], fractions: [0.5] },
+      ambientPickupDistribution: { repulsion: 1, noise: 0.3, roadAttraction: 0.25, obstacleAttraction: 0, groupSizeWeights: [4, 1, 1] },
+    };
   }
 }
 

@@ -38,6 +38,17 @@ describe("GameRulesPanel", () => {
     expect((wcOf().tournamentAnnounceDays as number[])[0]).toBe(7);  // battle 10 − 3 days
   });
 
+  it("adds a starting bonus (defaults to resources) and a value override", () => {
+    render(<GameRulesPanel />);
+    fireEvent.click(screen.getByText("+ Add bonus"));
+    fireEvent.click(screen.getByText("+ Add override"));
+    const gr = useEditorStore.getState().root!.gameRules as Record<string, unknown>;
+    const bonuses = gr.bonuses as { sid: string }[];
+    expect(bonuses).toHaveLength(1);
+    expect(bonuses[0].sid).toBe("add_bonus_res");
+    expect((useEditorStore.getState().root!.valueOverrides as unknown[]).length).toBe(1);
+  });
+
   it("caps the announcement so it can't fall before the previous battle", () => {
     render(<GameRulesPanel />);
     fireEvent.change(screen.getByLabelText("Points to win"), { target: { value: "2" } });

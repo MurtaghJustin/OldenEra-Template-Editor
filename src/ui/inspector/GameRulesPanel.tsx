@@ -3,6 +3,8 @@ import { catalogs, winConditionName } from "../../core/catalogs";
 import { GAME_MODES } from "../../core/types";
 import { NumberField, SelectField, CheckboxField } from "./fields";
 import { TournamentRounds } from "./TournamentRounds";
+import { BonusesEditor } from "./BonusesEditor";
+import { ValueOverridesEditor } from "./ValueOverridesEditor";
 
 export function GameRulesPanel() {
   const root = useEditorStore((s) => s.root);
@@ -73,6 +75,17 @@ export function GameRulesPanel() {
         <div style={span}>
           <TournamentRounds pointsToWin={n("tournamentPointsToWin")} advances={(wc.tournamentDays as number[]) ?? []}
             announceDays={(wc.tournamentAnnounceDays as number[]) ?? []} onChange={setWC} />
+        </div>
+
+        {head("Starting bonuses")}
+        <div style={span}>
+          <BonusesEditor bonuses={(gr.bonuses as Parameters<typeof BonusesEditor>[0]["bonuses"]) ?? []} onChange={(bonuses) => setRules({ bonuses })} />
+        </div>
+
+        {head("Value overrides")}
+        <div style={span}>
+          <ValueOverridesEditor overrides={(root.valueOverrides as Parameters<typeof ValueOverridesEditor>[0]["overrides"]) ?? []}
+            onChange={(valueOverrides) => setRoot({ valueOverrides })} />
         </div>
       </div>
     </div>

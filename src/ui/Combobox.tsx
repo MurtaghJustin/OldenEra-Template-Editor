@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 // A type-to-search combobox with a dropdown we render ourselves — unlike a native <datalist>, this
 // lets us size the menu to its content (at least as wide as the input, never truncating an option)
@@ -69,11 +70,13 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
             else if (open && filtered.length === 1) { e.preventDefault(); choose(filtered[0]); }
           }
         }} />
-      {open && rect && filtered.length > 0 && (
+      {open && rect && filtered.length > 0 && createPortal(
+        // Portalled to <body> so it escapes the inspector/drawer stacking context and never gets
+        // overlapped by panel content scrolling beneath it.
         <div role="listbox" style={{
           position: "fixed", left: rect.left, top: rect.top, minWidth: rect.width, width: "max-content",
-          maxWidth: "min(560px, 92vw)", maxHeight: 260, overflowY: "auto", zIndex: 60,
-          background: "#1f1f1f", border: "1px solid #3a3a3a", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.5)",
+          maxWidth: "min(560px, 92vw)", maxHeight: 260, overflowY: "auto", zIndex: 1000,
+          background: "#1f1f1f", border: "1px solid #3a3a3a", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.55)",
         }}>
           {filtered.map((o, i) => (
             <div key={o} role="option" aria-selected={i === hi}
@@ -86,7 +89,8 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
           {all.length > filtered.length && (
             <div style={{ padding: "5px 10px", fontSize: 11, opacity: 0.5 }}>+{all.length - filtered.length} more — keep typing…</div>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

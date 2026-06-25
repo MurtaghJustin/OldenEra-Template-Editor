@@ -34,8 +34,12 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
       {head("Basics")}
       <NumberField label="Size" value={zone.size ?? 1} onChange={(n) => onPatch({ size: n })}
         hint="Relative area weight; 1.0 is baseline. Scales the zone's share of the map and its content budget." />
-      <SelectField label="Layout" value={zone.layout ?? ""} options={catalogs.layouts} onChange={(v) => onPatch({ layout: v })}
-        hint="Terrain/obstacle/encounter profile — a built-in name or one defined in zoneLayouts." />
+      <div>
+        <SelectField label="Layout" value={zone.layout ?? ""} options={catalogs.layouts} onChange={(v) => onPatch({ layout: v })}
+          hint="Terrain/obstacle/encounter profile — a built-in name or one defined in zoneLayouts." />
+        <button type="button" style={{ fontSize: 11, marginTop: 2 }} disabled={!zone.layout}
+          onClick={() => zone.layout && openContentDrawer("layouts", zone.layout)}>Edit layout definition</button>
+      </div>
       <NumberField label="Crossroads position" value={zone.crossroadsPosition ?? 0} onChange={(n) => onPatch({ crossroadsPosition: n })}
         hint="0 = no crossroads; 1 = the zone has a central road junction." />
       <NumberField label="Diplomacy modifier" value={zone.diplomacyModifier ?? 0} onChange={(n) => onPatch({ diplomacyModifier: n })}

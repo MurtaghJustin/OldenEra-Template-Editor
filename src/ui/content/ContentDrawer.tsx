@@ -9,6 +9,7 @@ import { CountLimitsEditor } from "./CountLimitsEditor";
 import { ListEditor } from "./ListEditor";
 import { PoolEditor } from "./PoolEditor";
 import { MandatoryEditor } from "./MandatoryEditor";
+import { ZoneLayoutEditor } from "./ZoneLayoutEditor";
 import "./drawer.css";
 
 // A navigation entry in the drawer's back-stack. Edits operate on a DRAFT copy that is only
@@ -133,6 +134,7 @@ function EditorBody({ kind, draft, onChange, onOpenRef }:
       {kind === "lists" && <ListEditor draft={draft} onChange={onChange} />}
       {kind === "pools" && <PoolEditor draft={draft} onChange={onChange} onOpenRef={onOpenRef} />}
       {kind === "mandatory" && <MandatoryEditor draft={draft} onChange={onChange} onOpenRef={onOpenRef} />}
+      {kind === "layouts" && <ZoneLayoutEditor draft={draft} onChange={onChange} />}
     </div>
   );
 }
