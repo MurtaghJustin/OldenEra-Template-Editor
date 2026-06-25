@@ -3,7 +3,7 @@ import { GraphCanvas } from "./GraphCanvas";
 import { NodeTypePalette } from "./NodeTypePalette";
 import { InteractionHints } from "./InteractionHints";
 import { ContentDrawer } from "./content/ContentDrawer";
-import { Inspector } from "./inspector/Inspector";
+import { InspectorDrawer } from "./InspectorDrawer";
 import { useEditorStore } from "../state/store";
 
 function IssuesBanner() {
@@ -24,17 +24,15 @@ export default function App() {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Toolbar />
-      <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           {root ? <GraphCanvas /> : <div style={{ padding: 24, opacity: 0.6 }}>Click <b>New</b> to start a blank template, or <b>Open</b> a .rmg.json.</div>}
         </div>
-        <div style={{ width: 380, borderLeft: "1px solid #333", display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div style={{ width: 280, borderLeft: "1px solid #333", display: "flex", flexDirection: "column", minHeight: 0 }}>
           <NodeTypePalette />
           <InteractionHints />
-          <div style={{ flex: 1, overflow: "auto" }}>
-            <Inspector />
-          </div>
         </div>
+        <InspectorDrawer />
       </div>
       <IssuesBanner />
       <ContentDrawer />

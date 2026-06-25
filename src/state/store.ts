@@ -65,6 +65,7 @@ interface EditorState {
   setNodePosition(id: string, x: number, y: number): void;
   addZoneOfType(name: string, typeId: string, overrides: Partial<Zone>, position?: { x: number; y: number }): void;
   removeZoneById(name: string): void;
+  duplicateZoneById(name: string): void;
   renameZoneById(oldName: string, newName: string): void;
   addConn(conn: Connection): void;
   removeConn(id: string): void;
@@ -224,6 +225,30 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     removeZone(root, variantIndex, name);
     const { [name]: _drop, ...rest } = positions;
     set({ dirty: true, selection: null, positions: rest }); get().refresh();
+  },
+
+  duplicateZoneById(name) {
+    const { root, variantIndex, positions } = get(); if (!root) return;
+    const v = root.variants[variantIndex];
+    const src = v.zones.find((z) => z.name === name); if (!src) return;
+    const taken = new Set(v.zones.map((z) => z.name));
+    let newName = `${name}-copy`; for (let i = 2; taken.has(newName); i++) newName = `${name}-copy-${i}`;
+    const clone = structuredClone(src) as Zone;
+    clone.name = newName;
+    clone.roads = []; // roads reference this zone's specific connections — the copy starts unwired
+    // Reassign any Spawn slots to the next free players so the copy isn't a duplicate player start.
+    const used = new Set<number>();
+    for (const z of v.zones) for (const m of z.mainObjects ?? []) {
+      const mm = /^Player(\d+)$/.exec(typeof m.spawn === "string" ? m.spawn : ""); if (mm) used.add(Number(mm[1]));
+    }
+    for (const m of clone.mainObjects ?? []) if (m.type === "Spawn" && typeof m.spawn === "string" && /^Player\d+$/.test(m.spawn)) {
+      let n = 1; while (used.has(n)) n++; used.add(n); m.spawn = `Player${n}`;
+    }
+    addZone(root, variantIndex, clone);
+    const sp = positions[name];
+    const nextPos = sp ? { ...positions, [newName]: { x: sp.x + 48, y: sp.y + 48 } } : positions;
+    set({ dirty: true, selection: { kind: "zone", id: newName }, positions: nextPos });
+    get().refresh();
   },
 
   renameZoneById(oldName, newName) {

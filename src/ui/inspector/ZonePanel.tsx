@@ -10,6 +10,7 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
   const updateZone = useEditorStore((s) => s.updateZone);
   const renameZoneById = useEditorStore((s) => s.renameZoneById);
   const removeZoneById = useEditorStore((s) => s.removeZoneById);
+  const duplicateZoneById = useEditorStore((s) => s.duplicateZoneById);
   const nodeTypes = useEditorStore((s) => s.nodeTypes);
   const zone = root?.variants[vi].zones.find((z) => z.name === zoneName);
   const [nameDraft, setNameDraft] = useState(zoneName);
@@ -38,7 +39,10 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
 
       <ZoneFields zone={zone} onPatch={(patch) => updateZone(zoneName, patch)} onAddRef={addRef} />
 
-      <button style={{ marginTop: 12, color: "#e88" }} onClick={() => removeZoneById(zoneName)}>Delete zone</button>
+      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+        <button onClick={() => duplicateZoneById(zoneName)}>Duplicate zone</button>
+        <button style={{ color: "#e88" }} onClick={() => removeZoneById(zoneName)}>Delete zone</button>
+      </div>
     </div>
   );
 }

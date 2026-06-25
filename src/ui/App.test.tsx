@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import App from "./App";
 import { useEditorStore } from "../state/store";
 import minimal from "../test-fixtures/minimal.rmg.json";
@@ -22,11 +22,20 @@ beforeEach(() => {
 });
 
 describe("App", () => {
-  it("renders toolbar, canvas, and inspector regions", () => {
+  it("renders toolbar, canvas, and palette; inspector is closed until something is selected", () => {
     render(<App />);
     expect(screen.getByText("Open")).toBeInTheDocument();        // toolbar
     expect(screen.getByText("Hub")).toBeInTheDocument();          // canvas
-    expect(screen.getByText(/Select a zone/i)).toBeInTheDocument(); // inspector empty state
+    expect(screen.getByText(/Drag onto canvas/i)).toBeInTheDocument(); // palette
+    expect(screen.queryByLabelText("Close inspector")).toBeNull();     // inspector slide-out closed
+  });
+
+  it("opens the inspector slide-out when a zone is selected and closes it via ✕", () => {
+    render(<App />);
+    act(() => { useEditorStore.getState().select({ kind: "zone", id: "Hub" }); });
+    expect(screen.getByLabelText("Close inspector")).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Close inspector"));
+    expect(useEditorStore.getState().selection).toBeNull();
   });
 
   it("shows a validation error banner when present", () => {

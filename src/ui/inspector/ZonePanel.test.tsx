@@ -23,6 +23,14 @@ describe("ZonePanel", () => {
     expect(useEditorStore.getState().root!.variants[0].zones.some((z) => z.name === "Center")).toBe(true);
   });
 
+  it("duplicates a zone with a unique name and selects the copy", () => {
+    render(<ZonePanel zoneName="Hub" />);
+    fireEvent.click(screen.getByText("Duplicate zone"));
+    const names = useEditorStore.getState().root!.variants[0].zones.map((z) => z.name);
+    expect(names).toContain("Hub-copy");
+    expect(useEditorStore.getState().selection).toEqual({ kind: "zone", id: "Hub-copy" });
+  });
+
   it("adds a town (City main object) to a zone and configures its win-condition flag", () => {
     render(<ZonePanel zoneName="Hub" />);
     const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;

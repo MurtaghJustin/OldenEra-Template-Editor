@@ -10,3 +10,17 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   border-radius: 4px; font: inherit; min-width: 0;
 }
 input:disabled, select:disabled, textarea:disabled { opacity: 0.4; }
+
+/* The zone/details inspector is a non-modal left slide-out overlaying the canvas (so it can be wide
+   without permanently shrinking the center). Other slide-outs (the content drawer) layer over it via
+   higher z-index. Close it to reclaim the canvas. */
+@keyframes inspector-slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.inspector-drawer {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 960px; max-width: 92vw;
+  background: #1b1b1b; border-right: 1px solid #333; z-index: 40;
+  display: flex; flex-direction: column; box-shadow: 2px 0 14px rgba(0, 0, 0, 0.45);
+  animation: inspector-slide-in 0.18s ease-out;
+}
+@media (prefers-reduced-motion: reduce) { .inspector-drawer { animation: none; } }
+.inspector-drawer-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #333; }
+.inspector-drawer-body { flex: 1; overflow: auto; }

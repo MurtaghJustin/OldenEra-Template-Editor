@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   ReactFlow, ReactFlowProvider, Background, Controls, ConnectionMode, useNodesState, useReactFlow,
   type Node, type Edge, type Connection as RfConn,
@@ -23,9 +23,25 @@ function Flow() {
   const addConn = useEditorStore((s) => s.addConn);
   const setNodePosition = useEditorStore((s) => s.setNodePosition);
   const connectMode = useEditorStore((s) => s.connectMode);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getViewport, setViewport } = useReactFlow();
+  const paneRef = useRef<HTMLDivElement>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+
+  // When a zone is selected, pan it to the centre of the VISIBLE canvas — i.e. the strip not covered
+  // by the inspector slide-out (≈960px on the left) — so the node you're editing stays in view.
+  useEffect(() => {
+    if (selection?.kind !== "zone") return;
+    const node = (useEditorStore.getState().graph?.nodes ?? []).find((n) => n.id === selection.id);
+    const el = paneRef.current;
+    if (!node || !el) return;
+    const { width, height } = el.getBoundingClientRect();
+    const cover = Math.min(960, width);                                  // inspector overlay width
+    const centerX = width - cover > 120 ? (cover + width) / 2 : width / 2; // visible-strip centre
+    const { zoom } = getViewport();
+    const cx = node.x + 26, cy = node.y + 26;                            // disc centre (52px node)
+    setViewport({ x: centerX - cx * zoom, y: height / 2 - cy * zoom, zoom }, { duration: 250 });
+  }, [selection, getViewport, setViewport]);
 
   // Delete key removes the selected zone or connection — unless focus is in a text field/select,
   // where Delete must edit the text instead. (React Flow's own delete key is disabled below so it
@@ -92,7 +108,7 @@ function Flow() {
   };
 
   return (
-    <div style={{ height: "100%" }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }} onDrop={onDrop}>
+    <div ref={paneRef} style={{ height: "100%" }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }} onDrop={onDrop}>
       <ReactFlow
         nodes={nodes} edges={edges} nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
