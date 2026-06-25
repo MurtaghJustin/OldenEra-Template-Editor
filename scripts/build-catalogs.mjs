@@ -107,7 +107,11 @@ function buildSidNames() {
   for (const line of readFileSync(path, "utf-8").split(/\r?\n/)) {
     const m = /^\|\s*`([a-z0-9_]+)`\s*\|\s*(.+?)\s*\|\s*$/.exec(line);
     if (!m) continue;
-    const name = m[2].replace(/\*+/g, "").replace(/\s*\([^)]*\)/g, "").trim();
+    const name = m[2]
+      .replace(/\*+/g, "")                        // bold/italic markers
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")     // flatten markdown links → their text (avoids nested parens)
+      .replace(/\s*\([^)]*\)/g, "")                // drop parenthetical notes
+      .trim();
     if (!name || /[/…–]/.test(name) || name.toLowerCase() === "name") continue;
     out[m[1]] = name;
   }
