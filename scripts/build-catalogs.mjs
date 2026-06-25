@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..", "..");
 const OUT = join(__dirname, "..", "src", "generated", "catalogs.json");
+const OUT_LAYOUTS = join(__dirname, "..", "src", "generated", "zoneLayoutDefaults.json");
 
 // Doc-05 seed values that may not all appear in the corpus.
 const SEED = {
@@ -88,6 +89,34 @@ for (const file of collectFiles()) {
   }
 }
 
+// Authentic per-name zone-layout defaults: the game's built-in `zone_layout_default` plus, for each
+// named layout (zone_layout_sides, …), the most-common inline definition across the templates — so
+// a node type's auto-seeded layout starts from real role-appropriate values, not a generic guess.
+function buildZoneLayoutDefaults() {
+  const out = {};
+  const dfl = join(ROOT, "Data", "generator", "zone_layouts", "default_zone_layouts.json");
+  if (existsSync(dfl)) {
+    try { const j = JSON.parse(readFileSync(dfl, "utf-8")); const list = Array.isArray(j) ? j : (j.zoneLayouts || []); for (const d of list) if (d?.name) out[d.name] = d; } catch { /* ignore */ }
+  }
+  const counts = {}; // name -> { canonicalJSON: { count, def } }
+  for (const file of collectFiles()) {
+    let d; try { d = JSON.parse(readFileSync(file, "utf-8")); } catch { continue; }
+    for (const z of d.zoneLayouts || []) {
+      if (!z?.name) continue;
+      const { name, ...rest } = z;
+      const key = JSON.stringify(rest);
+      (counts[name] ??= {});
+      (counts[name][key] ??= { count: 0, def: z }).count++;
+    }
+  }
+  for (const [name, variants] of Object.entries(counts)) {
+    let best = null;
+    for (const e of Object.values(variants)) if (!best || e.count > best.count) best = e;
+    if (best) out[name] = best.def; // most-common template definition wins for named layouts
+  }
+  return out;
+}
+
 function merge(name) { return Array.from(new Set([...(SEED[name] || []), ...sets[name]])).sort(); }
 
 // Documented SID → display name, parsed from the clean two-column table rows in
@@ -137,5 +166,8 @@ const catalogs = {
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(catalogs, null, 2) + "\n");
+const zoneLayoutDefaults = buildZoneLayoutDefaults();
+writeFileSync(OUT_LAYOUTS, JSON.stringify(zoneLayoutDefaults, null, 2) + "\n");
+console.log("Wrote", OUT_LAYOUTS, "—", Object.keys(zoneLayoutDefaults).length, "layout defaults");
 console.log("Wrote", OUT);
 for (const [k, v] of Object.entries(catalogs)) console.log(`  ${k}: ${Array.isArray(v) ? v.length : Object.keys(v).length}`);

@@ -1,4 +1,7 @@
 import type { TemplateRoot } from "./types";
+import zoneLayoutDefaults from "../generated/zoneLayoutDefaults.json";
+
+const LAYOUT_DEFAULTS = zoneLayoutDefaults as Record<string, Record<string, unknown>>;
 
 // The four root-level content definition collections a template can author. Each is an array of
 // named definitions that zones reference by name. Shapes follow Documentation/04.
@@ -44,6 +47,15 @@ export function newContentDef(kind: ContentKind, name: string): ContentDef {
       ambientPickupDistribution: { repulsion: 1, noise: 0.3, roadAttraction: 0.25, obstacleAttraction: 0, groupSizeWeights: [4, 1, 1] },
     };
   }
+}
+
+// A zone-layout definition seeded with authentic values: the named role layout's real default when
+// known (mined from the templates / game data), else the game's built-in zone_layout_default, else a
+// generic skeleton. Used when a node type's layout must be auto-added to the template.
+export function defaultZoneLayout(name: string): ContentDef {
+  const base = LAYOUT_DEFAULTS[name] ?? LAYOUT_DEFAULTS["zone_layout_default"];
+  if (base) return structuredClone({ ...base, name }) as ContentDef;
+  return newContentDef("layouts", name);
 }
 
 // A "<base>-N" name not already used among definitions of this kind.

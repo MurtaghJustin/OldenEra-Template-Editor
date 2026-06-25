@@ -1,4 +1,4 @@
-import { catalogs, isKnownEnum } from "./catalogs";
+import { isKnownEnum } from "./catalogs";
 import { CONNECTION_TYPES } from "./types";
 import type { TemplateRoot } from "./types";
 
@@ -15,14 +15,17 @@ export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] 
 
   const names = new Set<string>();
   const slots = new Map<number, string>();
+  // A zone's layout must be defined in the template's zoneLayouts — referencing an undefined layout
+  // hangs the generator (there are no usable built-in layout defaults; see OctoJebus Outcast).
+  const definedLayouts = new Set(((root.zoneLayouts as { name?: string }[] | undefined) ?? []).map((z) => z.name).filter(Boolean));
 
   v.zones.forEach((z, zi) => {
     const p = `variants[${variantIndex}].zones[${zi}]`;
     if (names.has(z.name)) issues.push({ severity: "error", message: `Duplicate zone name "${z.name}"`, path: p });
     names.add(z.name);
 
-    if (!catalogs.layouts.includes(z.layout))
-      issues.push({ severity: "warning", message: `Unknown layout "${z.layout}" (not in catalog)`, path: `${p}.layout` });
+    if (z.layout && !definedLayouts.has(z.layout))
+      issues.push({ severity: "warning", message: `Layout "${z.layout}" is not defined in this template's Zone layouts — the generator may hang`, path: `${p}.layout` });
 
     for (const mo of z.mainObjects || []) {
       if (mo.type === "Spawn" && mo.spawn) {

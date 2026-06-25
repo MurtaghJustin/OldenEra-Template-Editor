@@ -1,0 +1,705 @@
+{
+  "zone_layout_default": {
+    "name": "zone_layout_default",
+    "obstaclesFill": 0.4,
+    "lakesFill": 0.3,
+    "minLakeArea": 20,
+    "elevationClusterScale": 0.15,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 70,
+    "guardedEncounterDencity": 1.4,
+    "guardedEncounterSizeDistribution": [
+      0,
+      0,
+      1,
+      3,
+      6,
+      6,
+      1
+    ],
+    "unguardedEncounterDencity": 1,
+    "unguardedEncounterSizeDistribution": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "ambientPickupDensity": 1,
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.2,
+      "roadAttraction": 0.5,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        4,
+        1,
+        1
+      ]
+    }
+  },
+  "zone_layout_center": {
+    "name": "zone_layout_center",
+    "obstaclesFill": 0.36,
+    "obstaclesFillVoid": 0.6,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_spawns": {
+    "name": "zone_layout_spawns",
+    "obstaclesFill": 0.24,
+    "obstaclesFillVoid": 0.48,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.4,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_sides": {
+    "name": "zone_layout_sides",
+    "obstaclesFill": 0.24,
+    "obstaclesFillVoid": 0.48,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.4,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_treasures": {
+    "name": "zone_layout_treasures",
+    "obstaclesFill": 0.24,
+    "obstaclesFillVoid": 0.48,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.4,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_spawn": {
+    "name": "zone_layout_spawn",
+    "obstaclesFill": 0.55,
+    "obstaclesFillVoid": 0.55,
+    "lakesFill": 0.3,
+    "minLakeArea": 12,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0.2
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.7,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 128,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": 0.5,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        4,
+        1,
+        1
+      ]
+    }
+  },
+  "zone_layout_treasure_zone": {
+    "name": "zone_layout_treasure_zone",
+    "obstaclesFill": 0.5,
+    "obstaclesFillVoid": 0.5,
+    "lakesFill": 0.3,
+    "minLakeArea": 10,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      }
+    ],
+    "roadClusterArea": 128,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": 0.25,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        4,
+        1,
+        1
+      ]
+    }
+  },
+  "zone_layout_supertreasure_zone": {
+    "name": "zone_layout_supertreasure_zone",
+    "obstaclesFill": 0.5,
+    "obstaclesFillVoid": 0.4,
+    "lakesFill": 0.45,
+    "minLakeArea": 12,
+    "elevationClusterScale": 0.12,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      }
+    ],
+    "roadClusterArea": 80,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_start_zone": {
+    "name": "zone_layout_start_zone",
+    "obstaclesFill": 0.4,
+    "obstaclesFillVoid": 0.4,
+    "lakesFill": 0.4,
+    "minLakeArea": 8,
+    "elevationClusterScale": 1,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 1,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 96,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_side_zone": {
+    "name": "zone_layout_side_zone",
+    "obstaclesFill": 0.4,
+    "obstaclesFillVoid": 0.85,
+    "lakesFill": 0.2,
+    "minLakeArea": 12,
+    "elevationClusterScale": 1,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 1,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 96,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_side_spawn_zone": {
+    "name": "zone_layout_side_spawn_zone",
+    "obstaclesFill": 0.4,
+    "obstaclesFillVoid": 0.4,
+    "lakesFill": 0.4,
+    "minLakeArea": 8,
+    "elevationClusterScale": 1,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 1,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 96,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_back": {
+    "name": "zone_layout_back",
+    "obstaclesFill": 0.8,
+    "obstaclesFillVoid": 0.8,
+    "lakesFill": 0.4,
+    "minLakeArea": 5,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      }
+    ],
+    "roadClusterArea": 64,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        1
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_wincondition_zone": {
+    "name": "zone_layout_wincondition_zone",
+    "obstaclesFill": 0.55,
+    "obstaclesFillVoid": 0.55,
+    "lakesFill": 0.35,
+    "minLakeArea": 12,
+    "elevationClusterScale": 1,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0
+      }
+    ],
+    "roadClusterArea": 90,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.9
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_center_zone": {
+    "name": "zone_layout_center_zone",
+    "obstaclesFill": 0.45,
+    "obstaclesFillVoid": 0.55,
+    "lakesFill": 0.1,
+    "minLakeArea": 8,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0.1
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.9,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 64,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_player_spawn": {
+    "name": "zone_layout_player_spawn",
+    "obstaclesFill": 0.36,
+    "obstaclesFillVoid": 0.6,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_ai_spawn": {
+    "name": "zone_layout_ai_spawn",
+    "obstaclesFill": 0.24,
+    "obstaclesFillVoid": 0.48,
+    "lakesFill": 0.3,
+    "minLakeArea": 16,
+    "elevationClusterScale": 0.16,
+    "elevationModes": [
+      {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
+      }
+    ],
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.4,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        20,
+        2,
+        1
+      ]
+    }
+  },
+  "zone_layout_leaf": {
+    "name": "zone_layout_leaf",
+    "obstaclesFill": 0.48,
+    "obstaclesFillVoid": 0.64,
+    "lakesFill": 0.2,
+    "elevationClusterScale": 0.16,
+    "roadClusterArea": 160,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.66
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": 0.5,
+      "obstacleAttraction": 0,
+      "groupSizeWeights": [
+        1,
+        0,
+        0
+      ]
+    }
+  },
+  "zone_layout_treasure": {
+    "name": "zone_layout_treasure",
+    "obstaclesFill": 0.55,
+    "obstaclesFillVoid": 0.55,
+    "lakesFill": 0.3,
+    "minLakeArea": 10,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0.3
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.7,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 128,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0.05,
+      "groupSizeWeights": [
+        12,
+        1,
+        0
+      ]
+    }
+  },
+  "zone_layout_second_spawn": {
+    "name": "zone_layout_second_spawn",
+    "obstaclesFill": 0.3,
+    "obstaclesFillVoid": 0.75,
+    "lakesFill": 0.3,
+    "minLakeArea": 8,
+    "elevationClusterScale": 0.128,
+    "elevationModes": [
+      {
+        "weight": 1,
+        "minElevatedFraction": 0,
+        "maxElevatedFraction": 0.2
+      },
+      {
+        "weight": 1,
+        "minElevatedFraction": 0.8,
+        "maxElevatedFraction": 1
+      }
+    ],
+    "roadClusterArea": 128,
+    "guardedEncounterResourceFractions": {
+      "countBounds": [],
+      "fractions": [
+        0.5
+      ]
+    },
+    "ambientPickupDistribution": {
+      "repulsion": 1,
+      "noise": 0.3,
+      "roadAttraction": -0.3,
+      "obstacleAttraction": 0.05,
+      "groupSizeWeights": [
+        12,
+        1,
+        0
+      ]
+    }
+  }
+}

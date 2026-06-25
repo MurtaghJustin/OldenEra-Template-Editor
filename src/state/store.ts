@@ -14,7 +14,7 @@ import {
 import { autoLayout } from "../core/layout";
 import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from "../core/nodeTypes";
 import { validateTemplate, type Issue } from "../core/validate";
-import { CONTENT_ROOT_FIELD, type ContentKind, type ContentDef } from "../core/content";
+import { CONTENT_ROOT_FIELD, defaultZoneLayout, type ContentKind, type ContentDef } from "../core/content";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -96,6 +96,16 @@ function saveCustomTypes(types: NodeType[]): void {
   try { localStorage.setItem(CUSTOM_TYPES_KEY, JSON.stringify(types.filter((t) => !t.builtin))); } catch { /* e.g. storage disabled */ }
 }
 function withCustoms(builtins: NodeType[]): NodeType[] { return [...builtins, ...loadCustomTypes()]; }
+
+// Ensure a zone-layout name is defined in the template's zoneLayouts — node types carry layout
+// names (zone_layout_sides, …) but referencing one that isn't defined inline hangs the generator,
+// so adding a zone of that type seeds a default definition. Mutates root; caller refreshes.
+function ensureLayoutDefined(root: TemplateRoot, name: string | undefined): void {
+  if (!name) return;
+  const r = root as Record<string, unknown>;
+  const arr = Array.isArray(r.zoneLayouts) ? (r.zoneLayouts as { name?: string }[]) : [];
+  if (!arr.some((z) => z.name === name)) { arr.push(defaultZoneLayout(name)); r.zoneLayouts = arr; }
+}
 
 // Factor the auto-layout is spread by for display (canvas + preview), so edges read longer relative
 // to the fixed-size discs. Pure scale → shapes unchanged.
@@ -226,6 +236,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       let n = 1; while (used.has(n)) n++;
       spawn.spawn = `Player${n}`;
     }
+    ensureLayoutDefined(root, zone.layout); // the type's layout must exist in zoneLayouts
     addZone(root, variantIndex, zone);
     if (position) set({ positions: { ...positions, [name]: position } });
     set({ dirty: true }); get().refresh();
@@ -302,6 +313,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // Renames must go through renameZoneById (it also rewrites connection endpoints);
     // strip any `name` from the patch so updateZone can't silently break the graph.
     if (z) { const { name: _ignore, ...safe } = patch; Object.assign(z, safe); }
+    if (typeof patch.layout === "string") ensureLayoutDefined(root, patch.layout); // e.g. "Apply type"
     set({ dirty: true }); get().refresh();
   },
 

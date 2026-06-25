@@ -25,6 +25,18 @@ describe("store", () => {
     expect(s.graph?.nodes.some((n) => n.id === "Side-A1")).toBe(true);
   });
 
+  it("adding a node type auto-defines its zone layout (so the generator can't be left dangling)", () => {
+    useEditorStore.getState().newTemplate(); // blank template: zoneLayouts is empty
+    useEditorStore.getState().addZoneOfType("S", "side", {}); // the "side" type uses zone_layout_sides
+    const defs = useEditorStore.getState().root!.zoneLayouts as { name: string; obstaclesFill?: number }[];
+    const sides = defs.find((z) => z.name === "zone_layout_sides")!;
+    expect(sides).toBeTruthy();
+    expect(typeof sides.obstaclesFill).toBe("number"); // seeded with real authentic values, not empty
+    // applying a type via updateZone also seeds its layout
+    useEditorStore.getState().updateZone("S", { layout: "zone_layout_treasures" });
+    expect((useEditorStore.getState().root!.zoneLayouts as { name: string }[]).map((z) => z.name)).toContain("zone_layout_treasures");
+  });
+
   it("a new player spawn defaults to the next free player slot", () => {
     // The minimal fixture already has Player1 and Player2; the next spawn should be Player3.
     useEditorStore.getState().addZoneOfType("Spawn-C", "player_spawn", {});

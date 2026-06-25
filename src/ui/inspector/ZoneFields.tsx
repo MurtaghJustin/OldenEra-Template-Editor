@@ -16,6 +16,10 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
 }) {
   const openContentDrawer = useEditorStore((s) => s.openContentDrawer);
   const createContentDraft = useEditorStore((s) => s.createContentDraft);
+  // A zone's layout must be defined in this template's zoneLayouts (there are no usable built-in
+  // layout defaults — referencing an undefined layout hangs the generator), so only offer those.
+  const root = useEditorStore((s) => s.root);
+  const layoutOptions = ((root?.zoneLayouts as { name?: string }[] | undefined) ?? []).map((z) => z.name ?? "").filter(Boolean);
 
   const refPicker = (label: string, field: keyof Zone, kind: ContentKind, options: string[], hint: string) => (
     <ReferenceListField label={label} hint={hint} values={(zone[field] as string[] | undefined) ?? []} options={options}
@@ -35,8 +39,8 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
       <NumberField label="Size" value={zone.size ?? 1} onChange={(n) => onPatch({ size: n })}
         hint="Relative area weight; 1.0 is baseline. Scales the zone's share of the map and its content budget." />
       <div>
-        <SelectField label="Layout" value={zone.layout ?? ""} options={catalogs.layouts} onChange={(v) => onPatch({ layout: v })}
-          hint="Terrain/obstacle/encounter profile — a built-in name or one defined in zoneLayouts." />
+        <SelectField label="Layout" value={zone.layout ?? ""} options={layoutOptions} onChange={(v) => onPatch({ layout: v })}
+          hint="Must be a layout defined in this template's Zone layouts — create them in the Zone layouts editor first." />
         <button type="button" style={{ fontSize: 11, marginTop: 2 }} disabled={!zone.layout}
           onClick={() => zone.layout && openContentDrawer("layouts", zone.layout)}>Edit layout definition</button>
       </div>
