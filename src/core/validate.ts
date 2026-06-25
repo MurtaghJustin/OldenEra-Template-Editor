@@ -10,6 +10,12 @@ export interface Issue {
 
 export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] {
   const issues: Issue[] = [];
+
+  // A win condition is required — the map generator won't run without one. Every official template
+  // sets displayWinCondition; a template missing it (e.g. a freshly created one) is invalid.
+  if (!(root as { displayWinCondition?: string }).displayWinCondition)
+    issues.push({ severity: "error", message: "No win condition set — the map can't generate. Set one in Game Rules → Win condition.", path: "displayWinCondition" });
+
   const v = root.variants[variantIndex];
   if (!v) return issues;
 

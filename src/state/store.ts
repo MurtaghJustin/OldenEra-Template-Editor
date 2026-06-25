@@ -160,7 +160,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // scratch — the normal "start a new map" flow. `original` is an empty-variant clone so the
     // round-trip merge has a base to merge dragged-in zones onto.
     const root: TemplateRoot = {
-      name: "Untitled", gameMode: "Classic", sizeX: 96, sizeZ: 96,
+      // A win condition is required for the map to generate, so a new template defaults to the
+      // standard "defeat all opponents" win (win_condition_1); description mirrors the corpus shape.
+      name: "Untitled", description: "", displayWinCondition: "win_condition_1",
+      gameMode: "Classic", sizeX: 96, sizeZ: 96,
       gameRules: {
         heroCountMin: 4, heroCountMax: 8, heroCountIncrement: 1, heroHireBan: false,
         encounterHoles: false, winConditions: { classic: true }, bonuses: [],

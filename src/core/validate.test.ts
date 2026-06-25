@@ -39,6 +39,14 @@ describe("validate", () => {
     expect(issues.some((i) => i.severity === "error" && /connectionType/.test(i.message))).toBe(true);
   });
 
+  it("errors when no win condition is set (required for generation)", () => {
+    const root = fresh();
+    expect(validateTemplate(root).some((i) => /win condition/i.test(i.message))).toBe(false);
+    delete (root as { displayWinCondition?: string }).displayWinCondition;
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "error" && /win condition/i.test(i.message))).toBe(true);
+  });
+
   it("warns (not errors) on an unknown layout SID", () => {
     const root = fresh();
     root.variants[0].zones[0].layout = "zone_layout_made_up";
