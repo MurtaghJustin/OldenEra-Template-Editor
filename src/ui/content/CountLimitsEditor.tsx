@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef } from "../../core/content";
 
 type Limit = { sid?: string; variant?: number; maxCount?: number };
@@ -16,10 +17,10 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
   return (
     <div>
       <div className="ct-playerrow">
-        <label className="ct-field">Player min
+        <label className="ct-field">Player min<HintMark hint="Only apply this cap-set at or above this player count; blank = any." />
           <input type="number" value={(draft.playerMin as number | null) ?? ""}
             onChange={(e) => onChange({ ...draft, playerMin: e.target.value === "" ? null : (num(e.target.value) ?? null) })} /></label>
-        <label className="ct-field">Player max
+        <label className="ct-field">Player max<HintMark hint="Only apply this cap-set at or below this player count; blank = any." />
           <input type="number" value={(draft.playerMax as number | null) ?? ""}
             onChange={(e) => onChange({ ...draft, playerMax: e.target.value === "" ? null : (num(e.target.value) ?? null) })} /></label>
         <span style={{ fontSize: 11, opacity: 0.5, paddingBottom: 4 }}>blank = applies to any player count</span>
@@ -27,7 +28,10 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
 
       <div className="content-section-label">Limits</div>
       <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 72px 72px 22px" }}>
-        <div className="ct-head">Object</div><div className="ct-head">Variant</div><div className="ct-head">Max</div><div />
+        <ColHead label="Object" hint="Object the cap applies to." />
+        <ColHead label="Variant" hint="Variant the cap applies to; blank/-1 = any." />
+        <ColHead label="Max" hint="Maximum occurrences allowed in the zone." />
+        <div />
         {limits.map((l, i) => (
           <Fragment key={i}>
             <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"

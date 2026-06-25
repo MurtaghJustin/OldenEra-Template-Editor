@@ -23,10 +23,14 @@ export function ConnectionPanel({ connId }: { connId: string }) {
       <h3>Connection</h3>
       <div style={{ fontSize: 12, opacity: 0.7 }}>{conn.from} → {conn.to}</div>
       <SelectField label="Type" value={conn.connectionType} options={[...CONNECTION_TYPES]}
+        hint="Direct/Default = road; Portal = teleport (doesn't affect layout); Proximity = adjacency hint only."
         onChange={(val) => set({ connectionType: val })} />
-      <NumberField label="Guard value" value={conn.guardValue ?? 0} onChange={(n) => set({ guardValue: n })} />
-      <NumberField label="Guard weekly increment" value={conn.guardWeeklyIncrement ?? 0} onChange={(n) => set({ guardWeeklyIncrement: n })} />
-      <CheckboxField label="Road" value={!!conn.road} onChange={(b) => set({ road: b })} />
+      <NumberField label="Guard value" value={conn.guardValue ?? 0} onChange={(n) => set({ guardValue: n })}
+        hint="Strength of the border guard army on this connection." />
+      <NumberField label="Guard weekly increment" value={conn.guardWeeklyIncrement ?? 0} onChange={(n) => set({ guardWeeklyIncrement: n })}
+        hint="Compounding weekly guard growth (0.10 = +10% per week)." />
+      <CheckboxField label="Road" value={!!conn.road} onChange={(b) => set({ road: b })}
+        hint="Whether a visible road is drawn along the connection." />
       <button style={{ marginTop: 12, color: "#e88" }} onClick={() => removeConn(connId)}>Delete connection</button>
     </div>
   );

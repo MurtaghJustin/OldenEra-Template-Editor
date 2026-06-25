@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
+import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
 
 type Rule = { type?: string; args?: string[]; targetMin?: number; targetMax?: number; weight?: number };
@@ -41,7 +42,11 @@ function RulesEditor({ rules, onChange }: { rules: Rule[]; onChange: (r: Rule[])
   return (
     <div>
       <div className="ct-grid" style={{ gridTemplateColumns: "110px 70px 110px 60px 22px" }}>
-        <div className="ct-head">Frame</div><div className="ct-head">Main obj #</div><div className="ct-head">Distance</div><div className="ct-head">Weight</div><div />
+        <ColHead label="Frame" hint="Reference point the distance is measured from." />
+        <ColHead label="Main obj #" hint="Index of the main object to measure from (for the Main object frame)." />
+        <ColHead label="Distance" hint="Target distance band from the reference (Next-to … Very far, or Custom)." />
+        <ColHead label="Weight" hint="Relative importance when several rules combine." />
+        <div />
         {rules.map((r, i) => {
           // A row is custom if the user chose Custom, or its stored band doesn't match any preset.
           const custom = customRows.has(i) || bandFor(r.targetMin, r.targetMax) === "custom";
@@ -90,25 +95,27 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
       {items.map((it, i) => (
         <div className="content-row" key={i}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-            <div className="ct-field" style={{ flex: "1 1 160px" }}>Object
+            <div className="ct-field" style={{ flex: "1 1 160px" }}>Object<HintMark hint="Object guaranteed in the zone — or leave blank and use include lists." />
               <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="(or use include lists)"
                 onChange={(v) => setItem(i, { sid: v || undefined })} /></div>
-            <label className="ct-field">Variant
+            <label className="ct-field">Variant<HintMark hint="Variant index; -1 = random/any; blank = none." />
               <input type="number" value={it.variant ?? ""} placeholder="none" onChange={(e) => setItem(i, { variant: num(e.target.value) })} /></label>
-            <label className="ct-field">Guarding
+            <label className="ct-field">Guarding<HintMark hint="Force this item guarded or unguarded (Default = the pool decides)." />
               <select value={it.isGuarded === undefined ? "" : it.isGuarded ? "yes" : "no"}
                 onChange={(e) => setItem(i, { isGuarded: e.target.value === "" ? undefined : e.target.value === "yes" })}>
                 <option value="">Default</option><option value="yes">Guarded</option><option value="no">Unguarded</option>
               </select></label>
           </div>
           <div style={{ display: "flex", gap: 14, margin: "6px 0", fontSize: 12, opacity: 0.85, alignItems: "center" }}>
-            <label style={{ display: "flex", gap: 4, alignItems: "center" }}><input type="checkbox" checked={!!it.isMine} onChange={(e) => setItem(i, { isMine: e.target.checked || undefined })} />Mine</label>
-            <label style={{ display: "flex", gap: 4, alignItems: "center" }}><input type="checkbox" checked={!!it.soloEncounter} onChange={(e) => setItem(i, { soloEncounter: e.target.checked || undefined })} />Solo encounter</label>
+            <label style={{ display: "flex", gap: 4, alignItems: "center" }} title="Treat this object as a resource mine."><input type="checkbox" checked={!!it.isMine} onChange={(e) => setItem(i, { isMine: e.target.checked || undefined })} />Mine</label>
+            <label style={{ display: "flex", gap: 4, alignItems: "center" }} title="Place this object alone, not clustered with other content."><input type="checkbox" checked={!!it.soloEncounter} onChange={(e) => setItem(i, { soloEncounter: e.target.checked || undefined })} />Solo encounter</label>
             <button className="ct-iconbtn" style={{ marginLeft: "auto" }} onClick={() => setItems(items.filter((_, j) => j !== i))}>Remove item</button>
           </div>
-          <ReferenceListField label="Include lists (instead of, or with, a fixed SID)" values={it.includeLists ?? []} options={catalogs.contentLists ?? []}
+          <ReferenceListField label="Include lists (instead of, or with, a fixed SID)"
+            hint="Pull one object per list mention; repeat a list to request several."
+            values={it.includeLists ?? []} options={catalogs.contentLists ?? []}
             onChange={(next) => setItem(i, { includeLists: next })} onOpen={(name) => onOpenRef("lists", name)} />
-          <div className="ct-head" style={{ marginTop: 6 }}>Placement rules</div>
+          <div style={{ marginTop: 6 }}><ColHead label="Placement rules" hint="Constrain where the object spawns relative to a reference point." /></div>
           <RulesEditor rules={it.rules ?? []} onChange={(rules) => setItem(i, { rules })} />
         </div>
       ))}

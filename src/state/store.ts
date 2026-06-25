@@ -93,6 +93,10 @@ function saveCustomTypes(types: NodeType[]): void {
 }
 function withCustoms(builtins: NodeType[]): NodeType[] { return [...builtins, ...loadCustomTypes()]; }
 
+// Factor the auto-layout is spread by for display (canvas + preview), so edges read longer relative
+// to the fixed-size discs. Pure scale → shapes unchanged.
+const LAYOUT_SCALE = 1.5;
+
 export const useEditorStore = create<EditorState>((set, get) => ({
   original: null, root: null, fileName: "untitled.rmg.json",
   variantIndex: 0, graph: null, positions: {}, selection: null, dirty: false, issues: [],
@@ -183,8 +187,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const { root, variantIndex } = get();
     if (!root || !root.variants[variantIndex]) return;
     const graph = autoLayout(extractGraph(root, variantIndex), root.variants[variantIndex]);
+    // Uniformly spread the computed layout so connection lines read longer relative to the
+    // fixed-size discs. A pure scale preserves every shape exactly. Applied here (render layer) so
+    // autoLayout and its shape tests stay in their natural units.
     const positions: Record<string, { x: number; y: number }> = {};
-    for (const n of graph.nodes) positions[n.id] = { x: n.x, y: n.y };
+    for (const n of graph.nodes) { n.x *= LAYOUT_SCALE; n.y *= LAYOUT_SCALE; positions[n.id] = { x: n.x, y: n.y }; }
     set({ root: { ...root }, graph, positions, issues: validateTemplate(root, variantIndex) });
   },
 

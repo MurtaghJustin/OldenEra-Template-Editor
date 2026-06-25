@@ -11,6 +11,13 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
 }
 input:disabled, select:disabled, textarea:disabled { opacity: 0.4; }
 
+/* Consistent button styling app-wide (toolbar, panels, drawers). React Flow's own controls use
+   more specific selectors so they're unaffected; small icon buttons opt out via inline styles. */
+button { font: inherit; padding: 4px 10px; background: #2a2a2a; color: #e6e6e6;
+  border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; }
+button:hover:not(:disabled) { background: #333; border-color: #4a4a4a; }
+button:disabled { opacity: 0.45; cursor: default; }
+
 /* The zone/details inspector is a non-modal left slide-out overlaying the canvas (so it can be wide
    without permanently shrinking the center). Other slide-outs (the content drawer) layer over it via
    higher z-index. Close it to reclaim the canvas. */

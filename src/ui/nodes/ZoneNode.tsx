@@ -48,7 +48,7 @@ export function ZoneNode({ data }: NodeProps) {
       <Handle type="source" position={Position.Bottom} className="zone-connect-handle" style={centreHandle(grab)} />
       {d.playerSlot !== undefined ? d.playerSlot : (d.hasTown ? "⌂" : "")}
       <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)",
-        marginTop: 2, fontSize: 11, whiteSpace: "nowrap", pointerEvents: "none", color: "#e0e0e0" }}>
+        marginTop: 2, fontSize: 9, whiteSpace: "nowrap", pointerEvents: "none", color: "#e0e0e0" }}>
         {d.label}
       </div>
     </div>

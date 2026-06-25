@@ -22,19 +22,30 @@ export function MainObjectsEditor({ objects, onChange }: { objects: MainObject[]
             <button onClick={() => onChange(objects.filter((_, j) => j !== i))}
               style={{ border: "none", background: "transparent", color: "#e88", cursor: "pointer" }}>Remove</button>
           </div>
-          {o.type === "Spawn" && <EnumField label="Player slot" value={o.spawn ?? ""} options={PLAYER_SLOTS} allowNone onChange={(v) => setObj(i, { spawn: v || undefined })} />}
-          {o.type === "City" && <CheckboxField label="Hold-city win condition" value={!!o.holdCityWinCon} onChange={(b) => setObj(i, { holdCityWinCon: b })} />}
-          <EnumField label="Owner" value={owner(o)} options={PLAYER_SLOTS} allowNone onChange={(v) => setObj(i, { owner: v || null })} />
-          <SelectorField label="Faction" value={o.faction} argOptions={catalogs.factions ?? []} onChange={(f) => setObj(i, { faction: f })} />
+          {o.type === "Spawn" && <EnumField label="Player slot" value={o.spawn ?? ""} options={PLAYER_SLOTS} allowNone onChange={(v) => setObj(i, { spawn: v || undefined })}
+            hint="Which player starts here (Player1–Player8)." />}
+          {o.type === "City" && <CheckboxField label="Hold-city win condition" value={!!o.holdCityWinCon} onChange={(b) => setObj(i, { holdCityWinCon: b })}
+            hint="This city is the Hold-City victory objective (pairs with the win condition)." />}
+          <EnumField label="Owner" value={owner(o)} options={PLAYER_SLOTS} allowNone onChange={(v) => setObj(i, { owner: v || null })}
+            hint="Player that owns this object from the start; blank = neutral." />
+          <SelectorField label="Faction" value={o.faction} argOptions={catalogs.factions ?? []} onChange={(f) => setObj(i, { faction: f })}
+            hint="Town faction selector (Match an index, FromList, etc.)." />
           <EnumField label="Construction template" value={o.buildingsConstructionSid ?? ""} options={catalogs.constructionSids ?? []} allowNone
+            hint="Pre-built building loadout (poor → ultra-rich, or a template-specific set). Defined in game data."
             onChange={(v) => setObj(i, { buildingsConstructionSid: v || undefined })} />
-          <EnumField label="Placement" value={o.placement ?? ""} options={PLACEMENTS} allowNone onChange={(v) => setObj(i, { placement: (v || undefined) as MainObject["placement"] })} />
+          <EnumField label="Placement" value={o.placement ?? ""} options={PLACEMENTS} allowNone onChange={(v) => setObj(i, { placement: (v || undefined) as MainObject["placement"] })}
+            hint="Where in the zone it spawns: Uniform (anywhere), Center, Connection, or NearZone." />
           <TextField label="Placement args (comma-separated)" value={(o.placementArgs ?? []).map(String).join(", ")}
+            hint="Extra placement arguments; usually empty."
             onChange={(v) => setObj(i, { placementArgs: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
-          <NumberField label="Guard chance" value={o.guardChance ?? 0} onChange={(n) => setObj(i, { guardChance: n })} />
-          <NumberField label="Guard value" value={o.guardValue ?? 0} onChange={(n) => setObj(i, { guardValue: n })} />
-          <NumberField label="Guard weekly increment" value={o.guardWeeklyIncrement ?? 0} onChange={(n) => setObj(i, { guardWeeklyIncrement: n })} />
-          <CheckboxField label="Remove guard if has owner" value={!!o.removeGuardIfHasOwner} onChange={(b) => setObj(i, { removeGuardIfHasOwner: b })} />
+          <NumberField label="Guard chance" value={o.guardChance ?? 0} onChange={(n) => setObj(i, { guardChance: n })}
+            hint="Probability (0–1) that this object is guarded." />
+          <NumberField label="Guard value" value={o.guardValue ?? 0} onChange={(n) => setObj(i, { guardValue: n })}
+            hint="Strength of the guarding army when guarded." />
+          <NumberField label="Guard weekly increment" value={o.guardWeeklyIncrement ?? 0} onChange={(n) => setObj(i, { guardWeeklyIncrement: n })}
+            hint="Compounding weekly guard growth (0.10 = +10% per week)." />
+          <CheckboxField label="Remove guard if has owner" value={!!o.removeGuardIfHasOwner} onChange={(b) => setObj(i, { removeGuardIfHasOwner: b })}
+            hint="Drop the guard once the object is owned (typical for player spawns)." />
         </div>
       ))}
       <button onClick={() => onChange([...objects, { type: "City", placement: "Center", placementArgs: [] }])}>+ Add object</button>

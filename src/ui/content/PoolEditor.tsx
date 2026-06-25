@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
+import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
 
 type ContentEntry = { sid?: string; weight?: number; variant?: number };
@@ -51,13 +52,13 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
       <label style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 12, opacity: 0.85, margin: "4px 0" }}>
         <input type="checkbox" checked={!!vd}
           onChange={(e) => onChange({ ...draft, valueDistribution: e.target.checked ? { priceBounds: [], weights: [0] } : undefined })} />
-        Bias selection by value tier
+        Bias selection by value tier<HintMark hint="Weight how often cheap vs. expensive content is drawn, using price buckets." />
       </label>
       {vd && (
         <div className="content-row">
-          <div className="ct-head">Price bounds (ascending)</div>
+          <ColHead label="Price bounds (ascending)" hint="Ascending value thresholds defining the price buckets." />
           <NumberRow values={vd.priceBounds ?? []} onChange={setBounds} />
-          <div className="ct-head" style={{ marginTop: 6 }}>Weights (one per bucket — one more than bounds)</div>
+          <div style={{ marginTop: 6 }}><ColHead label="Weights (one per bucket — one more than bounds)" hint="Selection weight per price bucket; controls cheap vs. expensive balance." /></div>
           <NumberRow values={vd.weights ?? []} fixedLen onChange={(w) => onChange({ ...draft, valueDistribution: { priceBounds: vd.priceBounds ?? [], weights: w } })} />
         </div>
       )}
@@ -66,15 +67,18 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
       {groups.map((g, i) => (
         <div className="content-row" key={i}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <label className="ct-field" style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>Weight
+            <label className="ct-field" style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>Weight<HintMark hint="Relative chance of drawing from this group within the pool." />
               <input type="number" style={{ width: 64 }} value={g.weight ?? ""} onChange={(e) => setGroup(i, { weight: num(e.target.value) })} /></label>
             <button className="ct-iconbtn" onClick={() => setGroups(groups.filter((_, j) => j !== i))}>Remove group</button>
           </div>
-          <ReferenceListField label="Include lists" values={g.includeLists ?? []} options={catalogs.contentLists ?? []}
+          <ReferenceListField label="Include lists" hint="Content lists this group pulls objects from." values={g.includeLists ?? []} options={catalogs.contentLists ?? []}
             onChange={(next) => setGroup(i, { includeLists: next })} onOpen={(name) => onOpenRef("lists", name)} />
-          <div className="ct-head" style={{ marginTop: 4 }}>Inline objects</div>
+          <div style={{ marginTop: 4 }}><ColHead label="Inline objects" hint="Objects placed directly by this group (besides the include lists)." /></div>
           <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 64px 64px 22px" }}>
-            <div className="ct-head">Object</div><div className="ct-head">Weight</div><div className="ct-head">Variant</div><div />
+            <ColHead label="Object" hint="Object SID placed by this group." />
+            <ColHead label="Weight" hint="Selection weight relative to sibling entries." />
+            <ColHead label="Variant" hint="Variant index; blank = none." />
+            <div />
             {(g.content ?? []).map((c, k) => {
               const patchContent = (p: Partial<ContentEntry>) => setGroup(i, { content: (g.content ?? []).map((x, m) => (m === k ? { ...x, ...p } : x)) });
               return (
@@ -95,7 +99,8 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
 
       <div className="content-section-label">Bans</div>
       <div className="ct-grid" style={{ gridTemplateColumns: "minmax(0,1fr) 22px" }}>
-        <div className="ct-head">Banned object</div><div />
+        <ColHead label="Banned object" hint="Objects removed from this pool's candidate set." />
+        <div />
         {bans.map((b, i) => (
           <Fragment key={i}>
             <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Banned object"

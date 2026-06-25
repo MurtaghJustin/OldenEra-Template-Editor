@@ -1,6 +1,6 @@
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
-import { NumberField, SelectField, ReferenceListField, SelectorField, TextField } from "./fields";
+import { NumberField, SelectField, ReferenceListField, SelectorField, ReactionDistributionField } from "./fields";
 import { MainObjectsEditor } from "./MainObjectsEditor";
 import type { ContentKind } from "../../core/content";
 import type { Zone, MainObject, Selector } from "../../core/types";
@@ -17,49 +17,76 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
   const openContentDrawer = useEditorStore((s) => s.openContentDrawer);
   const createContentDraft = useEditorStore((s) => s.createContentDraft);
 
-  const refPicker = (label: string, field: keyof Zone, kind: ContentKind, options: string[]) => (
-    <ReferenceListField label={label} values={(zone[field] as string[] | undefined) ?? []} options={options}
+  const refPicker = (label: string, field: keyof Zone, kind: ContentKind, options: string[], hint: string) => (
+    <ReferenceListField label={label} hint={hint} values={(zone[field] as string[] | undefined) ?? []} options={options}
       onChange={(next) => onPatch({ [field]: next } as Partial<Zone>)}
       onOpen={(name) => openContentDrawer(kind, name)}
       onAddNew={() => createContentDraft(kind, (name) => onAddRef(field, name))} />
   );
-  const reaction = (zone.guardReactionDistribution ?? []).map(String).join(", ");
+  // Flow fields into as many columns as fit (the inspector is wide); section headers and the wide
+  // editors span the full row.
+  const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", columnGap: 16, alignItems: "start" };
+  const span: React.CSSProperties = { gridColumn: "1 / -1" };
+  const head = (t: string) => <div style={{ ...span, fontSize: 12, opacity: 0.7, margin: "12px 0 2px", borderBottom: "1px solid #2e2e2e", paddingBottom: 2 }}>{t}</div>;
 
   return (
-    <>
-      <NumberField label="Size" value={zone.size ?? 1} onChange={(n) => onPatch({ size: n })} />
-      <SelectField label="Layout" value={zone.layout ?? ""} options={catalogs.layouts} onChange={(v) => onPatch({ layout: v })} />
-      <NumberField label="Crossroads position" value={zone.crossroadsPosition ?? 0} onChange={(n) => onPatch({ crossroadsPosition: n })} />
-      <NumberField label="Diplomacy modifier" value={zone.diplomacyModifier ?? 0} onChange={(n) => onPatch({ diplomacyModifier: n })} />
+    <div style={grid}>
+      {head("Basics")}
+      <NumberField label="Size" value={zone.size ?? 1} onChange={(n) => onPatch({ size: n })}
+        hint="Relative area weight; 1.0 is baseline. Scales the zone's share of the map and its content budget." />
+      <SelectField label="Layout" value={zone.layout ?? ""} options={catalogs.layouts} onChange={(v) => onPatch({ layout: v })}
+        hint="Terrain/obstacle/encounter profile — a built-in name or one defined in zoneLayouts." />
+      <NumberField label="Crossroads position" value={zone.crossroadsPosition ?? 0} onChange={(n) => onPatch({ crossroadsPosition: n })}
+        hint="0 = no crossroads; 1 = the zone has a central road junction." />
+      <NumberField label="Diplomacy modifier" value={zone.diplomacyModifier ?? 0} onChange={(n) => onPatch({ diplomacyModifier: n })}
+        hint="Adjusts neutral-creature join odds; negative makes recruiting harder." />
 
-      <div style={{ fontSize: 12, opacity: 0.7, margin: "10px 0 2px" }}>Guards</div>
-      <NumberField label="Guard cutoff" value={zone.guardCutoffValue ?? 0} onChange={(n) => onPatch({ guardCutoffValue: n })} />
-      <NumberField label="Guard multiplier" value={zone.guardMultiplier ?? 1} onChange={(n) => onPatch({ guardMultiplier: n })} />
-      <NumberField label="Guard randomization" value={zone.guardRandomization ?? 0} onChange={(n) => onPatch({ guardRandomization: n })} />
-      <NumberField label="Guard weekly increment" value={zone.guardWeeklyIncrement ?? 0} onChange={(n) => onPatch({ guardWeeklyIncrement: n })} />
-      <TextField label="Guard reaction distribution (comma-separated)" value={reaction}
-        onChange={(v) => onPatch({ guardReactionDistribution: v.split(",").map((s) => parseFloat(s.trim())).filter((n) => Number.isFinite(n)) })} />
+      {head("Guards")}
+      <NumberField label="Guard cutoff" value={zone.guardCutoffValue ?? 0} onChange={(n) => onPatch({ guardCutoffValue: n })}
+        hint="Minimum guard value to keep; guards weaker than this are dropped entirely (often 1500)." />
+      <NumberField label="Guard multiplier" value={zone.guardMultiplier ?? 1} onChange={(n) => onPatch({ guardMultiplier: n })}
+        hint="Scales this zone's content guard values; doesn't affect border/connection guards." />
+      <NumberField label="Guard randomization" value={zone.guardRandomization ?? 0} onChange={(n) => onPatch({ guardRandomization: n })}
+        hint="Per-guard random variance as a fraction (0.05 = ±5%); ~0.05–0.25 typical." />
+      <NumberField label="Guard weekly increment" value={zone.guardWeeklyIncrement ?? 0} onChange={(n) => onPatch({ guardWeeklyIncrement: n })}
+        hint="Compounding weekly guard growth (0.10 = +10% per week)." />
+      <div style={span}>
+        <ReactionDistributionField label="Guard reaction distribution" value={zone.guardReactionDistribution ?? []}
+          hint="Six weights spreading guards across disposition tiers (0 = fight … 5 = join)."
+          onChange={(v) => onPatch({ guardReactionDistribution: v })} />
+      </div>
 
-      <div style={{ fontSize: 12, opacity: 0.7, margin: "10px 0 2px" }}>Content budgets</div>
-      <NumberField label="Guarded value" value={zone.guardedContentValue ?? 0} onChange={(n) => onPatch({ guardedContentValue: n })} />
-      <NumberField label="Guarded value / area" value={zone.guardedContentValuePerArea ?? 0} onChange={(n) => onPatch({ guardedContentValuePerArea: n })} />
-      <NumberField label="Unguarded value" value={zone.unguardedContentValue ?? 0} onChange={(n) => onPatch({ unguardedContentValue: n })} />
-      <NumberField label="Unguarded value / area" value={zone.unguardedContentValuePerArea ?? 0} onChange={(n) => onPatch({ unguardedContentValuePerArea: n })} />
-      <NumberField label="Resources value" value={zone.resourcesValue ?? 0} onChange={(n) => onPatch({ resourcesValue: n })} />
-      <NumberField label="Resources value / area" value={zone.resourcesValuePerArea ?? 0} onChange={(n) => onPatch({ resourcesValuePerArea: n })} />
+      {head("Content budgets")}
+      <NumberField label="Guarded value" value={zone.guardedContentValue ?? 0} onChange={(n) => onPatch({ guardedContentValue: n })}
+        hint="Total value budget of guarded content (absolute amount)." />
+      <NumberField label="Guarded value / area" value={zone.guardedContentValuePerArea ?? 0} onChange={(n) => onPatch({ guardedContentValuePerArea: n })}
+        hint="Guarded-content value budget, scaled by zone size." />
+      <NumberField label="Unguarded value" value={zone.unguardedContentValue ?? 0} onChange={(n) => onPatch({ unguardedContentValue: n })}
+        hint="Total value budget of freely-accessible content (absolute)." />
+      <NumberField label="Unguarded value / area" value={zone.unguardedContentValuePerArea ?? 0} onChange={(n) => onPatch({ unguardedContentValuePerArea: n })}
+        hint="Unguarded-content value budget, scaled by zone size." />
+      <NumberField label="Resources value" value={zone.resourcesValue ?? 0} onChange={(n) => onPatch({ resourcesValue: n })}
+        hint="Total value budget for resource pickups/mines (absolute)." />
+      <NumberField label="Resources value / area" value={zone.resourcesValuePerArea ?? 0} onChange={(n) => onPatch({ resourcesValuePerArea: n })}
+        hint="Resource value budget, scaled by zone size." />
 
-      <div style={{ fontSize: 12, opacity: 0.7, margin: "10px 0 2px" }}>Biomes</div>
-      <SelectorField label="Zone biome" value={zone.zoneBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ zoneBiome: s })} />
-      <SelectorField label="Content biome" value={zone.contentBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ contentBiome: s })} />
-      <SelectorField label="Meta-objects biome" value={zone.metaObjectsBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ metaObjectsBiome: s })} />
+      {head("Biomes")}
+      <SelectorField label="Zone biome" value={zone.zoneBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ zoneBiome: s })}
+        hint="Selects the zone's terrain biome (FromList / Match / MatchMainObject / MatchZone)." />
+      <SelectorField label="Content biome" value={zone.contentBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ contentBiome: s })}
+        hint="Biome theme used when choosing content objects." />
+      <SelectorField label="Meta-objects biome" value={zone.metaObjectsBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ metaObjectsBiome: s })}
+        hint="Biome theme for meta/decoration objects." />
 
-      <div style={{ fontSize: 12, opacity: 0.7, margin: "10px 0 2px" }}>Objects &amp; content</div>
-      <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} onChange={(next) => onPatch({ mainObjects: next })} />
-      {refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [])}
-      {refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [])}
-      {refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [])}
-      {refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [])}
-      {refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [])}
-    </>
+      {head("Objects & content")}
+      <div style={span}>
+        <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} onChange={(next) => onPatch({ mainObjects: next })} />
+      </div>
+      {refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the guarded objects (banks, dwellings, strong buildings) are drawn from.")}
+      {refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the freely-accessible objects are drawn from.")}
+      {refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [], "Pool(s) the resource pickups/mines are drawn from.")}
+      {refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [], "Mandatory-content groups guaranteed to spawn in this zone.")}
+      {refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [], "Per-object cap-sets limiting how many of an object can appear here.")}
+    </div>
   );
 }
