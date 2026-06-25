@@ -58,6 +58,22 @@ describe("store", () => {
     localStorage.clear();
   });
 
+  it("makes a custom type from an existing zone (settings copied, roads cleared, persisted)", () => {
+    localStorage.clear();
+    const s = useEditorStore.getState();
+    // Give Hub a distinctive setting + some road wiring to confirm copy/clear behavior.
+    s.updateZone("Hub", { size: 2.5, roads: [{ from: 1 }] } as never);
+    const id = s.createTypeFromZone("Hub");
+    const type = useEditorStore.getState().nodeTypes.find((t) => t.id === id)!;
+    expect(type.builtin).toBe(false);
+    expect(type.label).toBe("Hub");
+    expect((type.zone as { size: number }).size).toBe(2.5);   // settings carried over
+    expect((type.zone as { roads: unknown[] }).roads).toEqual([]); // per-zone wiring cleared
+    expect("name" in type.zone).toBe(false);
+    expect(JSON.parse(localStorage.getItem("rmg.nodeTypes.custom")!).some((t: { id: string }) => t.id === id)).toBe(true);
+    localStorage.clear();
+  });
+
   it("upserts, renames and removes content definitions; opens/closes the drawer", () => {
     const s = useEditorStore.getState();
     s.upsertContentDef("pools", { name: "my_pool", groups: [] });

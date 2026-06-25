@@ -73,6 +73,7 @@ interface EditorState {
   serializeForSave(): string;
   // Custom node-type authoring (persisted in localStorage; merged into nodeTypes alongside builtins).
   createCustomType(fromId?: string): string; // returns the new type's id
+  createTypeFromZone(zoneName: string): string; // make a custom type from an existing zone's settings
   updateCustomType(id: string, patch: { label?: string; zone?: NodeType["zone"] }): void;
   removeCustomType(id: string): void;
 }
@@ -303,6 +304,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const base = nodeTypes.find((t) => t.id === fromId) ?? nodeTypes.find((t) => t.id === "side") ?? nodeTypes[0];
     const label = base && fromId ? `${base.label} copy` : "Custom type";
     const type: NodeType = { id, label, builtin: false, zone: structuredClone(base!.zone) };
+    const next = [...nodeTypes, type];
+    set({ nodeTypes: next }); saveCustomTypes(next);
+    return id;
+  },
+
+  createTypeFromZone(zoneName) {
+    const { root, variantIndex, nodeTypes } = get();
+    const zone = root?.variants[variantIndex]?.zones.find((z) => z.name === zoneName);
+    if (!zone) return "";
+    const ids = new Set(nodeTypes.map((t) => t.id));
+    let n = 1; while (ids.has(`custom_${n}`)) n++;
+    const id = `custom_${n}`;
+    const clone = structuredClone(zone) as Record<string, unknown>;
+    delete clone.name;
+    clone.roads = []; // per-zone wiring isn't part of a reusable type
+    const type: NodeType = { id, label: zoneName, builtin: false, zone: clone as NodeType["zone"] };
     const next = [...nodeTypes, type];
     set({ nodeTypes: next }); saveCustomTypes(next);
     return id;

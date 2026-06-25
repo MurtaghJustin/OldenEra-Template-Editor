@@ -11,6 +11,8 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
   const renameZoneById = useEditorStore((s) => s.renameZoneById);
   const removeZoneById = useEditorStore((s) => s.removeZoneById);
   const duplicateZoneById = useEditorStore((s) => s.duplicateZoneById);
+  const createTypeFromZone = useEditorStore((s) => s.createTypeFromZone);
+  const select = useEditorStore((s) => s.select);
   const nodeTypes = useEditorStore((s) => s.nodeTypes);
   const zone = root?.variants[vi].zones.find((z) => z.name === zoneName);
   const [nameDraft, setNameDraft] = useState(zoneName);
@@ -39,8 +41,10 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
 
       <ZoneFields zone={zone} onPatch={(patch) => updateZone(zoneName, patch)} onAddRef={addRef} />
 
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
         <button onClick={() => duplicateZoneById(zoneName)}>Duplicate zone</button>
+        <button title="Create a reusable node type from this zone's settings"
+          onClick={() => { if (createTypeFromZone(zoneName)) select({ kind: "nodeTypes" }); }}>Save as type</button>
         <button style={{ color: "#e88" }} onClick={() => removeZoneById(zoneName)}>Delete zone</button>
       </div>
     </div>
