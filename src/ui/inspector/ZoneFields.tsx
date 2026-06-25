@@ -82,11 +82,12 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
       <div style={span}>
         <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} onChange={(next) => onPatch({ mainObjects: next })} />
       </div>
-      {refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the guarded objects (banks, dwellings, strong buildings) are drawn from.")}
-      {refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the freely-accessible objects are drawn from.")}
-      {refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [], "Pool(s) the resource pickups/mines are drawn from.")}
-      {refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [], "Mandatory-content groups guaranteed to spawn in this zone.")}
-      {refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [], "Per-object cap-sets limiting how many of an object can appear here.")}
+      {/* Reference pickers each take a full row — long pool/group names overflow a narrow column. */}
+      <div style={span}>{refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the guarded objects (banks, dwellings, strong buildings) are drawn from.")}</div>
+      <div style={span}>{refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the freely-accessible objects are drawn from.")}</div>
+      <div style={span}>{refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [], "Pool(s) the resource pickups/mines are drawn from.")}</div>
+      <div style={span}>{refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [], "Mandatory-content groups guaranteed to spawn in this zone.")}</div>
+      <div style={span}>{refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [], "Per-object cap-sets limiting how many of an object can appear here.")}</div>
     </div>
   );
 }

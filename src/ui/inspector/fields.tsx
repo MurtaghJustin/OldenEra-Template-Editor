@@ -36,11 +36,11 @@ export function TextField({ label, value, onChange, hint }: { label: string; val
 
 // Editable dropdown: a type-to-search combo-box that lets users pick a known value or type a custom
 // one. Uses the shared Combobox so opening an already-filled field shows the full option list.
-export function SelectField({ label, value, options, onChange, hint }: { label: string; value: string; options: string[]; onChange: (s: string) => void; hint?: string; }) {
+export function SelectField({ label, value, options, onChange, hint, labelFor }: { label: string; value: string; options: string[]; onChange: (s: string) => void; hint?: string; labelFor?: (v: string) => string; }) {
   return (
     <div style={{ display: "grid", gap: 2, marginBottom: 6 }}>
       <FieldLabel label={label} hint={hint} />
-      <Combobox value={value} options={options} onChange={onChange} ariaLabel={label} />
+      <Combobox value={value} options={options} onChange={onChange} ariaLabel={label} labelFor={labelFor} />
     </div>
   );
 }
@@ -105,21 +105,21 @@ export function SelectorField({ label, value, onChange, argOptions, hint }:
   const sel: Selector = value ?? { type: "FromList", args: [] };
   const setArgs = (args: string[]) => onChange({ ...sel, args });
   return (
-    <div style={{ display: "grid", gap: 2, marginBottom: 6 }}>
+    <div style={{ display: "grid", gap: 4, marginBottom: 6 }}>
       <FieldLabel label={label} hint={hint} />
-      <div style={{ display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>
-        <select aria-label={`${label} type`} value={sel.type} onChange={(e) => onChange({ ...sel, type: e.target.value as Selector["type"] })} style={{ flex: "0 0 140px" }}>
+      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        <select aria-label={`${label} type`} value={sel.type} onChange={(e) => onChange({ ...sel, type: e.target.value as Selector["type"] })} style={{ flex: 1, minWidth: 0 }}>
           {SELECTOR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
-        {sel.args.map((a, i) => (
-          <span key={i} style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
-            <input list={listId} value={a} style={{ width: 110 }} onChange={(e) => setArgs(sel.args.map((x, j) => (j === i ? e.target.value : x)))} />
-            <button aria-label="Remove arg" onClick={() => setArgs(sel.args.filter((_, j) => j !== i))}
-              style={{ border: "none", background: "transparent", color: "#e88", cursor: "pointer", padding: 0 }}>✕</button>
-          </span>
-        ))}
-        <button type="button" onClick={() => setArgs([...sel.args, ""])}>+ arg</button>
+        <button type="button" onClick={() => setArgs([...sel.args, ""])} style={{ flexShrink: 0 }}>+ arg</button>
       </div>
+      {sel.args.map((a, i) => (
+        <div key={i} style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <input list={listId} value={a} style={{ flex: 1, minWidth: 0 }} onChange={(e) => setArgs(sel.args.map((x, j) => (j === i ? e.target.value : x)))} />
+          <button aria-label="Remove arg" onClick={() => setArgs(sel.args.filter((_, j) => j !== i))}
+            style={{ border: "none", background: "transparent", color: "#e88", cursor: "pointer", padding: 0, flexShrink: 0 }}>✕</button>
+        </div>
+      ))}
       <datalist id={listId}>{(argOptions ?? []).map((o) => <option key={o} value={o} />)}</datalist>
     </div>
   );

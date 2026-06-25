@@ -33,17 +33,31 @@ export function MainObjectsEditor({ objects, onChange }: { objects: MainObject[]
           <EnumField label="Construction template" value={o.buildingsConstructionSid ?? ""} options={catalogs.constructionSids ?? []} allowNone
             hint="Pre-built building loadout (poor → ultra-rich, or a template-specific set). Defined in game data."
             onChange={(v) => setObj(i, { buildingsConstructionSid: v || undefined })} />
-          <EnumField label="Placement" value={o.placement ?? ""} options={PLACEMENTS} allowNone onChange={(v) => setObj(i, { placement: (v || undefined) as MainObject["placement"] })}
-            hint="Where in the zone it spawns: Uniform (anywhere), Center, Connection, or NearZone." />
-          <TextField label="Placement args (comma-separated)" value={(o.placementArgs ?? []).map(String).join(", ")}
-            hint="Extra placement arguments; usually empty."
-            onChange={(v) => setObj(i, { placementArgs: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
-          <NumberField label="Guard chance" value={o.guardChance ?? 0} onChange={(n) => setObj(i, { guardChance: n })}
-            hint="Probability (0–1) that this object is guarded." />
-          <NumberField label="Guard value" value={o.guardValue ?? 0} onChange={(n) => setObj(i, { guardValue: n })}
-            hint="Strength of the guarding army when guarded." />
-          <NumberField label="Guard weekly increment" value={o.guardWeeklyIncrement ?? 0} onChange={(n) => setObj(i, { guardWeeklyIncrement: n })}
-            hint="Compounding weekly guard growth (0.10 = +10% per week)." />
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <EnumField label="Placement" value={o.placement ?? ""} options={PLACEMENTS} allowNone onChange={(v) => setObj(i, { placement: (v || undefined) as MainObject["placement"] })}
+                hint="Where in the zone it spawns: Uniform (anywhere), Center, Connection, or NearZone." />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <TextField label="Placement args" value={(o.placementArgs ?? []).map(String).join(", ")}
+                hint="Extra placement arguments, comma-separated; rarely used (usually empty)."
+                onChange={(v) => setObj(i, { placementArgs: v.split(",").map((s) => s.trim()).filter(Boolean) })} />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <NumberField label="Guard chance" value={o.guardChance ?? 0} onChange={(n) => setObj(i, { guardChance: n })}
+                hint="Probability (0–1) that this object is guarded; 0.5 is the most common value." />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <NumberField label="Guard value" value={o.guardValue ?? 0} onChange={(n) => setObj(i, { guardValue: n })}
+                hint="Strength of the guarding army when guarded." />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <NumberField label="Guard weekly +" value={o.guardWeeklyIncrement ?? 0} onChange={(n) => setObj(i, { guardWeeklyIncrement: n })}
+                hint="Compounding weekly guard growth (0.10 = +10% per week)." />
+            </div>
+          </div>
           <CheckboxField label="Remove guard if has owner" value={!!o.removeGuardIfHasOwner} onChange={(b) => setObj(i, { removeGuardIfHasOwner: b })}
             hint="Drop the guard once the object is owned (typical for player spawns)." />
         </div>

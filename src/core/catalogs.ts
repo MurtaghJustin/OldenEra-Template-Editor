@@ -38,3 +38,17 @@ export function objectName(sid: string): string {
   if (!sid) return "";
   return sidNames[sid] || sidDisplayName(sid);
 }
+
+// Display names for the headline win-condition IDs (Documentation/02 & 05).
+const WIN_CONDITION_NAMES: Record<string, string> = {
+  win_condition_1: "Standard",
+  win_condition_2: "Capital Capture",
+  win_condition_3: "Lost Starting City",
+  win_condition_4: "Gladiator Arena",
+  win_condition_5: "Hold City",
+  win_condition_6: "Tournament",
+};
+export function winConditionName(id: string): string {
+  if (!id) return "";
+  return WIN_CONDITION_NAMES[id] || id;
+}
