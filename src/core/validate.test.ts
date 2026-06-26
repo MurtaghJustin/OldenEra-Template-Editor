@@ -39,6 +39,20 @@ describe("validate", () => {
     expect(issues.some((i) => i.severity === "error" && /connectionType/.test(i.message))).toBe(true);
   });
 
+  it("errors when a zone is missing any content pool (the generation-hang root cause)", () => {
+    const root = fresh();
+    expect(validateTemplate(root).some((i) => /content pool/i.test(i.message))).toBe(false);
+    root.variants[0].zones[0].unguardedContentPool = [];
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "error" && /unguarded content pool/i.test(i.message))).toBe(true);
+    // guarded and resources are checked too
+    root.variants[0].zones[1].guardedContentPool = [];
+    root.variants[0].zones[2].resourcesContentPool = [];
+    const all = validateTemplate(root);
+    expect(all.some((i) => /guarded content pool/i.test(i.message))).toBe(true);
+    expect(all.some((i) => /resources content pool/i.test(i.message))).toBe(true);
+  });
+
   it("errors when no win condition is set (required for generation)", () => {
     const root = fresh();
     expect(validateTemplate(root).some((i) => /win condition/i.test(i.message))).toBe(false);

@@ -14,13 +14,23 @@ const baseGuard = {
   guardWeeklyIncrement: 0.1,
   guardReactionDistribution: [60, 20, 10, 5, 2, 0],
 };
-const emptyPools = {
-  guardedContentPool: [], unguardedContentPool: [], resourcesContentPool: [],
-  guardedContentValue: 0, guardedContentValuePerArea: 0,
-  unguardedContentValue: 0, unguardedContentValuePerArea: 0,
-  resourcesValue: 0, resourcesValuePerArea: 0,
-  mandatoryContent: [], contentCountLimits: [], roads: [],
-};
+// Every generatable zone carries all three content pools — guarded, unguarded AND resources. A zone
+// missing any of them hangs the map generator (no zone in the entire official corpus omits one; an
+// empty pool was the root cause of editor-made templates failing to generate). So each node type
+// gets role-appropriate pools: the classic random `_base` families for guarded/unguarded (the
+// guarded `tN_base` paired with its `unguarded_tN_base`) plus a general resources pool. All pool
+// names are verified to exist in the game data. Budgets are modest, sane defaults the user can tune.
+function pools(tier: number, resourcePool: string, guardedPerArea: number) {
+  return {
+    guardedContentPool: [`classic_template_pool_random_t${tier}_base`],
+    unguardedContentPool: [`classic_template_pool_random_unguarded_t${tier}_base`],
+    resourcesContentPool: [resourcePool],
+    guardedContentValue: 0, guardedContentValuePerArea: guardedPerArea,
+    unguardedContentValue: 0, unguardedContentValuePerArea: 600,
+    resourcesValue: 0, resourcesValuePerArea: 300,
+    mandatoryContent: [] as string[], contentCountLimits: [] as string[], roads: [] as unknown[],
+  };
+}
 const anyBiome = { type: "FromList" as const, args: [] as string[] };
 const biomes = { zoneBiome: anyBiome, contentBiome: anyBiome, metaObjectsBiome: anyBiome };
 
@@ -28,7 +38,8 @@ export const BUILTIN_NODE_TYPES: NodeType[] = [
   {
     id: "player_spawn", label: "Player Spawn", builtin: true,
     zone: {
-      size: 1.0, layout: "zone_layout_spawns", ...baseGuard, ...emptyPools, ...biomes,
+      size: 1.0, layout: "zone_layout_spawns", ...baseGuard,
+      ...pools(2, "content_pool_general_resources_start_zone_medium", 1000), ...biomes,
       zoneBiome: { type: "MatchMainObject", args: ["0"] },
       mainObjects: [{ type: "Spawn", spawn: "Player1", owner: null, guardChance: 0,
         guardValue: 0, removeGuardIfHasOwner: true,
@@ -38,25 +49,26 @@ export const BUILTIN_NODE_TYPES: NodeType[] = [
   },
   {
     id: "hub", label: "Hub / Center", builtin: true,
-    zone: { size: 1.5, layout: "zone_layout_center", ...baseGuard, ...emptyPools, ...biomes,
-      crossroadsPosition: 1, guardedContentPool: ["classic_template_pool_random_t4_base"],
-      guardedContentValuePerArea: 2000, mainObjects: [] },
+    zone: { size: 1.5, layout: "zone_layout_center", ...baseGuard,
+      ...pools(4, "content_pool_general_resources_treasure_zone_poor", 2000), ...biomes,
+      crossroadsPosition: 1, mainObjects: [] },
   },
   {
     id: "side", label: "Side / Neutral", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_sides", ...baseGuard, ...emptyPools, ...biomes,
-      guardedContentPool: ["classic_template_pool_random_t2_base"],
-      guardedContentValuePerArea: 1200, mainObjects: [] },
+    zone: { size: 1.0, layout: "zone_layout_sides", ...baseGuard,
+      ...pools(2, "content_pool_general_resources_side_zone_poor", 1200), ...biomes,
+      mainObjects: [] },
   },
   {
     id: "treasure", label: "Treasure", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_treasures", ...baseGuard, ...emptyPools, ...biomes,
-      guardedContentPool: ["classic_template_pool_random_t5_base"],
-      guardedContentValuePerArea: 3000, mainObjects: [] },
+    zone: { size: 1.0, layout: "zone_layout_treasures", ...baseGuard,
+      ...pools(5, "content_pool_general_resources_treasure_zone_poor", 3000), ...biomes,
+      mainObjects: [] },
   },
   {
     id: "hold_city", label: "Hold-City Objective", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_wincondition_zone", ...baseGuard, ...emptyPools, ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_wincondition_zone", ...baseGuard,
+      ...pools(4, "content_pool_general_resources_start_zone_medium", 1500), ...biomes,
       mainObjects: [{ type: "City", guardChance: 1, guardValue: 20000,
         buildingsConstructionSid: "rich_buildings_construction",
         faction: { type: "FromList", args: [] }, placement: "Center",
@@ -64,7 +76,8 @@ export const BUILTIN_NODE_TYPES: NodeType[] = [
   },
   {
     id: "arena", label: "Gladiator Arena", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_center", ...baseGuard, ...emptyPools, ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_center", ...baseGuard,
+      ...pools(2, "content_pool_general_resources_side_zone_poor", 1000), ...biomes,
       mainObjects: [{ type: "GladiatorArena", placement: "Center", placementArgs: [] }] },
   },
 ];

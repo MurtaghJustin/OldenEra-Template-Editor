@@ -33,6 +33,15 @@ export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] 
     if (z.layout && !definedLayouts.has(z.layout))
       issues.push({ severity: "warning", message: `Layout "${z.layout}" is not defined in this template's Zone layouts — the generator may hang`, path: `${p}.layout` });
 
+    // Every zone must carry all three content pools. An empty guarded/unguarded/resources pool hangs
+    // the generator (no official template ever omits one) — this was the cause of editor-made
+    // templates failing to generate.
+    for (const [field, label] of [["guardedContentPool", "guarded"], ["unguardedContentPool", "unguarded"], ["resourcesContentPool", "resources"]] as const) {
+      const pool = (z as Record<string, unknown>)[field];
+      if (!Array.isArray(pool) || pool.length === 0)
+        issues.push({ severity: "error", message: `Zone "${z.name}" has no ${label} content pool — the map can't generate. Every zone needs guarded, unguarded and resources pools.`, path: `${p}.${field}` });
+    }
+
     for (const mo of z.mainObjects || []) {
       if (mo.type === "Spawn" && mo.spawn) {
         const m = /^Player(\d)$/.exec(mo.spawn);

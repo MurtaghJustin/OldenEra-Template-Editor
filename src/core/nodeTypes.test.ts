@@ -28,6 +28,15 @@ describe("node types", () => {
     const zone = resolveZone("Spawn-A", type, {});
     expect(zone.mainObjects?.[0].type).toBe("Spawn");
   });
+
+  it("every built-in type carries all three content pools (empty ones hang the generator)", () => {
+    for (const t of BUILTIN_NODE_TYPES) {
+      const z = t.zone as unknown as Zone;
+      expect(z.guardedContentPool?.length, `${t.id} guarded`).toBeGreaterThan(0);
+      expect(z.unguardedContentPool?.length, `${t.id} unguarded`).toBeGreaterThan(0);
+      expect(z.resourcesContentPool?.length, `${t.id} resources`).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe("deriveNodeTypes", () => {
