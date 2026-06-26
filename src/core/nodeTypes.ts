@@ -7,27 +7,33 @@ export interface NodeType {
   zone: Omit<Zone, "name">; // defaults applied to a node, minus identity
 }
 
-const baseGuard = {
-  guardCutoffValue: 1500,
-  guardRandomization: 0.05,
-  guardMultiplier: 1.0,
-  guardWeeklyIncrement: 0.1,
-  guardReactionDistribution: [60, 20, 10, 5, 2, 0],
-};
-// Every generatable zone carries all three content pools — guarded, unguarded AND resources. A zone
-// missing any of them hangs the map generator (no zone in the entire official corpus omits one; an
-// empty pool was the root cause of editor-made templates failing to generate). So each node type
-// gets role-appropriate pools: the classic random `_base` families for guarded/unguarded (the
-// guarded `tN_base` paired with its `unguarded_tN_base`) plus a general resources pool. All pool
-// names are verified to exist in the game data. Budgets are modest, sane defaults the user can tune.
-function pools(tier: number, resourcePool: string, guardedPerArea: number) {
+// Guard settings shared across roles, taken from Exodus (the most-used template). The reaction
+// distribution and randomization are constant there; cutoff/multiplier/weekly vary per role.
+function guard(cutoff: number, multiplier: number, weekly: number) {
   return {
-    guardedContentPool: [`classic_template_pool_random_t${tier}_base`],
-    unguardedContentPool: [`classic_template_pool_random_unguarded_t${tier}_base`],
-    resourcesContentPool: [resourcePool],
-    guardedContentValue: 0, guardedContentValuePerArea: guardedPerArea,
-    unguardedContentValue: 0, unguardedContentValuePerArea: 600,
-    resourcesValue: 0, resourcesValuePerArea: 300,
+    guardCutoffValue: cutoff, guardRandomization: 0.05, guardMultiplier: multiplier,
+    guardWeeklyIncrement: weekly, guardReactionDistribution: [120, 60, 20, 10, 4, 0],
+  };
+}
+
+// Content pools/values modelled on Exodus's real zones so a freshly added node looks like a popular
+// template, not an invented stub. CRITICAL: every zone must carry all three pools (guarded,
+// unguarded AND resources) — an empty pool hangs the generator (no official-corpus zone omits one;
+// this was the root cause of editor-made templates failing to generate). All pool names below are
+// the game-global `template_pool_exodus_*` / `content_pool_general_resources_*` pools (verified to
+// exist in the game data). Mandatory-content / count-limit refs are left empty on purpose: Exodus's
+// (mandatory_content_spawn, …) are template-inline definitions, not game-global, so referencing
+// them from a fresh template would dangle — and they aren't required for generation.
+function pools(role: "start" | "treasure" | "supertreasure", gVal: number, uVal: number, rVal: number) {
+  const guarded = `template_pool_exodus_guarded_${role}_zone`;
+  const unguarded = `template_pool_exodus_unguarded_${role}_zone`;
+  const resources = role === "start"
+    ? "content_pool_general_resources_start_zone_rich"
+    : "content_pool_general_resources_treasure_zone_rich_no_scrolls";
+  return {
+    guardedContentPool: [guarded], guardedContentValue: gVal, guardedContentValuePerArea: 0,
+    unguardedContentPool: [unguarded], unguardedContentValue: uVal, unguardedContentValuePerArea: 0,
+    resourcesContentPool: [resources], resourcesValue: rVal, resourcesValuePerArea: 0,
     mandatoryContent: [] as string[], contentCountLimits: [] as string[], roads: [] as unknown[],
   };
 }
@@ -36,39 +42,45 @@ const biomes = { zoneBiome: anyBiome, contentBiome: anyBiome, metaObjectsBiome: 
 
 export const BUILTIN_NODE_TYPES: NodeType[] = [
   {
+    // Exodus Spawn (zone_layout_start_zone): a town spawn with guarded/unguarded start content.
     id: "player_spawn", label: "Player Spawn", builtin: true,
     zone: {
-      size: 1.0, layout: "zone_layout_spawns", ...baseGuard,
-      ...pools(2, "content_pool_general_resources_start_zone_medium", 1000), ...biomes,
+      size: 1.0, layout: "zone_layout_spawns", ...guard(3500, 1, 0.15),
+      ...pools("start", 400000, 100000, 50000), ...biomes,
       zoneBiome: { type: "MatchMainObject", args: ["0"] },
-      mainObjects: [{ type: "Spawn", spawn: "Player1", owner: null, guardChance: 0,
-        guardValue: 0, removeGuardIfHasOwner: true,
-        buildingsConstructionSid: "poor_buildings_construction",
-        faction: { type: "FromList", args: [] }, placement: "Center", placementArgs: [] }],
+      contentBiome: { type: "MatchMainObject", args: ["0"] },
+      metaObjectsBiome: { type: "MatchMainObject", args: ["0"] },
+      mainObjects: [{ type: "Spawn", spawn: "Player1", removeGuardIfHasOwner: true, guardChance: 1,
+        guardValue: 10000, guardWeeklyIncrement: 0.1,
+        buildingsConstructionSid: "default_buildings_construction",
+        placement: "Uniform", placementArgs: ["true", "0.0", "2"] }],
     },
   },
   {
+    // Exodus Center-Treasure (zone_layout_treasure_zone): the central guarded treasure zone.
     id: "hub", label: "Hub / Center", builtin: true,
-    zone: { size: 1.5, layout: "zone_layout_center", ...baseGuard,
-      ...pools(4, "content_pool_general_resources_treasure_zone_poor", 2000), ...biomes,
+    zone: { size: 1.5, layout: "zone_layout_center", ...guard(2500, 1.5, 0.15),
+      ...pools("treasure", 500000, 50000, 25000), ...biomes,
       crossroadsPosition: 1, mainObjects: [] },
   },
   {
+    // A neutral side zone: Exodus's treasure-zone content scaled down for a minor zone.
     id: "side", label: "Side / Neutral", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_sides", ...baseGuard,
-      ...pools(2, "content_pool_general_resources_side_zone_poor", 1200), ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_sides", ...guard(2500, 1.5, 0.15),
+      ...pools("treasure", 200000, 25000, 15000), ...biomes,
       mainObjects: [] },
   },
   {
+    // Exodus Center-SuperTreasure (zone_layout_supertreasure_zone): the richest guarded zone.
     id: "treasure", label: "Treasure", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_treasures", ...baseGuard,
-      ...pools(5, "content_pool_general_resources_treasure_zone_poor", 3000), ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_treasures", ...guard(2500, 2, 0.15),
+      ...pools("supertreasure", 750000, 75000, 25000), ...biomes,
       mainObjects: [] },
   },
   {
     id: "hold_city", label: "Hold-City Objective", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_wincondition_zone", ...baseGuard,
-      ...pools(4, "content_pool_general_resources_start_zone_medium", 1500), ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_wincondition_zone", ...guard(2500, 1.5, 0.15),
+      ...pools("treasure", 500000, 50000, 25000), ...biomes,
       mainObjects: [{ type: "City", guardChance: 1, guardValue: 20000,
         buildingsConstructionSid: "rich_buildings_construction",
         faction: { type: "FromList", args: [] }, placement: "Center",
@@ -76,8 +88,8 @@ export const BUILTIN_NODE_TYPES: NodeType[] = [
   },
   {
     id: "arena", label: "Gladiator Arena", builtin: true,
-    zone: { size: 1.0, layout: "zone_layout_center", ...baseGuard,
-      ...pools(2, "content_pool_general_resources_side_zone_poor", 1000), ...biomes,
+    zone: { size: 1.0, layout: "zone_layout_center", ...guard(2500, 1.5, 0.15),
+      ...pools("treasure", 300000, 30000, 15000), ...biomes,
       mainObjects: [{ type: "GladiatorArena", placement: "Center", placementArgs: [] }] },
   },
 ];
