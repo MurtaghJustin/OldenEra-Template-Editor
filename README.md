@@ -31,4 +31,4 @@ npm run test
 - Edits **variant 0**; other variants are preserved untouched on save.
 - Node positions are not part of the format — the editor auto-lays-out the graph deterministically and the preview PNG renders from that layout.
 - Save preserves all unmodeled/unknown fields and the original placement of `globalBans` (root vs inside `gameRules`).
-- Deep editing of content pools/lists, multi-variant editing, and symmetry/`guardMatchGroup` helpers are planned for v2.
+- Multi-variant editing (currently variant 0 only), symmetry/`guardMatchGroup` auto-wiring, a hover-revealed connect handle, and dark-style PNG export are planned for v2. (Content-pool/list editing and custom node-type authoring shipped after v1.)
