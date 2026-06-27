@@ -4,19 +4,23 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Path to the extracted game files — a folder containing `Templates/` and `Data/`. Set it via the
-// first CLI arg (`npm run catalogs -- /path/to/game-files`) or the OLDEN_ERA_GAME_FILES env var.
-// The editor ships with pre-generated catalogs (src/generated/*.json); this script only re-mines
-// them, so it's a maintainer task run when the game's templates/data change.
+// Path to the game's map templates — the install's
+// `…/HeroesOldenEra_Data/StreamingAssets/map_templates` folder (templates live directly in it), or
+// any folder holding the `*.rmg.json` templates (a `Templates/` subfolder is also accepted, e.g. the
+// dev repo layout). Set it via the first CLI arg (`npm run catalogs -- <path>`) or the
+// OLDEN_ERA_GAME_FILES env var. The editor ships with pre-generated catalogs (src/generated/*.json);
+// this only re-mines them, a maintainer task run when the game's templates change.
 const GAME_FILES = process.argv[2] || process.env.OLDEN_ERA_GAME_FILES;
 if (!GAME_FILES || !existsSync(GAME_FILES)) {
   console.error(GAME_FILES
-    ? `Game-files path not found: ${GAME_FILES}`
-    : "Set the game-files path: `npm run catalogs -- <path>` (a folder containing Templates/ and Data/), or set OLDEN_ERA_GAME_FILES.");
+    ? `Templates path not found: ${GAME_FILES}`
+    : "Set the templates path: `npm run catalogs -- <path>` (the game's map_templates folder), or set OLDEN_ERA_GAME_FILES.");
   process.exit(1);
 }
-// SID display names are vendored in the editor (the game files don't carry them).
+// Reference data vendored in the editor (the game's map_templates folder doesn't carry these):
+// SID display names, and the generic zone_layout_default fallback base.
 const REFERENCE = join(__dirname, "..", "reference", "05-id-reference.md");
+const ZONE_LAYOUT_DEFAULTS = join(__dirname, "..", "reference", "default_zone_layouts.json");
 const OUT = join(__dirname, "..", "src", "generated", "catalogs.json");
 const OUT_LAYOUTS = join(__dirname, "..", "src", "generated", "zoneLayoutDefaults.json");
 
@@ -41,9 +45,15 @@ const SEED = {
 };
 
 function collectFiles() {
-  const dir = join(GAME_FILES, "Templates");
-  if (!existsSync(dir)) { console.error(`No Templates/ folder under ${GAME_FILES}`); process.exit(1); }
-  return readdirSync(dir).filter((f) => f.endsWith(".rmg.json")).map((f) => join(dir, f));
+  // Accept either the templates folder itself (the game's map_templates) or a parent with a
+  // Templates/ subfolder (the dev repo layout) — whichever actually holds *.rmg.json files.
+  for (const dir of [GAME_FILES, join(GAME_FILES, "Templates")]) {
+    if (!existsSync(dir)) continue;
+    const files = readdirSync(dir).filter((f) => f.endsWith(".rmg.json"));
+    if (files.length) return files.map((f) => join(dir, f));
+  }
+  console.error(`No *.rmg.json templates found in ${GAME_FILES} (or a Templates/ subfolder).`);
+  process.exit(1);
 }
 
 const sets = {
@@ -103,7 +113,7 @@ for (const file of collectFiles()) {
 // a node type's auto-seeded layout starts from real role-appropriate values, not a generic guess.
 function buildZoneLayoutDefaults() {
   const out = {};
-  const dfl = join(GAME_FILES, "Data", "generator", "zone_layouts", "default_zone_layouts.json");
+  const dfl = ZONE_LAYOUT_DEFAULTS;
   if (existsSync(dfl)) {
     try { const j = JSON.parse(readFileSync(dfl, "utf-8")); const list = Array.isArray(j) ? j : (j.zoneLayouts || []); for (const d of list) if (d?.name) out[d.name] = d; } catch { /* ignore */ }
   }

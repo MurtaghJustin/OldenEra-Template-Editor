@@ -16,11 +16,23 @@ npm run build
 This produces a **single self-contained `dist/index.html`** (JS + CSS inlined via `vite-plugin-singlefile`). Open it directly in a browser by double-clicking (`file://`) — no server needed; external module scripts are blocked over `file://`, so inlining is what makes double-click work. Loading uses a file picker; Save and Export PNG download files.
 
 ## Regenerate catalogs
-The editor ships with pre-generated catalogs (`src/generated/*.json`), so this is only needed when the game's templates/data change. Point it at your extracted **game files** — a folder containing `Templates/` and `Data/`:
+The editor ships with pre-generated catalogs (`src/generated/*.json`), so this is only needed when the game's templates change. Point it at the game's **map templates folder** — `…\HeroesOldenEra_Data\StreamingAssets\map_templates` (the `*.rmg.json` templates live directly in it; a folder with a `Templates/` subfolder also works) — either as a CLI argument:
 ```
-npm run catalogs -- /path/to/game-files
+npm run catalogs -- "G:\SteamLibrary\steamapps\common\Heroes of Might and Magic Olden Era\HeroesOldenEra_Data\StreamingAssets\map_templates"
 ```
-(or set the `OLDEN_ERA_GAME_FILES` env var). It mines the official templates and game data and unions in the doc-05 seed lists. SID display names come from the vendored `reference/05-id-reference.md`.
+…or via the `OLDEN_ERA_GAME_FILES` environment variable:
+
+PowerShell
+```powershell
+$env:OLDEN_ERA_GAME_FILES = "G:\SteamLibrary\steamapps\common\Heroes of Might and Magic Olden Era\HeroesOldenEra_Data\StreamingAssets\map_templates"
+npm run catalogs
+```
+Bash
+```bash
+export OLDEN_ERA_GAME_FILES="/g/SteamLibrary/steamapps/common/Heroes of Might and Magic Olden Era/HeroesOldenEra_Data/StreamingAssets/map_templates"
+npm run catalogs
+```
+It scans every `*.rmg.json` in that folder and unions in the doc-05 seed lists. SID display names and the zone-layout default come from the vendored `reference/` files.
 
 ## Tests
 ```
