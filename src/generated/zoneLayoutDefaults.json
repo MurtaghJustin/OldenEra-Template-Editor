@@ -314,24 +314,24 @@
   },
   "zone_layout_start_zone": {
     "name": "zone_layout_start_zone",
-    "obstaclesFill": 0.4,
-    "obstaclesFillVoid": 0.4,
-    "lakesFill": 0.4,
-    "minLakeArea": 8,
-    "elevationClusterScale": 1,
+    "obstaclesFill": 0.5,
+    "obstaclesFillVoid": 0.55,
+    "lakesFill": 0.3,
+    "minLakeArea": 9,
+    "elevationClusterScale": 0.18,
     "elevationModes": [
       {
-        "weight": 1,
-        "minElevatedFraction": 0,
-        "maxElevatedFraction": 0
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
       },
       {
         "weight": 1,
-        "minElevatedFraction": 1,
-        "maxElevatedFraction": 1
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
       }
     ],
-    "roadClusterArea": 96,
+    "roadClusterArea": 80,
     "guardedEncounterResourceFractions": {
       "countBounds": [],
       "fractions": [
