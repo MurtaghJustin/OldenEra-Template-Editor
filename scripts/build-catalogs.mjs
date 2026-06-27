@@ -3,7 +3,20 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..", "..");
+
+// Path to the extracted game files — a folder containing `Templates/` and `Data/`. Set it via the
+// first CLI arg (`npm run catalogs -- /path/to/game-files`) or the OLDEN_ERA_GAME_FILES env var.
+// The editor ships with pre-generated catalogs (src/generated/*.json); this script only re-mines
+// them, so it's a maintainer task run when the game's templates/data change.
+const GAME_FILES = process.argv[2] || process.env.OLDEN_ERA_GAME_FILES;
+if (!GAME_FILES || !existsSync(GAME_FILES)) {
+  console.error(GAME_FILES
+    ? `Game-files path not found: ${GAME_FILES}`
+    : "Set the game-files path: `npm run catalogs -- <path>` (a folder containing Templates/ and Data/), or set OLDEN_ERA_GAME_FILES.");
+  process.exit(1);
+}
+// SID display names are vendored in the editor (the game files don't carry them).
+const REFERENCE = join(__dirname, "..", "reference", "05-id-reference.md");
 const OUT = join(__dirname, "..", "src", "generated", "catalogs.json");
 const OUT_LAYOUTS = join(__dirname, "..", "src", "generated", "zoneLayoutDefaults.json");
 
@@ -28,13 +41,9 @@ const SEED = {
 };
 
 function collectFiles() {
-  const dirs = [join(ROOT, "Templates"), join(ROOT, "Documentation", "test-templates")];
-  const out = [];
-  for (const d of dirs) {
-    if (!existsSync(d)) continue;
-    for (const f of readdirSync(d)) if (f.endsWith(".rmg.json")) out.push(join(d, f));
-  }
-  return out;
+  const dir = join(GAME_FILES, "Templates");
+  if (!existsSync(dir)) { console.error(`No Templates/ folder under ${GAME_FILES}`); process.exit(1); }
+  return readdirSync(dir).filter((f) => f.endsWith(".rmg.json")).map((f) => join(dir, f));
 }
 
 const sets = {
@@ -94,7 +103,7 @@ for (const file of collectFiles()) {
 // a node type's auto-seeded layout starts from real role-appropriate values, not a generic guess.
 function buildZoneLayoutDefaults() {
   const out = {};
-  const dfl = join(ROOT, "Data", "generator", "zone_layouts", "default_zone_layouts.json");
+  const dfl = join(GAME_FILES, "Data", "generator", "zone_layouts", "default_zone_layouts.json");
   if (existsSync(dfl)) {
     try { const j = JSON.parse(readFileSync(dfl, "utf-8")); const list = Array.isArray(j) ? j : (j.zoneLayouts || []); for (const d of list) if (d?.name) out[d.name] = d; } catch { /* ignore */ }
   }
@@ -119,8 +128,8 @@ function buildZoneLayoutDefaults() {
 
 function merge(name) { return Array.from(new Set([...(SEED[name] || []), ...sets[name]])).sort(); }
 
-// Documented SID → display name, parsed from the clean two-column table rows in
-// Documentation/05-id-reference.md (e.g. `tree_of_abundance` → "Arborcopia"). Rows that are ranges
+// Documented SID → display name, parsed from the clean two-column table rows in the vendored
+// reference/05-id-reference.md (e.g. `tree_of_abundance` → "Arborcopia"). Rows that are ranges
 // or prose ("…", "/", "–") are skipped — the editor derives a title-case name for those at runtime.
 function buildSidNames() {
   // Names for SIDs the doc only documents as ranges/prose (so the table parser can't reach them),
@@ -131,7 +140,7 @@ function buildSidNames() {
     random_hire_5: "Random Hire Tier 5", random_hire_6: "Random Hire Tier 6",
     random_hire_7: "Random Hire Tier 7",
   };
-  const path = join(ROOT, "Documentation", "05-id-reference.md");
+  const path = REFERENCE;
   if (!existsSync(path)) return out;
   for (const line of readFileSync(path, "utf-8").split(/\r?\n/)) {
     const m = /^\|\s*`([a-z0-9_]+)`\s*\|\s*(.+?)\s*\|\s*$/.exec(line);

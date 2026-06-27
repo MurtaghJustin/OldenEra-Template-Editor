@@ -245,31 +245,36 @@
     "name": "zone_layout_treasure_zone",
     "obstaclesFill": 0.5,
     "obstaclesFillVoid": 0.5,
-    "lakesFill": 0.3,
-    "minLakeArea": 10,
-    "elevationClusterScale": 0.128,
+    "lakesFill": 0.45,
+    "minLakeArea": 12,
+    "elevationClusterScale": 0.12,
     "elevationModes": [
       {
+        "weight": 2,
+        "minElevatedFraction": 0.2,
+        "maxElevatedFraction": 0.4
+      },
+      {
         "weight": 1,
-        "minElevatedFraction": 0,
-        "maxElevatedFraction": 0
+        "minElevatedFraction": 0.6,
+        "maxElevatedFraction": 0.8
       }
     ],
-    "roadClusterArea": 128,
+    "roadClusterArea": 96,
     "guardedEncounterResourceFractions": {
       "countBounds": [],
       "fractions": [
-        0.5
+        0.66
       ]
     },
     "ambientPickupDistribution": {
       "repulsion": 1,
       "noise": 0.3,
-      "roadAttraction": 0.25,
+      "roadAttraction": -0.3,
       "obstacleAttraction": 0,
       "groupSizeWeights": [
-        4,
-        1,
+        12,
+        3,
         1
       ]
     }
