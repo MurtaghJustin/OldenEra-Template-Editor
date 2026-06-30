@@ -26,6 +26,10 @@ describe("displayEdges", () => {
     expect(out).toHaveLength(2);
     const pairs = out.map((x) => [x.from, x.to].sort().join("-")).sort();
     expect(pairs).toEqual(["Center-Spawn-A", "Center-Spawn-B"]);
+    // ...but each edge reports how many connections it represents (for the count badge).
+    const count = Object.fromEntries(out.map((x) => [[x.from, x.to].sort().join("-"), x.count]));
+    expect(count["Center-Spawn-A"]).toBe(3);
+    expect(count["Center-Spawn-B"]).toBe(1);
   });
 
   it("prefers a Portal connection as the representative for a pair", () => {
@@ -36,6 +40,7 @@ describe("displayEdges", () => {
     const out = displayEdges(g);
     expect(out).toHaveLength(1);
     expect(out[0].connection.connectionType).toBe("Portal");
+    expect(out[0].count).toBe(2); // Direct + Portal both counted toward the pair
   });
 
   it("Jebus Outcast renders exactly 4 connections (the cross)", () => {

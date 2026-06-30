@@ -95,12 +95,20 @@ function Flow() {
 
   const edges: Edge[] = (graph ? displayEdges(graph) : []).map((e) => {
     const sel = selection?.kind === "connection" && selection.id === e.id;
-    const base = e.connection.connectionType === "Portal" ? "#5b8fb9" : "#caa84a";
+    const portal = e.connection.connectionType === "Portal";
+    const base = portal ? "#5b8fb9" : "#caa84a";
     return {
       id: e.id, source: e.from, target: e.to, type: "straight",
       // Wide invisible hit area so the thin line (mostly hidden under the discs) is still easy to
       // click to select and edit the connection.
       interactionWidth: 24,
+      // A pair can hold several parallel connections (drawn as one line). Badge the count when >1 so
+      // the multiplicity is visible — they may differ in guards, and are edited individually in the
+      // inspector. Single connections get no badge.
+      label: e.count > 1 ? `×${e.count}` : undefined,
+      labelStyle: { fill: "#1e1c18", fontSize: 11, fontWeight: 700 },
+      labelBgStyle: { fill: portal ? "#9ecbe8" : "#e6cf7a", fillOpacity: 0.95 },
+      labelBgPadding: [5, 2] as [number, number], labelBgBorderRadius: 9,
       // Selected connection lights up bright and thick so it stands out from under the discs.
       style: { stroke: sel ? "#ffd54a" : base, strokeWidth: sel ? 4 : 2 },
     };
