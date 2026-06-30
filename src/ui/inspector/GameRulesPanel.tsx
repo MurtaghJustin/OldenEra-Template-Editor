@@ -36,8 +36,13 @@ export function GameRulesPanel() {
         <SelectField label="Win condition" value={root.displayWinCondition ?? ""} options={catalogs.winConditions} labelFor={winConditionName}
           onChange={(v) => setRoot({ displayWinCondition: v })}
           hint="Headline victory condition (e.g. Standard, Hold City, Tournament). Can set the actual mechanic, not just a label." />
-        <NumberField label="Map size X" value={root.sizeX} onChange={(v) => setRoot({ sizeX: v })} hint="Map width in tiles." />
-        <NumberField label="Map size Z" value={root.sizeZ} onChange={(v) => setRoot({ sizeZ: v })} hint="Map height in tiles." />
+        <NumberField label="Map size" value={root.sizeX} onChange={(v) => setRoot({ sizeX: v, sizeZ: v })}
+          hint="Map edge length in tiles. Maps must be square (the generator won't build a non-square map), so this sets both width and height." />
+        {root.sizeX !== root.sizeZ && (
+          <div style={{ ...span, fontSize: 12, color: "#e0a030" }}>
+            ⚠ This map is {root.sizeX}×{root.sizeZ} (non-square) and won't generate — set the size above to make it square.
+          </div>
+        )}
         <NumberField label="Hero count min" value={(gr.heroCountMin as number) ?? 0} onChange={(v) => setRules({ heroCountMin: v })}
           hint="Minimum heroes per player (1 for SingleHero, 4 for Classic)." />
         <NumberField label="Hero count max" value={(gr.heroCountMax as number) ?? 0} onChange={(v) => setRules({ heroCountMax: v })}
