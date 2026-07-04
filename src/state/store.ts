@@ -14,7 +14,7 @@ import {
 import { autoLayout } from "../core/layout";
 import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from "../core/nodeTypes";
 import { validateTemplate, type Issue } from "../core/validate";
-import { CONTENT_ROOT_FIELD, defaultZoneLayout, type ContentKind, type ContentDef } from "../core/content";
+import { CONTENT_ROOT_FIELD, defaultZoneLayout, renameContentReferences, type ContentKind, type ContentDef } from "../core/content";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -130,6 +130,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (originalName && originalName !== def.name) {
       const j = arr.findIndex((d) => d.name === originalName);
       if (j >= 0) arr.splice(j, 1);
+      // Cascade the rename into zones (and pool includeLists) so nothing is left referencing the
+      // old name — a dangling pool/layout/etc. reference breaks generation.
+      renameContentReferences(root, kind, originalName, def.name);
     }
     const i = arr.findIndex((d) => d.name === def.name);
     if (i >= 0) arr[i] = def; else arr.push(def);

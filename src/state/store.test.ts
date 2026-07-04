@@ -114,6 +114,38 @@ describe("store", () => {
     expect(useEditorStore.getState().contentDrawer).toBeNull();
   });
 
+  it("renaming a content pool updates every zone that referenced it", () => {
+    const s = useEditorStore.getState();
+    s.upsertContentDef("pools", { name: "my_pool", groups: [] });
+    // Point two zones at the pool across the guarded / unguarded / resources fields.
+    const zones = () => useEditorStore.getState().root!.variants[0].zones;
+    const hub = zones().find((z) => z.name === "Hub")!;
+    hub.guardedContentPool = ["my_pool"];
+    hub.unguardedContentPool = ["classic_template_pool_random_unguarded_t4_base", "my_pool"];
+    zones().find((z) => z.name === "Spawn-A")!.resourcesContentPool = ["my_pool"];
+    // Rename it.
+    s.upsertContentDef("pools", { name: "renamed_pool", groups: [] }, "my_pool");
+    // No zone should still point at the old name; each should now reference the new one.
+    const after = zones();
+    const hubAfter = after.find((z) => z.name === "Hub")!;
+    expect(hubAfter.guardedContentPool).toEqual(["renamed_pool"]);
+    expect(hubAfter.unguardedContentPool).toEqual(["classic_template_pool_random_unguarded_t4_base", "renamed_pool"]);
+    expect(after.find((z) => z.name === "Spawn-A")!.resourcesContentPool).toEqual(["renamed_pool"]);
+    // Nothing anywhere still references the stale name.
+    const stillStale = after.some((z) =>
+      [z.guardedContentPool, z.unguardedContentPool, z.resourcesContentPool].some((f) => (f ?? []).includes("my_pool")));
+    expect(stillStale).toBe(false);
+  });
+
+  it("renaming a content list updates includeLists inside content pools that reference it", () => {
+    const s = useEditorStore.getState();
+    s.upsertContentDef("lists", { name: "my_list", content: [] });
+    s.upsertContentDef("pools", { name: "p", groups: [{ weight: 1, includeLists: ["my_list"], content: [] }] });
+    s.upsertContentDef("lists", { name: "renamed_list", content: [] }, "my_list");
+    const pool = (useEditorStore.getState().root!.contentPools as { name: string; groups: { includeLists?: string[] }[] }[]).find((d) => d.name === "p")!;
+    expect(pool.groups[0].includeLists).toEqual(["renamed_list"]);
+  });
+
   it("serializeForSave applies round-trip merge", () => {
     useEditorStore.getState().addZoneOfType("Z", "side", {});
     const text = useEditorStore.getState().serializeForSave();

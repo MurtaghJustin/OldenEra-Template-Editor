@@ -58,6 +58,41 @@ export function defaultZoneLayout(name: string): ContentDef {
   return newContentDef("layouts", name);
 }
 
+// Zone fields (arrays of names) that reference each content kind. Used to cascade a definition
+// rename into the zones that use it, so a rename never leaves a zone pointing at a name that no
+// longer exists. `layouts` isn't here because a zone's `layout` is a single string, not an array
+// (it's handled separately below); `lists` aren't referenced by zones at all, only by pool groups.
+export const ZONE_REF_FIELDS: Record<ContentKind, string[]> = {
+  pools: ["guardedContentPool", "unguardedContentPool", "resourcesContentPool"],
+  lists: [],
+  mandatory: ["mandatoryContent"],
+  countLimits: ["contentCountLimits"],
+  layouts: [],
+};
+
+// Cascade a definition rename through every place its name is referenced: the zone fields above
+// across all variants, the single-string zone `layout`, and content-pool group `includeLists`
+// (which point at content lists). Mutates `root` in place; no-op when the name is unchanged.
+export function renameContentReferences(root: TemplateRoot | null, kind: ContentKind, oldName: string, newName: string): void {
+  if (!root || oldName === newName) return;
+  const swap = (arr: unknown): string[] | undefined =>
+    Array.isArray(arr) ? (arr as string[]).map((n) => (n === oldName ? newName : n)) : undefined;
+  const variants = (root as { variants?: unknown }).variants;
+  for (const v of Array.isArray(variants) ? variants : []) {
+    for (const z of ((v as { zones?: Record<string, unknown>[] }).zones ?? [])) {
+      for (const f of ZONE_REF_FIELDS[kind]) { const next = swap(z[f]); if (next) z[f] = next; }
+      if (kind === "layouts" && z.layout === oldName) z.layout = newName;
+    }
+  }
+  if (kind === "lists") {
+    for (const pool of contentDefs(root, "pools")) {
+      for (const g of ((pool.groups as { includeLists?: unknown }[] | undefined) ?? [])) {
+        const next = swap(g.includeLists); if (next) g.includeLists = next;
+      }
+    }
+  }
+}
+
 // A "<base>-N" name not already used among definitions of this kind.
 export function uniqueContentName(root: TemplateRoot | null, kind: ContentKind, base: string): string {
   const taken = new Set(contentDefs(root, kind).map((d) => d.name));
