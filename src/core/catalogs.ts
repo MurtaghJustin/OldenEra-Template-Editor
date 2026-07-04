@@ -1,4 +1,5 @@
 import data from "../generated/catalogs.json";
+import icons from "../generated/mapObjectIcons.json";
 import {
   CONNECTION_TYPES, GAME_MODES, MAIN_OBJECT_TYPES, PLACEMENTS,
   ORIENTATION_MODES, SELECTOR_TYPES, PLAYER_SLOTS,
@@ -8,6 +9,32 @@ const raw = data as Record<string, unknown>;
 export const catalogs = raw as unknown as Record<string, string[]>;
 // Documented object display names (SID → name), built from Documentation/05 at catalog-build time.
 export const sidNames = (raw.sidNames as Record<string, string> | undefined) ?? {};
+
+// Rich per-object metadata mirrored from the community DB (oldenera.th.gl), keyed by SID. Covers the
+// objects catalogued there (most content SIDs); generator meta-objects (random_hire_*, resource_*, …)
+// have no entry. See Documentation/05 and reference/map_objects.json.
+export interface MapObjectInfo {
+  name: string;
+  group: string;        // raw enum: adventure | dwellings | magic | markets | military | resources | special | travel | treasure
+  groupLabel: string;   // display group: Dwellings | Resource Sites | Adventure Sites | Magic Sites | Military | Special
+  description: string;
+  value: number;
+  visitType: string | null;
+  guardUnits: boolean | null;
+  totalChance: number | null;
+}
+export const mapObjects = (raw.mapObjects as Record<string, MapObjectInfo> | undefined) ?? {};
+const mapObjectIcons = icons as Record<string, string>;
+
+// Full metadata record for an object SID, or undefined if it isn't in the mirrored catalog.
+export function mapObjectInfo(sid: string): MapObjectInfo | undefined {
+  return sid ? mapObjects[sid] : undefined;
+}
+
+// Inlined `data:image/webp;base64,…` icon for an object SID, or undefined if none was mirrored.
+export function mapObjectIcon(sid: string): string | undefined {
+  return sid ? mapObjectIcons[sid] : undefined;
+}
 
 const ENUMS: Record<string, readonly string[]> = {
   gameMode: GAME_MODES,

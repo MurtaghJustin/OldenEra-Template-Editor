@@ -1,0 +1,2738 @@
+{
+  "barracks_unfrozen_3": {
+    "name": "Aga'Shoth Stables",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Aga'Shoth Riders in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2444,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_3": {
+    "name": "Amphitheater",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Onyx Dancers in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1982,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_5": {
+    "name": "Apex",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Reavers in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 530,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_13": {
+    "name": "Battlefield",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Animated Armors in this dwelling.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_6": {
+    "name": "Bloated Mansion",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Arbitrators in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 134,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_7": {
+    "name": "Blooming Marsh",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Giant Toads in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_4": {
+    "name": "Blooming Pond",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Naiads in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1586,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_4": {
+    "name": "Bone Exchange",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Graverobbers in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1124,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_6": {
+    "name": "Burning Soul Burrows",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Waurmos in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 596,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_15": {
+    "name": "Burrow",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Halflings in this dwelling.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_2": {
+    "name": "Carrion Lair",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Locusts in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 332,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_7": {
+    "name": "Cave Palace",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Cave Dragons in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 2246,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_7": {
+    "name": "Chateau of Feasts",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Vampires in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1322,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_4": {
+    "name": "Chitinous Ziggurat",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Scorpions in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 464,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_6": {
+    "name": "Chthonic Home",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Hydras in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 2180,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_1": {
+    "name": "Crypts and Graves",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Skeletons in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 926,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_10": {
+    "name": "Crystal Nest",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Kittenhorns in this dwelling.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_2": {
+    "name": "Cultist Spire",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Cultists in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2378,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_4": {
+    "name": "Disturbing Summoning Rite",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Grand Shoth in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 2,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_6": {
+    "name": "Dragon Eggshells",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Faerie Dragons in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_9": {
+    "name": "Dragonslayer Base",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Dragonslayers in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_7": {
+    "name": "Eerie Summoning Rite",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Abyssal Envoys in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 200,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_1": {
+    "name": "Faun Huts",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Fauns in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1388,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_1": {
+    "name": "Garrison",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Swordsmen in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 464,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_3": {
+    "name": "Griffin Rookery",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Griffins in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 596,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_5": {
+    "name": "Hippodrome",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Cavalry in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_2": {
+    "name": "Hop Patch",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Hoplets in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1454,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_5": {
+    "name": "House of Chains",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Concubi in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 68,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_3": {
+    "name": "Kennel",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Undead Pets in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1058,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_4": {
+    "name": "Labyrinth",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Minotaurs in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 2048,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_unfrozen_1": {
+    "name": "Lesser Summoning Rite",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Ra'Shoth in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2312,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_3": {
+    "name": "Menhir Circle",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Vine Iriyads in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1520,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mercenary_guild": {
+    "name": "Mercenary Guild",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "Allows the hero to recruit up to {0} random units. Refreshes every week.",
+    "value": 7500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 794,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_2": {
+    "name": "Mews",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Crossbowmen in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 530,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_1": {
+    "name": "Neglected Housing",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Parasites in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 266,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_3": {
+    "name": "Paper Nest",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Hornets in this dwelling. Their weekly growth increases by {0}.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 398,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_17": {
+    "name": "Pixie Tower",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Pixies in this dwelling.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_4": {
+    "name": "Pyramid",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Couatls in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_7": {
+    "name": "Pyre",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Phoenixes in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1784,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_2": {
+    "name": "Quiet Pavilion",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Wights in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 992,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_7": {
+    "name": "Radiant Forge",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Angels in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 860,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_2": {
+    "name": "Safe House",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Infiltrators in this dwelling. Their weekly growth increases by {0}.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1916,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_5": {
+    "name": "Shroomwood Shack",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Herbomancers in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1652,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_11": {
+    "name": "Starshard",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Starchildren in this dwelling.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_5": {
+    "name": "Stilled Voices",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Medusae in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 2114,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_12": {
+    "name": "Sundew Thicket",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Primal Remnants in this dwelling.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_4": {
+    "name": "Sundrop Chapel",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Lightweavers in this dwelling. Their weekly growth increases by {0}.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 662,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_1": {
+    "name": "Temple of the Four Scholars",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Sentinels of Glory in this dwelling.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_14": {
+    "name": "Terror Wood",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Grolls in this dwelling.",
+    "value": 8000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_human_6": {
+    "name": "Threshold Basilica",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Inquisitors in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 794,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_nature_6": {
+    "name": "Thunder Lair",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Qilins in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1718,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_5": {
+    "name": "Timeless Mansion",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Liches in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1190,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_necropolis_6": {
+    "name": "Tomb of Warriors",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Dread Knights in this dwelling. Their weekly growth increases by {0}.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1256,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_demon_7": {
+    "name": "Tower of Love",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Hive Queens in this dwelling. Their weekly growth increases by {0}.",
+    "value": 16000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 662,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_8": {
+    "name": "Unicorn Vale",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Unicorns in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_16": {
+    "name": "Village Hut",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Peasants in this dwelling.",
+    "value": 6000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_dungeon_1": {
+    "name": "Warren",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Troglodytes in this dwelling. Their weekly growth increases by {0}.",
+    "value": 4000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1850,
+      "y": 2246,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "barracks_neutral_3": {
+    "name": "Watcher Platform",
+    "group": "dwellings",
+    "groupLabel": "Dwellings",
+    "description": "You can recruit Worldwatchers in this dwelling.",
+    "value": 12000,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_crystals": {
+    "name": "Crystal Vein",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Crystals daily.",
+    "value": 2000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1058,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_gemstones": {
+    "name": "Gem Mound",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Gems daily.",
+    "value": 2000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1190,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_gold": {
+    "name": "Gold Mine",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Gold daily.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 860,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_mercury": {
+    "name": "Mercury Fissure",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Mercury daily.",
+    "value": 2000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1124,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_ore": {
+    "name": "Ore Mine",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Ore daily.",
+    "value": 1500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 992,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mine_wood": {
+    "name": "Sawmill",
+    "group": "resources",
+    "groupLabel": "Resource Sites",
+    "description": "Produces {0} Wood daily.",
+    "value": 1500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 926,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "abandoned_mansion": {
+    "name": "Abandoned Mansion",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Grants Gold and possibly also valuable artifacts after defeating its guard.",
+    "value": 1500,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1256,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "abnormal_structure": {
+    "name": "Abnormal Structure",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives valuable artifacts after defeating its guard.",
+    "value": 6250,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1322,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "alvars_eye": {
+    "name": "Alvar Outpost",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives common and valuable resources after defeating its guard.",
+    "value": 2500,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1388,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "overgrown_grave": {
+    "name": "Ancient Crypt",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and possibly also valuable artifacts after defeating its guard.",
+    "value": 7000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1916,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "black_tower": {
+    "name": "Black Tower",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives a valuable artifact, some Gold, or resources after defeating its guard.",
+    "value": 5000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 110,
+    "icon": {
+      "x": 1454,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "boreal_call": {
+    "name": "Boreal Call",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Abyssal Envoys.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 2,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "the_gorge": {
+    "name": "Carrion Pile",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Waurmos.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "circle_of_life": {
+    "name": "Circle of Life",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and Crystals after defeating its guard.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1520,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "jousting_range": {
+    "name": "Colosseum",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Cavalry.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 68,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "cursed_old_house": {
+    "name": "Cursed Old House",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives valuable artifacts after defeating its guard.",
+    "value": 5250,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1586,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "dragon_utopia": {
+    "name": "Dragon Utopia",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives a very large amount of Gold and valuable artifacts after defeating its guard.",
+    "value": 13750,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1652,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "orb_observatory": {
+    "name": "Four Scholars Observatory",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Spell Power or Knowledge by {0} for {1} Gold.",
+    "value": 7500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "infernal_cirque": {
+    "name": "Infernal Cirque",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Allows each visiting hero to learn up to {0} random Expert skills or level them up.",
+    "value": 20000,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 992,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "iridescent_abbey": {
+    "name": "Iridescent Abbey",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and Gems after defeating its guard.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1718,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "knowledge_garden": {
+    "name": "Knowledge Garden",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Knowledge by {0}.",
+    "value": 3000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 596,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "learning_stone": {
+    "name": "Learning Stone",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives +{0} XP to each visiting hero.",
+    "value": 2000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1190,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "legions_memorial": {
+    "name": "Legion's Memorial",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold, Wood, and Ore after defeating its guard.",
+    "value": 2500,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1784,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "maze": {
+    "name": "Living Maze",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's chosen attribute by {0}.",
+    "value": 9500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "lost_library": {
+    "name": "Lost Library",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives the first visiting hero {0} XP.",
+    "value": 12000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 100,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "magic_wheel": {
+    "name": "Magic Wheel",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Spell Power by {0}.",
+    "value": 3000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 662,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mereas_shrine": {
+    "name": "Mearea's Altar",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Grants Gold after defeating its guard.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1850,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "college_of_wonder": {
+    "name": "Mountain Monastery",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Attack, Defense, Spell Power, and Knowledge by {0} for {1} Gold.",
+    "value": 20000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 464,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "unstable_ruins": {
+    "name": "Overgrown Vori Ruins",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives a very large amount of Gold and resources after defeating its guard.",
+    "value": 13200,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2444,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "fort": {
+    "name": "Pauper Knight Order",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Attack or Defense by {0} for {1} Gold.",
+    "value": 7500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 530,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "petrified_memorial": {
+    "name": "Petrified Memorial",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Medusae.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 134,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "point_of_balance": {
+    "name": "Point of Balance",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Sentinels of Glory.",
+    "value": 5000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 200,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "prismatic_lair": {
+    "name": "Prismatic Nest",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gems, Crystals, and Mercury after defeating its guard.",
+    "value": 7000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 1982,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "raiders_camp": {
+    "name": "Raiders' Camp",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and possibly also valuable artifacts after defeating its guard.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2048,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "research_laboratory": {
+    "name": "Research Laboratory",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives a very large amount of Gold and valuable artifacts after defeating its guard.",
+    "value": 16750,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "ritual_pyre": {
+    "name": "Ritual Pyre",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Phoenixes.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 266,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "trial_scales": {
+    "name": "Scales of Worth",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's chosen attribute by {0}.",
+    "value": 30000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 860,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "stinging_sword": {
+    "name": "Stinging Sword",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Attack by {0}.",
+    "value": 3000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 794,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "armory_automaton": {
+    "name": "Summit Automaton",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Permanently increases each visiting hero's Defense by {0}.",
+    "value": 3000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 398,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "unforgotten_grave": {
+    "name": "Tomb of Vigilance",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guard to obtain Dread Knights.",
+    "value": 4000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 90,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "circus": {
+    "name": "Travelling Circus",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Levels up a random skill for each visiting hero.",
+    "value": 4000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 926,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "tree_of_knowledge": {
+    "name": "Tree of Knowledge",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives one level to each visiting hero.",
+    "value": 17500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1256,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "troglodyte_throne": {
+    "name": "Troglodyte Throne",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives a very large amount of Gold after defeating its guard.",
+    "value": 6000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2246,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "shady_den": {
+    "name": "Trophy Hunter's Den",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Once per week, gives the first visiting hero a random reward.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2114,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "twilight_bloom": {
+    "name": "Twilight Bloom",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and a valuable artifact after defeating its guard.",
+    "value": 9000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2312,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "uncanny_rite": {
+    "name": "Uncanny Rite",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Gives Gold and Mercury after defeating its guard.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": 100,
+    "icon": {
+      "x": 2378,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "underground_lair": {
+    "name": "Underground Labyrinth",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Defeat its guards to obtain Basilisks. Guards and Basilisks respawn every week.",
+    "value": 50000,
+    "visitType": "OneTime",
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 332,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "university": {
+    "name": "University",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Allows each visiting hero to learn up to {0} random skills for {1} Gold each.",
+    "value": 7500,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1058,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "wise_owl": {
+    "name": "Wise Owl",
+    "group": "adventure",
+    "groupLabel": "Adventure Sites",
+    "description": "Teaches a random skill to each visiting hero. If they already know this skill, levels it up instead.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": 2100,
+    "icon": {
+      "x": 1124,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "peasant_cart": {
+    "name": "Abandoned Cart",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per game, grants a random small reward.",
+    "value": 1500,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 1000,
+    "icon": {
+      "x": 2,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_dust": {
+    "name": "Alchemical Dust Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Alchemical Dust to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 134,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "alchemy_lab": {
+    "name": "Alchemical Lab",
+    "group": "markets",
+    "groupLabel": "Magic Sites",
+    "description": "Allows Gems, Crystals and Mercury to be converted into Alchemical Dust.",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1388,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mystical_tower": {
+    "name": "Altar of Insight",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Grants {0} Insight(s) to the first visiting hero. It can be used as usual to learn or upgrade Global Map spells.",
+    "value": 15000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2444,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "altar_of_magic_3": {
+    "name": "Arcane Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to pick and learn {0} out of {1} random Arcane spells.",
+    "value": 12000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1454,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "beer_fountain": {
+    "name": "Beer Fountain",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Increases each visiting hero's Luck by {0} until the end of the week.",
+    "value": 2500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "camp_fire": {
+    "name": "Campfire",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Gives a small amount of random resources.",
+    "value": 1000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 750,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "crow_nest": {
+    "name": "Crow Nest",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per game, grants a random small reward.",
+    "value": 2000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 4850,
+    "icon": {
+      "x": 2114,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "unit_trade_lab_kitten_horn": {
+    "name": "Crystal Nest",
+    "group": "markets",
+    "groupLabel": "Magic Sites",
+    "description": "",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_crystals": {
+    "name": "Crystal Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Crystals to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 68,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "altar_of_magic_2": {
+    "name": "Daylight Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to pick and learn {0} out of {1} random Daylight spells.",
+    "value": 12000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1388,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "crystal_trail": {
+    "name": "Dragon Step",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week for each hero, fully restores each visiting hero's mana, then doubles it.",
+    "value": 17500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 662,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "enchanted_scroll_box": {
+    "name": "Enchanted Magic Scroll",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to use a specific spell at its maximum level.",
+    "value": 3000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 7200,
+    "icon": {
+      "x": 1784,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "huntsmans_camp": {
+    "name": "Explorer's Camp",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Restores {0}% of hero's maximum Movement points and {1}% maximum mana.",
+    "value": 6500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "forge": {
+    "name": "Forge of the Second Man",
+    "group": "markets",
+    "groupLabel": "Magic Sites",
+    "description": "Allows visiting heroes to trade resources for artifacts.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1322,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "abandoned_corpse": {
+    "name": "Forgotten Remains",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per game, grants a random small reward.",
+    "value": 500,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 660,
+    "icon": {
+      "x": 2048,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "fountain": {
+    "name": "Fountain",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Gives +{0} Movement points this turn.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "fountain_2": {
+    "name": "Fountain",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Gives +{0} Movement points this turn.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 794,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "fickle_shrine": {
+    "name": "Four Scholars Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Resets all skills and attributes gained from levels, allowing one to re‑train the hero. Only once per hero.",
+    "value": 30000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1652,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_gemstones": {
+    "name": "Gem Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Gems to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 200,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "gingerbread_house": {
+    "name": "Gingerbread House",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives the first visiting hero a valuable resource of their choice.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 2246,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "goblin_cache": {
+    "name": "Goblin Cache",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per game, grants a random small reward.",
+    "value": 1500,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 925,
+    "icon": {
+      "x": 2312,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_gold": {
+    "name": "Gold Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Gold to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 266,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "gardener": {
+    "name": "Magic Garden",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives Gold or valuable resources to the first visiting hero.",
+    "value": 750,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 450,
+    "icon": {
+      "x": 2180,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "scroll_box": {
+    "name": "Magic Scroll",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to use a specific spell.",
+    "value": 1500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 7200,
+    "icon": {
+      "x": 1982,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "market": {
+    "name": "Marketplace",
+    "group": "markets",
+    "groupLabel": "Magic Sites",
+    "description": "Allows visiting heroes to exchange their resources for different ones.",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1256,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_mercury": {
+    "name": "Mercury Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Mercury to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 332,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mythic_scroll_box": {
+    "name": "Mythic Magic Scroll",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to use a special global map spell.",
+    "value": 30000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 450,
+    "icon": {
+      "x": 1850,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "unit_trade_lab_gnat": {
+    "name": "Neglected Housing",
+    "group": "markets",
+    "groupLabel": "Magic Sites",
+    "description": "",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "altar_of_magic_1": {
+    "name": "Nightshade Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to pick and learn {0} out of {1} random Nightshade spells.",
+    "value": 12000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1322,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_ore": {
+    "name": "Ore Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Ore to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 398,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "pandora_box": {
+    "name": "Pandora's Box",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Gives an unpredictable but great reward.",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 364,
+    "icon": {
+      "x": 1916,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "pile_of_books": {
+    "name": "Pile of Books",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Increases XP gained by each visiting hero by {0}% until the end of the week.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 860,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "pocket_dimension": {
+    "name": "Pocket Dimension",
+    "group": "travel",
+    "groupLabel": "Magic Sites",
+    "description": "Allows heroes to leave creatures and artifacts here and immediately transfer them to any Remote Foothold or Pocket Dimension you control.",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1520,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "portal_1": {
+    "name": "Portal",
+    "group": "travel",
+    "groupLabel": "Magic Sites",
+    "description": "Teleports the visiting hero to a paired portal.",
+    "value": 0,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "altar_of_magic_4": {
+    "name": "Primal Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Allows the hero to pick and learn {0} out of {1} random Primal spells.",
+    "value": 12000,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1520,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "quixs_path": {
+    "name": "Quix's Altar",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Increases each visiting hero's Morale by {0} until the end of the week.",
+    "value": 2500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 926,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "watchtower": {
+    "name": "Redwood Observatory",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Removes the fog of war in a huge radius around it.",
+    "value": 2500,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1124,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "sacrificial_shrine": {
+    "name": "Sacrificial Shrine",
+    "group": "magic",
+    "groupLabel": "Magic Sites",
+    "description": "Allows visiting heroes to sacrifice artifacts and creatures for experience.",
+    "value": 10000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1718,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "stables": {
+    "name": "Stables",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Restores {0}% of hero's maximum Movement points and grants +{0}% until the end of the week.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 992,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "tear_of_truth": {
+    "name": "Tear of Truth",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week for each hero, fully restores the hero's Movement points.",
+    "value": 7500,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "monty_hall": {
+    "name": "The Monty Hall",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per game, offers a choice of {0} among {1} random artifacts.",
+    "value": 3500,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 100,
+    "icon": {
+      "x": 2378,
+      "y": 2378,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "town_gate": {
+    "name": "Town Gate",
+    "group": "travel",
+    "groupLabel": "Magic Sites",
+    "description": "Teleports the visiting hero to any chosen city under your control.",
+    "value": 15000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1454,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "chest": {
+    "name": "Treasure Chest",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Gives a choice of either {0} Gold or half that amount in XP.",
+    "value": 500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 200,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "village": {
+    "name": "Village",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives the first visiting hero a common resource of their choice.",
+    "value": 2250,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 530,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mana_well": {
+    "name": "Well",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Fully restores each visiting hero's mana.",
+    "value": 3750,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mysterious_stone": {
+    "name": "Whispering Stones",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Increases each visiting hero's maximum mana by {0}% until the end of the week.",
+    "value": 3750,
+    "visitType": "EachHeroOneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "wind_rose": {
+    "name": "Wind Rose",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Fully reveals the whole map.",
+    "value": 75000,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1190,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "windmill": {
+    "name": "Windmill",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives the first visiting hero a small amount of random resources.",
+    "value": 1500,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 1200,
+    "icon": {
+      "x": 596,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "storage_wood": {
+    "name": "Wood Storage",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Once per week, gives {0} Wood to the first visiting hero.",
+    "value": 3000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 300,
+    "icon": {
+      "x": 464,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "flattering_mirror": {
+    "name": "World Mirror",
+    "group": "treasure",
+    "groupLabel": "Magic Sites",
+    "description": "Removes the fog of war in a small radius around each Mirror on the map.",
+    "value": 20000,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1058,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "gladiator_arena": {
+    "name": "Hell Light Arena",
+    "group": "military",
+    "groupLabel": "Military",
+    "description": "The Arena of Champions! After it's visited and a few days pass, a battle will occur. The winner of the battle wins the game. If the enemy does not appear, you win by default.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "arena": {
+    "name": "Pit of Glory",
+    "group": "military",
+    "groupLabel": "Military",
+    "description": "Allows visiting heroes to upgrade their creatures for Gold.",
+    "value": 15000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1652,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "remote_foothold": {
+    "name": "Remote Foothold",
+    "group": "military",
+    "groupLabel": "Military",
+    "description": "Allows heroes to leave creatures and artifacts here and immediately transfer them to another Remote Foothold you control.",
+    "value": 5000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1586,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "abandoned_outpost": {
+    "name": "Abandoned Outpost",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Defeat its guard to transform this outpost into a city of your starting faction.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": true,
+    "totalChance": null,
+    "icon": {
+      "x": 1916,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "tree_of_abundance": {
+    "name": "Arborcopia",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Once per game, triggers one week of creature growth in all cities under the player's control.",
+    "value": 40000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2246,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "celestial_sphere": {
+    "name": "Celestial Spire",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Allows the study of all spells contained within the magical observatory.",
+    "value": 7500,
+    "visitType": "Unlimited",
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2114,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "chimerologist": {
+    "name": "Chimerologist",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Allows visiting heroes to trade creatures for other, random creatures.",
+    "value": 7500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 728,
+      "y": 2312,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "eternal_dragon": {
+    "name": "Eternal Dragon",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Allows visiting heroes to transform their dragons into very powerful Lich Dragons.",
+    "value": 35000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1718,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "prison": {
+    "name": "Hero Cage",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Unlock to release a friendly hero.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": 210,
+    "icon": {
+      "x": 1982,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "insaras_eye": {
+    "name": "Insara's Eye",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Gives the owner an additional level of knowledge about their opponents, as well as {0} Law points daily.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1784,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "mirage": {
+    "name": "Mirage",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Defeat your better self to coalesce the illusion into a Grail. This treasure will allow the hero to build a unique and wondrous building in a city.",
+    "value": 50000,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 1850,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "tavern": {
+    "name": "Tavern",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Allows visiting heroes to recruit additional heroes.",
+    "value": 2500,
+    "visitType": null,
+    "guardUnits": false,
+    "totalChance": null,
+    "icon": {
+      "x": 2048,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  },
+  "heros_crypt": {
+    "name": "Tomb of a Nameless Hero",
+    "group": "special",
+    "groupLabel": "Special",
+    "description": "Once per game, grants a random artifact. Curses its plunderer.",
+    "value": 2000,
+    "visitType": "OneTime",
+    "guardUnits": false,
+    "totalChance": 1200,
+    "icon": {
+      "x": 2180,
+      "y": 2444,
+      "width": 64,
+      "height": 64
+    }
+  }
+}
