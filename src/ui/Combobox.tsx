@@ -22,7 +22,9 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(-1);
-  const [rect, setRect] = useState<{ left: number; top: number; width: number } | null>(null);
+  // Either `top` (menu drops below the input) or `bottom` (menu opens upward, its bottom pinned to
+  // the input's top) is set, never both. `maxHeight` is clamped to the room on the chosen side.
+  const [rect, setRect] = useState<{ left: number; width: number; top?: number; bottom?: number; maxHeight: number } | null>(null);
   const [editing, setEditing] = useState(false);
   const [typed, setTyped] = useState(false);
   const [query, setQuery] = useState("");
@@ -39,9 +41,20 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   const reposition = () => {
     const el = inputRef.current; if (!el) return;
     const r = el.getBoundingClientRect();
-    setRect({ left: r.left, top: r.bottom, width: r.width });
+    const MARGIN = 8, MAX = 260, ROW = 28; // ROW ≈ one option's rendered height, for estimating menu size
+    const wanted = Math.min(MAX, filtered.length * ROW + (all.length > filtered.length ? ROW : 0));
+    const spaceBelow = window.innerHeight - r.bottom - MARGIN;
+    const spaceAbove = r.top - MARGIN;
+    // Flip up only when the menu wouldn't fit below AND there's more room above — otherwise keep the
+    // natural downward drop. Either way, cap the height to the space on the chosen side so it never
+    // runs off-screen (it scrolls instead).
+    const flip = spaceBelow < wanted && spaceAbove > spaceBelow;
+    const maxHeight = Math.min(MAX, Math.max(0, flip ? spaceAbove : spaceBelow));
+    setRect(flip
+      ? { left: r.left, width: r.width, bottom: window.innerHeight - r.top, maxHeight }
+      : { left: r.left, width: r.width, top: r.bottom, maxHeight });
   };
-  useLayoutEffect(() => { if (open) reposition(); }, [open, shown]);
+  useLayoutEffect(() => { if (open) reposition(); }, [open, shown, filtered.length]);
   // While open, keep the fixed menu aligned to the input as the panel scrolls/resizes.
   useLayoutEffect(() => {
     if (!open) return;
@@ -74,8 +87,9 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
         // Portalled to <body> so it escapes the inspector/drawer stacking context and never gets
         // overlapped by panel content scrolling beneath it.
         <div role="listbox" style={{
-          position: "fixed", left: rect.left, top: rect.top, minWidth: rect.width, width: "max-content",
-          maxWidth: "min(560px, 92vw)", maxHeight: 260, overflowY: "auto", zIndex: 1000,
+          position: "fixed", left: rect.left, minWidth: rect.width, width: "max-content",
+          ...(rect.top !== undefined ? { top: rect.top } : { bottom: rect.bottom }),
+          maxWidth: "min(560px, 92vw)", maxHeight: rect.maxHeight, overflowY: "auto", zIndex: 1000,
           background: "#1f1f1f", border: "1px solid #3a3a3a", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.55)",
         }}>
           {filtered.map((o, i) => (

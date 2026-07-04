@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Combobox } from "./Combobox";
 import { objectName } from "../core/catalogs";
@@ -42,5 +42,39 @@ describe("Combobox label mode", () => {
     // All options visible despite mine_wood being selected — not pre-filtered to the selection.
     expect(screen.getByText("Arborcopia", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("Gold Mine", { exact: false })).toBeInTheDocument();
+  });
+});
+
+describe("Combobox menu placement", () => {
+  const originalRect = Element.prototype.getBoundingClientRect;
+  const originalHeight = window.innerHeight;
+  const mockInputRect = (top: number, bottom: number) => {
+    Element.prototype.getBoundingClientRect = function () {
+      return { left: 20, right: 220, top, bottom, width: 200, height: bottom - top, x: 20, y: top, toJSON: () => {} } as DOMRect;
+    };
+  };
+  afterEach(() => {
+    Element.prototype.getBoundingClientRect = originalRect;
+    (window as { innerHeight: number }).innerHeight = originalHeight;
+  });
+
+  it("drops the menu downward when there is room below the input", () => {
+    (window as { innerHeight: number }).innerHeight = 800;
+    mockInputRect(40, 60); // near the top of a tall viewport
+    render(<Combobox value="" options={["alpha", "beta", "gamma"]} ariaLabel="Pick" onChange={() => {}} />);
+    fireEvent.focus(screen.getByLabelText("Pick"));
+    const menu = screen.getByRole("listbox");
+    expect(menu.style.top).toBe("60px");   // anchored just below the input
+    expect(menu.style.bottom).toBe("");    // not flipped
+  });
+
+  it("flips the menu upward when the input is near the bottom of the viewport", () => {
+    (window as { innerHeight: number }).innerHeight = 500;
+    mockInputRect(470, 490); // little room below (only ~10px)
+    render(<Combobox value="" options={["alpha", "beta", "gamma"]} ariaLabel="Pick" onChange={() => {}} />);
+    fireEvent.focus(screen.getByLabelText("Pick"));
+    const menu = screen.getByRole("listbox");
+    expect(menu.style.bottom).toBe("30px"); // 500 - 470: pinned to the input's top, growing upward
+    expect(menu.style.top).toBe("");        // not dropped downward
   });
 });
