@@ -108,6 +108,77 @@ for (const file of collectFiles()) {
   }
 }
 
+mineGameObjectSids();
+
+// The map_templates folder doesn't carry the object database, so mining templates alone only yields
+// the SIDs a template happens to reference *inline* — objects the generator places purely through
+// built-in content lists (e.g. `mereas_shrine`) never surface in the picker. Backfill `sids` from the
+// game-data dump: the placeable object prefabs (DB/map/objects), the generator's own managed-object
+// list (generator_stats_config `statSids`), and the built-in content lists' inline objects. The dump
+// lives beside map_templates in a game install, or under Data/ in the dev repo; resolved relative to
+// GAME_FILES, or set OLDEN_ERA_GAME_DATA to the folder holding DB/ and generator/.
+function findGameDataRoot() {
+  const candidates = [
+    process.env.OLDEN_ERA_GAME_DATA,
+    join(GAME_FILES, ".."),           // game install: StreamingAssets/{map_templates,DB,generator}
+    join(GAME_FILES, "Data"),         // dev repo, GAME_FILES = OldenEra/ (holds Templates/ and Data/)
+    join(GAME_FILES, "..", "Data"),   // dev repo, GAME_FILES = OldenEra/Templates
+    GAME_FILES,
+  ].filter(Boolean);
+  for (const root of candidates) {
+    if (existsSync(join(root, "DB", "map", "objects")) && existsSync(join(root, "generator"))) return root;
+  }
+  return null;
+}
+
+// Keep only SIDs that can populate a content pool. Drops campaign/custom variants, terrain blocks,
+// portals, town/city objects, and spawner meta-ids — none are pool content.
+function isContentSid(id) {
+  return !!id && !(
+    id.startsWith("custom_") || id.startsWith("campaign_") || id.endsWith("_campaign") ||
+    id.startsWith("block") || id.startsWith("portal_") || id.startsWith("pvp_promo") ||
+    id.startsWith("unit_trade_lab") ||
+    /_city$|-spawner|^random-|^city-/.test(id) ||
+    ["shroom_of_growth", "fairy_ring", "learning_stone_old", "temporary_camp",
+     "gladiator_arena", "pocket_dimension", "testing_grounds"].includes(id)
+  );
+}
+
+function mineGameObjectSids() {
+  const root = findGameDataRoot();
+  if (!root) {
+    console.warn("! Game-data dump (DB/ + generator/) not found next to the templates — `sids` limited to inline template usage.\n"
+      + "  Set OLDEN_ERA_GAME_DATA to the folder holding DB/ and generator/ to include every placeable object.");
+    return;
+  }
+  const before = sets.sids.size;
+  const add = (id) => { if (isContentSid(id)) sets.sids.add(id); };
+  // Physical placeable objects: the resource and interactable prefab definitions (ids). Other object
+  // files (environment, animals, fx, artifacts, blocks, test) aren't content-pool objects.
+  const objDir = join(root, "DB", "map", "objects");
+  for (const f of ["3_resources.json", "4_interactables.json"]) {
+    const p = join(objDir, f);
+    if (!existsSync(p)) continue;
+    for (const m of readFileSync(p, "utf-8").matchAll(/"id"\s*:\s*"([^"]+)"/g)) add(m[1]);
+  }
+  // The generator's managed-object list: logical spawner SIDs that aren't prefabs (random_item_*,
+  // random_hire_*, scroll boxes, …) plus valued objects.
+  const stats = join(root, "generator", "generator_stats_config.json");
+  if (existsSync(stats)) {
+    try { for (const s of JSON.parse(readFileSync(stats, "utf-8")).statSids || []) add(s); } catch { /* ignore */ }
+  }
+  // Objects referenced by the built-in content lists (the "groups" most templates place through).
+  // The test list is excluded — it carries reward-pool artifact SIDs that aren't standalone objects.
+  const clDir = join(root, "generator", "content_lists");
+  if (existsSync(clDir)) {
+    for (const f of readdirSync(clDir)) {
+      if (!f.endsWith(".json") || f.includes("test")) continue;
+      for (const m of readFileSync(join(clDir, f), "utf-8").matchAll(/"sid"\s*:\s*"([^"]+)"/g)) add(m[1]);
+    }
+  }
+  console.log(`  game-data object sids: ${root} (+${sets.sids.size - before}, total ${sets.sids.size})`);
+}
+
 // Authentic per-name zone-layout defaults: the game's built-in `zone_layout_default` plus, for each
 // named layout (zone_layout_sides, …), the most-common inline definition across the templates — so
 // a node type's auto-seeded layout starts from real role-appropriate values, not a generic guess.
