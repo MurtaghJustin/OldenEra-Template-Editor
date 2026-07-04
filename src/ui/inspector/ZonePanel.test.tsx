@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ZonePanel } from "./ZonePanel";
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
@@ -56,6 +56,18 @@ describe("ZonePanel", () => {
     draft!.referenceBack!("fresh_pool");
     const zone = useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
     expect((zone.guardedContentPool as string[]) ?? []).toContain("fresh_pool");
+  });
+
+  it("offers pools added to this template (not just the build-time catalog) in a pool picker search", () => {
+    render(<ZonePanel zoneName="Hub" />);
+    const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
+    // Author a brand-new pool in this template — it is NOT in the static build-time catalog.
+    const fresh = "session_only_pool";
+    expect(catalogs.pools ?? []).not.toContain(fresh);
+    act(() => useEditorStore.getState().upsertContentDef("pools", { name: fresh, groups: [] }));
+    // It must be selectable in the guarded-pool picker: typing its name adds the reference.
+    fireEvent.change(screen.getByLabelText("Add Guarded content pool"), { target: { value: fresh } });
+    expect((zone().guardedContentPool as string[]) ?? []).toContain(fresh);
   });
 
   it("adds and removes a mandatory content reference via the store", () => {

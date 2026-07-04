@@ -2,7 +2,7 @@ import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
 import { NumberField, SelectField, ReferenceListField, SelectorField, ReactionDistributionField } from "./fields";
 import { MainObjectsEditor } from "./MainObjectsEditor";
-import type { ContentKind } from "../../core/content";
+import { contentDefs, type ContentKind } from "../../core/content";
 import type { Zone, MainObject, Selector } from "../../core/types";
 
 // The full set of zone-level fields, shared by the zone inspector (editing one zone) and node-type
@@ -21,12 +21,19 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
   const root = useEditorStore((s) => s.root);
   const layoutOptions = ((root?.zoneLayouts as { name?: string }[] | undefined) ?? []).map((z) => z.name ?? "").filter(Boolean);
 
-  const refPicker = (label: string, field: keyof Zone, kind: ContentKind, options: string[], hint: string) => (
-    <ReferenceListField label={label} hint={hint} values={(zone[field] as string[] | undefined) ?? []} options={options}
-      onChange={(next) => onPatch({ [field]: next } as Partial<Zone>)}
-      onOpen={(name) => openContentDrawer(kind, name)}
-      onAddNew={() => createContentDraft(kind, (name) => onAddRef(field, name))} />
-  );
+  // Offer both the build-time catalog names AND definitions authored in this template, so a pool
+  // (or mandatory/count-limit group) just added here is immediately selectable — the static catalog
+  // is only regenerated at build time and never sees session-local definitions. Dedupe, keep sorted.
+  const refPicker = (label: string, field: keyof Zone, kind: ContentKind, catalogOptions: string[], hint: string) => {
+    const live = contentDefs(root, kind).map((d) => d.name).filter(Boolean);
+    const options = Array.from(new Set([...catalogOptions, ...live])).sort();
+    return (
+      <ReferenceListField label={label} hint={hint} values={(zone[field] as string[] | undefined) ?? []} options={options}
+        onChange={(next) => onPatch({ [field]: next } as Partial<Zone>)}
+        onOpen={(name) => openContentDrawer(kind, name)}
+        onAddNew={() => createContentDraft(kind, (name) => onAddRef(field, name))} />
+    );
+  };
   // Flow fields into as many columns as fit (the inspector is wide); section headers and the wide
   // editors span the full row.
   const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", columnGap: 16, alignItems: "start" };
