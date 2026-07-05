@@ -37,10 +37,11 @@ function renderOption(sid: string): ReactNode {
       <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {info.name}
       </span>
-      <span style={{ fontSize: 11, opacity: 0.65, fontVariantNumeric: "tabular-nums" }}>
+      {info.guardUnits && <span title="Guarded" style={{ color: "#d9a066", fontSize: 12 }}>⚔</span>}
+      {/* Right-anchored (against the fixed-width chip) so values line up in a column across rows. */}
+      <span style={{ fontSize: 11, opacity: 0.65, fontVariantNumeric: "tabular-nums", minWidth: 46, textAlign: "right" }}>
         {info.value.toLocaleString()}
       </span>
-      {info.guardUnits && <span title="Guarded" style={{ color: "#d9a066", fontSize: 12 }}>⚔</span>}
       <span style={{ fontSize: 10, padding: "1px 5px", borderRadius: 4, background: "#ffffff1a", opacity: 0.7 }}>
         {GROUP_ABBR[info.groupLabel] ?? info.groupLabel}
       </span>

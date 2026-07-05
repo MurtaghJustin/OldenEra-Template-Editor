@@ -101,10 +101,15 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
         // Portalled to <body> so it escapes the inspector/drawer stacking context and never gets
         // overlapped by panel content scrolling beneath it.
         <div role="listbox" style={{
-          position: "fixed", left: rect.left, minWidth: rect.width, width: "max-content",
+          position: "fixed", left: rect.left,
           ...(rect.top !== undefined ? { top: rect.top } : { bottom: rect.bottom }),
-          maxWidth: "min(560px, 92vw)", maxHeight: rect.maxHeight, zIndex: 1000,
+          maxHeight: rect.maxHeight, zIndex: 1000,
           display: "flex", flexDirection: "column",
+          // With a detail panel, pin a stable width — otherwise `max-content` would resize the menu as
+          // each highlighted row's (differently-sized) description renders. Without one, size to content.
+          ...(renderDetail
+            ? { width: "min(420px, 92vw)", minWidth: rect.width }
+            : { minWidth: rect.width, width: "max-content", maxWidth: "min(560px, 92vw)" }),
           background: "#1f1f1f", border: "1px solid #3a3a3a", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.55)",
         }}>
           {/* Scrolling option list. When renderDetail is set, the detail panel below stays pinned. */}
