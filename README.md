@@ -13,7 +13,7 @@ On localhost, Open/Save use the File System Access API where supported.
 ```
 npm run build
 ```
-This produces a **single self-contained `dist/index.html`** (JS + CSS inlined via `vite-plugin-singlefile`). Open it directly in a browser by double-clicking (`file://`) — no server needed; external module scripts are blocked over `file://`, so inlining is what makes double-click work. Loading uses a file picker; Save and Export PNG download files.
+This produces `dist/index.html` with **JS + CSS inlined** (via `vite-plugin-singlefile`) plus the **map-object icons as separate `*.webp` files beside it** in `dist/`. Open `index.html` directly by double-clicking (`file://`) — no server needed. External module scripts are blocked over `file://`, so JS/CSS are inlined; images are *not* blocked, so the ~140 icons are kept external (they'd add ~400 KB of base64 to the HTML otherwise) and load by relative path. **Distribute the whole `dist/` folder together** — the icons must travel with `index.html`. Loading uses a file picker; Save and Export PNG download files.
 
 ## Regenerate catalogs
 The editor ships with pre-generated catalogs (`src/generated/*.json`), so this is only needed when the game's templates change. Point it at the game's **map templates folder** — `…\HeroesOldenEra_Data\StreamingAssets\map_templates` (the `*.rmg.json` templates live directly in it; a folder with a `Templates/` subfolder also works) — either as a CLI argument:

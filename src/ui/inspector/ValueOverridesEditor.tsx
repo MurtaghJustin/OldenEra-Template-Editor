@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { objectComboProps } from "../objectPickerProps";
 import { VariantField } from "./fields";
 import { ColHead } from "../content/ColHead";
 
@@ -20,7 +21,7 @@ export function ValueOverridesEditor({ overrides, onChange }: { overrides: Overr
         <div />
         {overrides.map((o, i) => (
           <Fragment key={i}>
-            <Combobox value={o.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Override object" placeholder="search objects…"
+            <Combobox value={o.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Override object" placeholder="search objects…"
               onChange={(v) => set(i, { sid: v })} />
             <VariantField sid={o.sid} value={o.variant} ariaLabel="Override variant" onChange={(v) => set(i, { variant: v })} />
             <input type="number" value={o.guardValue ?? ""} onChange={(e) => set(i, { guardValue: num(e.target.value) })} />

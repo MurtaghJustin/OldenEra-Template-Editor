@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 // A type-to-search combobox with a dropdown we render ourselves — unlike a native <datalist>, this
@@ -9,7 +9,8 @@ import { createPortal } from "react-dom";
 //  • free-text (default): the input text IS the stored value; typing edits it live.
 //  • label mode (pass `labelFor`): the field stores a value (e.g. an object SID) but the input
 //    shows its human name; typing searches names/values and only an explicit pick changes the value.
-export function Combobox({ value, onChange, options, onSelect, labelFor, placeholder, ariaLabel }: {
+export function Combobox({ value, onChange, options, onSelect, labelFor, placeholder, ariaLabel,
+  renderOption, renderDetail, valueAdornment }: {
   value: string;
   onChange: (v: string) => void;
   options: string[];
@@ -17,6 +18,10 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   labelFor?: (v: string) => string;
   placeholder?: string;
   ariaLabel?: string;
+  // Optional rich rendering (used for map-object pickers; other pickers pass none and render plainly):
+  renderOption?: (v: string, highlighted: boolean) => ReactNode; // replaces the default row content
+  renderDetail?: (v: string) => ReactNode;                       // pinned detail panel for the highlighted row
+  valueAdornment?: (v: string) => ReactNode;                     // node shown inside the field, left of the text
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,8 +46,10 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   const reposition = () => {
     const el = inputRef.current; if (!el) return;
     const r = el.getBoundingClientRect();
-    const MARGIN = 8, MAX = 260, ROW = 28; // ROW ≈ one option's rendered height, for estimating menu size
-    const wanted = Math.min(MAX, filtered.length * ROW + (all.length > filtered.length ? ROW : 0));
+    // ROW ≈ one option's rendered height; DETAIL reserves room for the pinned detail panel when present.
+    const DETAIL = renderDetail ? 132 : 0;
+    const MARGIN = 8, MAX = renderDetail ? 380 : 260, ROW = 28;
+    const wanted = Math.min(MAX, filtered.length * ROW + (all.length > filtered.length ? ROW : 0) + DETAIL);
     const spaceBelow = window.innerHeight - r.bottom - MARGIN;
     const spaceAbove = r.top - MARGIN;
     // Flip up only when the menu wouldn't fit below AND there's more room above — otherwise keep the
@@ -68,9 +75,16 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
   // Closing without an explicit pick: free-text value is already live; label mode reverts to the name.
   const close = () => { setEditing(false); setTyped(false); setQuery(""); setOpen(false); setHi(-1); };
 
+  // Icon (or other node) for the currently-stored value, shown inside the field's left edge.
+  const adorn = valueAdornment && value ? valueAdornment(value) : null;
   return (
     <div ref={wrap} style={{ position: "relative", width: "100%", minWidth: 0 }}>
-      <input ref={inputRef} aria-label={ariaLabel} placeholder={placeholder} value={shown} style={{ width: "100%" }}
+      {adorn && (
+        <span style={{ position: "absolute", left: 6, top: "50%", transform: "translateY(-50%)",
+          display: "flex", alignItems: "center", pointerEvents: "none", zIndex: 1 }}>{adorn}</span>
+      )}
+      <input ref={inputRef} aria-label={ariaLabel} placeholder={placeholder} value={shown}
+        style={{ width: "100%", ...(adorn ? { paddingLeft: 26 } : null) }}
         onFocus={() => { setEditing(true); setTyped(false); setQuery(""); setOpen(true); }}
         onChange={(e) => { if (labelFor) setQuery(e.target.value); else onChange(e.target.value); setTyped(true); setOpen(true); setHi(-1); }}
         onBlur={close}
@@ -89,19 +103,29 @@ export function Combobox({ value, onChange, options, onSelect, labelFor, placeho
         <div role="listbox" style={{
           position: "fixed", left: rect.left, minWidth: rect.width, width: "max-content",
           ...(rect.top !== undefined ? { top: rect.top } : { bottom: rect.bottom }),
-          maxWidth: "min(560px, 92vw)", maxHeight: rect.maxHeight, overflowY: "auto", zIndex: 1000,
+          maxWidth: "min(560px, 92vw)", maxHeight: rect.maxHeight, zIndex: 1000,
+          display: "flex", flexDirection: "column",
           background: "#1f1f1f", border: "1px solid #3a3a3a", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.55)",
         }}>
-          {filtered.map((o, i) => (
-            <div key={o} role="option" aria-selected={i === hi}
-              onMouseDown={(e) => { e.preventDefault(); choose(o); }} onMouseEnter={() => setHi(i)}
-              style={{ padding: "5px 10px", cursor: "pointer", fontSize: 12, wordBreak: "break-word",
-                background: i === hi ? "#2b3a1d" : "transparent", color: i === hi ? "#cfe8a0" : "#ddd" }}>
-              {labelFor ? <>{labelFor(o)} <span style={{ opacity: 0.4, fontSize: 11 }}>{o}</span></> : o}
+          {/* Scrolling option list. When renderDetail is set, the detail panel below stays pinned. */}
+          <div style={{ flex: "1 1 auto", overflowY: "auto", minHeight: 0 }}>
+            {filtered.map((o, i) => (
+              <div key={o} role="option" aria-selected={i === hi}
+                onMouseDown={(e) => { e.preventDefault(); choose(o); }} onMouseEnter={() => setHi(i)}
+                style={{ padding: "5px 10px", cursor: "pointer", fontSize: 12, wordBreak: "break-word",
+                  background: i === hi ? "#2b3a1d" : "transparent", color: i === hi ? "#cfe8a0" : "#ddd" }}>
+                {renderOption ? renderOption(o, i === hi)
+                  : labelFor ? <>{labelFor(o)} <span style={{ opacity: 0.4, fontSize: 11 }}>{o}</span></> : o}
+              </div>
+            ))}
+            {all.length > filtered.length && (
+              <div style={{ padding: "5px 10px", fontSize: 11, opacity: 0.5 }}>+{all.length - filtered.length} more — keep typing…</div>
+            )}
+          </div>
+          {renderDetail && (
+            <div style={{ flex: "0 0 auto", borderTop: "1px solid #3a3a3a", background: "#191919" }}>
+              {renderDetail(hi >= 0 ? filtered[hi] : filtered[0])}
             </div>
-          ))}
-          {all.length > filtered.length && (
-            <div style={{ padding: "5px 10px", fontSize: 11, opacity: 0.5 }}>+{all.length - filtered.length} more — keep typing…</div>
           )}
         </div>,
         document.body,

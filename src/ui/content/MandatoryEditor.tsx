@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField, VariantField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
+import { objectComboProps } from "../objectPickerProps";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
 
@@ -96,7 +97,7 @@ export function MandatoryEditor({ draft, onChange, onOpenRef }:
         <div className="content-row" key={i}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
             <div className="ct-field" style={{ flex: "1 1 160px" }}>Object<HintMark hint="Object guaranteed in the zone — or leave blank and use include lists." />
-              <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="(or use include lists)"
+              <Combobox value={it.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Object" placeholder="(or use include lists)"
                 onChange={(v) => setItem(i, { sid: v || undefined })} /></div>
             <label className="ct-field">Variant<HintMark hint="Object sub-type; named for utopias/pandora/etc., -1 = any, blank = none." />
               <VariantField sid={it.sid} value={it.variant} ariaLabel="Variant" onChange={(v) => setItem(i, { variant: v })} /></label>

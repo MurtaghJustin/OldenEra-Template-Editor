@@ -45,6 +45,36 @@ describe("Combobox label mode", () => {
   });
 });
 
+describe("Combobox render props", () => {
+  it("uses renderOption for row content instead of the default label", () => {
+    render(<Combobox value="" options={["alpha", "beta"]} ariaLabel="Pick" onChange={() => {}}
+      renderOption={(v) => <span>OPT:{v}</span>} />);
+    fireEvent.focus(screen.getByLabelText("Pick"));
+    expect(screen.getByText("OPT:alpha")).toBeInTheDocument();
+    expect(screen.getByText("OPT:beta")).toBeInTheDocument();
+  });
+
+  it("renders the detail panel for the highlighted row (first row until arrowed)", () => {
+    render(<Combobox value="" options={["alpha", "beta", "gamma"]} ariaLabel="Pick" onChange={() => {}}
+      renderDetail={(v) => <span>DETAIL:{v}</span>} />);
+    const input = screen.getByLabelText("Pick");
+    fireEvent.focus(input);
+    expect(screen.getByText("DETAIL:alpha")).toBeInTheDocument(); // defaults to first while hi = -1
+    fireEvent.keyDown(input, { key: "ArrowDown" }); // hi 0
+    fireEvent.keyDown(input, { key: "ArrowDown" }); // hi 1
+    expect(screen.getByText("DETAIL:beta")).toBeInTheDocument();
+  });
+
+  it("shows valueAdornment only when a value is set", () => {
+    const { rerender } = render(<Combobox value="" options={["alpha"]} ariaLabel="Pick" onChange={() => {}}
+      valueAdornment={(v) => <span>ADORN:{v}</span>} />);
+    expect(screen.queryByText(/^ADORN:/)).toBeNull();
+    rerender(<Combobox value="alpha" options={["alpha"]} ariaLabel="Pick" onChange={() => {}}
+      valueAdornment={(v) => <span>ADORN:{v}</span>} />);
+    expect(screen.getByText("ADORN:alpha")).toBeInTheDocument();
+  });
+});
+
 describe("Combobox menu placement", () => {
   const originalRect = Element.prototype.getBoundingClientRect;
   const originalHeight = window.innerHeight;

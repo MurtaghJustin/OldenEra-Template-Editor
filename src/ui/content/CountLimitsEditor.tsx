@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { objectComboProps } from "../objectPickerProps";
 import { VariantField } from "../inspector/fields";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef } from "../../core/content";
@@ -35,7 +36,7 @@ export function CountLimitsEditor({ draft, onChange }: { draft: ContentDef; onCh
         <div />
         {limits.map((l, i) => (
           <Fragment key={i}>
-            <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
+            <Combobox value={l.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setLimit(i, { sid: v })} />
             <VariantField sid={l.sid} value={l.variant} ariaLabel="Variant" onChange={(v) => setLimit(i, { variant: v })} />
             <input type="number" value={l.maxCount ?? ""} onChange={(e) => setLimit(i, { maxCount: num(e.target.value) })} />

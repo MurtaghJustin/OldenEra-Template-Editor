@@ -21,15 +21,14 @@ if (!GAME_FILES || !existsSync(GAME_FILES)) {
 // SID display names, and the generic zone_layout_default fallback base.
 const REFERENCE = join(__dirname, "..", "reference", "05-id-reference.md");
 const ZONE_LAYOUT_DEFAULTS = join(__dirname, "..", "reference", "default_zone_layouts.json");
-// Rich map-object data + per-object icons mirrored from the community DB (oldenera.th.gl); see
-// reference/README or Documentation/05. map_objects.json is sid → {name, group, groupLabel,
-// description, value, visitType, guardUnits, totalChance, icon rect}; map_object_icons/<sid>.webp
-// is the 64×64 sprite. Both are maintainer-refreshed by the scraper, not by this script.
+// Rich map-object data mirrored from the community DB (oldenera.th.gl); see Documentation/05.
+// map_objects.json is sid → {name, group, groupLabel, description, value, visitType, guardUnits,
+// totalChance, icon rect}. The per-object icons in reference/map_object_icons/<sid>.webp are the
+// 64×64 sprites; the app build (Vite) copies those in as external assets directly (not this script).
+// Both are maintainer-refreshed by the scraper, not by this script.
 const MAP_OBJECTS = join(__dirname, "..", "reference", "map_objects.json");
-const ICON_DIR = join(__dirname, "..", "reference", "map_object_icons");
 const OUT = join(__dirname, "..", "src", "generated", "catalogs.json");
 const OUT_LAYOUTS = join(__dirname, "..", "src", "generated", "zoneLayoutDefaults.json");
-const OUT_ICONS = join(__dirname, "..", "src", "generated", "mapObjectIcons.json");
 
 // The scraped map-object catalog (authoritative names + metadata). Empty if not yet mirrored.
 const mapObjects = existsSync(MAP_OBJECTS) ? JSON.parse(readFileSync(MAP_OBJECTS, "utf-8")) : {};
@@ -284,26 +283,10 @@ function buildMapObjects() {
   return out;
 }
 
-// Inline every cropped icon as a data URI, keyed by SID — the editor is a single-file build, so the
-// picker can't reference image files on disk; base64 in a JSON module is the offline-safe delivery.
-function buildIconModule() {
-  const out = {};
-  if (!existsSync(ICON_DIR)) return out;
-  for (const f of readdirSync(ICON_DIR)) {
-    if (!f.endsWith(".webp")) continue;
-    const sid = f.slice(0, -5);
-    out[sid] = "data:image/webp;base64," + readFileSync(join(ICON_DIR, f)).toString("base64");
-  }
-  return out;
-}
-
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(catalogs, null, 2) + "\n");
 const zoneLayoutDefaults = buildZoneLayoutDefaults();
 writeFileSync(OUT_LAYOUTS, JSON.stringify(zoneLayoutDefaults, null, 2) + "\n");
-const iconModule = buildIconModule();
-writeFileSync(OUT_ICONS, JSON.stringify(iconModule) + "\n");
 console.log("Wrote", OUT_LAYOUTS, "—", Object.keys(zoneLayoutDefaults).length, "layout defaults");
-console.log("Wrote", OUT_ICONS, "—", Object.keys(iconModule).length, "object icons");
 console.log("Wrote", OUT);
 for (const [k, v] of Object.entries(catalogs)) console.log(`  ${k}: ${Array.isArray(v) ? v.length : Object.keys(v).length}`);

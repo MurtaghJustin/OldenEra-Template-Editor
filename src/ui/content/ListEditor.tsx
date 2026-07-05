@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { Combobox } from "../Combobox";
+import { objectComboProps } from "../objectPickerProps";
 import { VariantField } from "../inspector/fields";
 import { ColHead } from "./ColHead";
 import type { ContentDef } from "../../core/content";
@@ -26,7 +27,7 @@ export function ListEditor({ draft, onChange }: { draft: ContentDef; onChange: (
         <div />
         {content.map((e, i) => (
           <Fragment key={i}>
-            <Combobox value={e.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
+            <Combobox value={e.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Object" placeholder="search objects…"
               onChange={(v) => setEntry(i, { sid: v })} />
             <input type="number" value={e.weight ?? ""} onChange={(ev) => setEntry(i, { weight: num(ev.target.value) })} />
             <VariantField sid={e.sid} value={e.variant} ariaLabel="Variant" onChange={(v) => setEntry(i, { variant: v })} />

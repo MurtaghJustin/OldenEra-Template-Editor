@@ -1,5 +1,4 @@
 import data from "../generated/catalogs.json";
-import icons from "../generated/mapObjectIcons.json";
 import {
   CONNECTION_TYPES, GAME_MODES, MAIN_OBJECT_TYPES, PLACEMENTS,
   ORIENTATION_MODES, SELECTOR_TYPES, PLAYER_SLOTS,
@@ -24,7 +23,18 @@ export interface MapObjectInfo {
   totalChance: number | null;
 }
 export const mapObjects = (raw.mapObjects as Record<string, MapObjectInfo> | undefined) ?? {};
-const mapObjectIcons = icons as Record<string, string>;
+
+// Icons ship as external hashed webp assets (not base64-inlined — see vite.config.ts). Vite copies
+// each file in reference/map_object_icons/ into the build and, via import.meta.glob('?url'), hands
+// back its URL; we key those by SID (the filename stem).
+const iconUrls = import.meta.glob("../../reference/map_object_icons/*.webp", {
+  eager: true, query: "?url", import: "default",
+}) as Record<string, string>;
+const mapObjectIcons: Record<string, string> = {};
+for (const p in iconUrls) {
+  const sid = p.slice(p.lastIndexOf("/") + 1, -".webp".length);
+  mapObjectIcons[sid] = iconUrls[p];
+}
 
 // Full metadata record for an object SID, or undefined if it isn't in the mirrored catalog.
 export function mapObjectInfo(sid: string): MapObjectInfo | undefined {

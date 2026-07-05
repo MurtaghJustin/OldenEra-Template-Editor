@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { catalogs, objectName } from "../../core/catalogs";
 import { ReferenceListField, VariantField } from "../inspector/fields";
 import { Combobox } from "../Combobox";
+import { objectComboProps } from "../objectPickerProps";
 import { ColHead, HintMark } from "./ColHead";
 import type { ContentDef, ContentKind } from "../../core/content";
 
@@ -83,7 +84,7 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
               const patchContent = (p: Partial<ContentEntry>) => setGroup(i, { content: (g.content ?? []).map((x, m) => (m === k ? { ...x, ...p } : x)) });
               return (
                 <Fragment key={k}>
-                  <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Object" placeholder="search objects…"
+                  <Combobox value={c.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Object" placeholder="search objects…"
                     onChange={(v) => patchContent({ sid: v })} />
                   <input type="number" value={c.weight ?? ""} onChange={(e) => patchContent({ weight: num(e.target.value) })} />
                   <VariantField sid={c.sid} value={c.variant} ariaLabel="Variant" onChange={(v) => patchContent({ variant: v })} />
@@ -103,7 +104,7 @@ export function PoolEditor({ draft, onChange, onOpenRef }:
         <div />
         {bans.map((b, i) => (
           <Fragment key={i}>
-            <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} ariaLabel="Banned object"
+            <Combobox value={b.sid ?? ""} options={catalogs.sids ?? []} labelFor={objectName} {...objectComboProps} ariaLabel="Banned object"
               onChange={(v) => setBans(bans.map((x, j) => (j === i ? { sid: v } : x)))} />
             <button className="ct-iconbtn" aria-label="Remove ban" onClick={() => setBans(bans.filter((_, j) => j !== i))}>✕</button>
           </Fragment>
