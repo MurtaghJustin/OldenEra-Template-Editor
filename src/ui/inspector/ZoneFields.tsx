@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
-import { NumberField, SelectField, ReferenceListField, SelectorField, ReactionDistributionField } from "./fields";
+import { NumberField, SelectField, ReferenceListField, ReactionDistributionField } from "./fields";
+import { SelectorField } from "./SelectorField";
 import { MainObjectsEditor } from "./MainObjectsEditor";
 import { ZoneItemsPanel } from "../content/ZoneItemsPanel";
 import { contentDefs, type ContentKind } from "../../core/content";
@@ -26,7 +27,11 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
   // A zone's layout must be defined in this template's zoneLayouts (there are no usable built-in
   // layout defaults — referencing an undefined layout hangs the generator), so only offer those.
   const root = useEditorStore((s) => s.root);
+  const vi = useEditorStore((s) => s.variantIndex);
   const layoutOptions = ((root?.zoneLayouts as { name?: string }[] | undefined) ?? []).map((z) => z.name ?? "").filter(Boolean);
+  // Other zones in the variant — the targets for biome/faction selectors that "match" or "differ
+  // from" a zone. Exclude this zone itself.
+  const zoneNames = (root?.variants[vi]?.zones ?? []).map((z) => z.name).filter((n) => n && n !== zone.name);
 
   // Offer both the build-time catalog names AND definitions authored in this template, so a pool
   // (or mandatory/count-limit group) just added here is immediately selectable — the static catalog
@@ -93,17 +98,17 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
         hint="Resource value budget, scaled by zone size." />
 
       {head("Biomes")}
-      <SelectorField label="Zone biome" value={zone.zoneBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ zoneBiome: s })}
-        hint="Selects the zone's terrain biome (FromList / Match / MatchMainObject / MatchZone)." />
-      <SelectorField label="Content biome" value={zone.contentBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ contentBiome: s })}
+      <SelectorField label="Zone biome" kind="biome" value={zone.zoneBiome as Selector | undefined} zones={zoneNames} onChange={(s) => onPatch({ zoneBiome: s })}
+        hint="Selects the zone's terrain biome: pick specific biomes, follow a main object, or match another zone." />
+      <SelectorField label="Content biome" kind="biome" value={zone.contentBiome as Selector | undefined} zones={zoneNames} onChange={(s) => onPatch({ contentBiome: s })}
         hint="Biome theme used when choosing content objects." />
-      <SelectorField label="Meta-objects biome" value={zone.metaObjectsBiome as Selector | undefined} argOptions={catalogs.biomes ?? []} onChange={(s) => onPatch({ metaObjectsBiome: s })}
+      <SelectorField label="Meta-objects biome" kind="biome" value={zone.metaObjectsBiome as Selector | undefined} zones={zoneNames} onChange={(s) => onPatch({ metaObjectsBiome: s })}
         hint="Biome theme for meta/decoration objects." />
 
       {head("Objects & content")}
       {isRealZone && <div style={span}><ZoneItemsPanel zone={zone} /></div>}
       <div style={span}>
-        <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} onChange={(next) => onPatch({ mainObjects: next })} />
+        <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} zones={zoneNames} onChange={(next) => onPatch({ mainObjects: next })} />
       </div>
       {/* The raw pool/mandatory reference pickers. The friendly item list above covers the common
           case; the pickers stay for power users (choosing which named pools/groups a zone uses) but

@@ -1,11 +1,12 @@
 import { catalogs } from "../../core/catalogs";
 import { MAIN_OBJECT_TYPES, PLACEMENTS, PLAYER_SLOTS, type MainObject } from "../../core/types";
-import { NumberField, CheckboxField, TextField, EnumField, SelectorField } from "./fields";
+import { NumberField, CheckboxField, TextField, EnumField } from "./fields";
+import { SelectorField } from "./SelectorField";
 
 // Full editor for a zone's (or node type's) main objects: towns (City), player spawns, gladiator
 // arenas, abandoned outposts. Every field is editable so a town can be fully configured here
 // instead of only via applying a node type. Unknown keys on an object are preserved (spread).
-export function MainObjectsEditor({ objects, onChange }: { objects: MainObject[]; onChange: (o: MainObject[]) => void }) {
+export function MainObjectsEditor({ objects, zones = [], onChange }: { objects: MainObject[]; zones?: string[]; onChange: (o: MainObject[]) => void }) {
   const setObj = (i: number, patch: Partial<MainObject>) => onChange(objects.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   const owner = (o: MainObject) => (typeof o.owner === "string" ? o.owner : "");
 
@@ -28,8 +29,8 @@ export function MainObjectsEditor({ objects, onChange }: { objects: MainObject[]
             hint="This city is the Hold-City victory objective (pairs with the win condition)." />}
           <EnumField label="Owner" value={owner(o)} options={PLAYER_SLOTS} allowNone onChange={(v) => setObj(i, { owner: v || null })}
             hint="Player that owns this object from the start; blank = neutral." />
-          <SelectorField label="Faction" value={o.faction} argOptions={catalogs.factions ?? []} onChange={(f) => setObj(i, { faction: f })}
-            hint="Town faction selector (Match an index, FromList, etc.)." />
+          <SelectorField label="Faction" kind="faction" value={o.faction} zones={zones} onChange={(f) => setObj(i, { faction: f })}
+            hint="Which faction this town/spawn is: any, random, match a main object's faction, or different from other zones." />
           <EnumField label="Construction template" value={o.buildingsConstructionSid ?? ""} options={catalogs.constructionSids ?? []} allowNone
             hint="Pre-built building loadout (poor → ultra-rich, or a template-specific set). Defined in game data."
             onChange={(v) => setObj(i, { buildingsConstructionSid: v || undefined })} />
