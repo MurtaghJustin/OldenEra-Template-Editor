@@ -48,18 +48,19 @@ export function buildZoneRoads(zone: Zone, variant: Variant): Road[] {
   return roads;
 }
 
-// Derive `roads[]` for every zone in any variant that currently has NO road segments at all — i.e.
-// an editor-made / unrouted template. A variant that already has roads (every official template) is
-// left completely untouched, preserving hand-authored routing and lossless round-trips. Only assigns
-// when a zone actually yields segments, so a road-less variant (no road-connections) is unchanged.
-// Mutates `root` in place.
-export function generateRoads(root: TemplateRoot): void {
-  for (const v of root.variants ?? []) {
-    const hasAnyRoads = (v.zones ?? []).some((z) => Array.isArray((z as Zone).roads) && ((z as Zone).roads as unknown[]).length > 0);
-    if (hasAnyRoads) continue;
-    for (const z of v.zones ?? []) {
-      const roads = buildZoneRoads(z, v);
-      if (roads.length) (z as Zone).roads = roads;
+// (Re)derive `roads[]` for the zones this editor created, leaving loaded zones exactly as they were.
+// A zone present in the loaded `original` is preserved (keeps hand-authored/official routing and a
+// lossless round-trip); a zone NOT in the original is editor-created, so its roads are derived from
+// the current connection graph on every save (fresh, never stale). Deciding per zone — rather than
+// per whole variant — is what makes a mixed template correct: e.g. a shape built by hand plus a
+// pasted copy still gets roads on the hand-built zones (the earlier per-variant check skipped them
+// once the paste had added any roads). Mutates `root` in place.
+export function generateRoads(root: TemplateRoot, original: TemplateRoot | null): void {
+  (root.variants ?? []).forEach((v, vi) => {
+    const loaded = new Set(((original?.variants?.[vi]?.zones ?? []) as Zone[]).map((z) => z.name));
+    for (const z of (v.zones ?? []) as Zone[]) {
+      if (loaded.has(z.name)) continue;        // loaded zone → preserve exactly
+      z.roads = buildZoneRoads(z, v);           // editor-created zone → derive from the current graph
     }
-  }
+  });
 }

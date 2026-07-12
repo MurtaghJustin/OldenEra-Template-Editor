@@ -175,14 +175,18 @@ describe("store", () => {
     expect(text.endsWith("\n")).toBe(true);
   });
 
-  it("serializeForSave auto-authors roads for an unrouted (editor-made) template", () => {
-    // minimal's zones all have roads: [] and its connections are road:true — so it's "unrouted".
+  it("serializeForSave derives roads for editor-created zones and preserves loaded ones", () => {
+    // Add a NEW spawn zone + road-connection to Hub (not present in the loaded fixture).
+    useEditorStore.getState().addZoneOfType("NewSpawn", "player_spawn", {});
+    useEditorStore.getState().addConn({ name: "NewSpawn-Hub", from: "NewSpawn", to: "Hub", connectionType: "Direct", road: true });
     const out = JSON.parse(useEditorStore.getState().serializeForSave());
-    const spawnA = out.variants[0].zones.find((z: { name: string }) => z.name === "Spawn-A");
-    // Spawn-A has a Spawn main object and the road-connection "Spawn-A-Hub" → MainObject 0 → that connection.
-    expect(spawnA.roads).toEqual([
-      { type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Connection", args: ["Spawn-A-Hub"] } },
+    const created = out.variants[0].zones.find((z: { name: string }) => z.name === "NewSpawn");
+    expect(created.roads).toEqual([
+      { type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Connection", args: ["NewSpawn-Hub"] } },
     ]);
+    // A zone from the loaded fixture is preserved exactly (no roads injected → lossless).
+    const spawnA = out.variants[0].zones.find((z: { name: string }) => z.name === "Spawn-A");
+    expect(spawnA.roads).toEqual([]);
   });
 
   it("serializeForSave strips empty-string sids (which would crash generation)", () => {

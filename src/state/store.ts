@@ -383,7 +383,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // pass never mutates the live working model. stripEmptySids drops invalid empty-string sids that
     // would crash generation (see normalize.ts).
     const merged = original ? mergeEdits(original, root) : cloneRaw(root);
-    generateRoads(merged);        // fill in road paths for editor-made (unrouted) templates
+    generateRoads(merged, original); // derive road paths for editor-created zones; preserve loaded ones
     return serializeTemplate(stripEmptySids(merged));
   },
 

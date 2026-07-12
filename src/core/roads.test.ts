@@ -47,22 +47,30 @@ describe("buildZoneRoads", () => {
 describe("generateRoads", () => {
   const root = (v: Variant): TemplateRoot => ({ name: "T", gameMode: "Classic", sizeX: 96, sizeZ: 96, gameRules: {}, variants: [v] } as unknown as TemplateRoot);
 
-  it("fills roads for an unrouted variant (no roads anywhere)", () => {
+  it("derives roads for editor-created zones (not in the original) and preserves loaded ones", () => {
+    // A hand-built shape (Spawn+Hub, no roads) plus a "pasted" copy that already has roads — the exact
+    // mixed case that broke before: the copy having roads must not stop the originals being filled.
     const spawn = zone({ name: "Spawn", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: [] });
     const hub = zone({ name: "Hub", roads: [] });
-    const r = root({ zones: [spawn, hub], connections: [rc("c1", "Spawn", "Hub")] } as unknown as Variant);
-    generateRoads(r);
-    expect((r.variants[0].zones[0].roads as unknown[]).length).toBe(1);   // Spawn → its connection
-    expect(r.variants[0].zones[1].roads).toEqual([]);                     // Hub is a 1-connection leaf → none
+    const copy = zone({ name: "Spawn-copy", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"],
+      roads: [{ type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Connection", args: ["c2"] } }] });
+    const r = root({ zones: [spawn, hub, copy], connections: [rc("c1", "Spawn", "Hub"), rc("c2", "Spawn-copy", "Hub")] } as unknown as Variant);
+    generateRoads(r, null);   // no original → every zone is editor-created
+    expect((r.variants[0].zones[0].roads as unknown[]).length).toBe(1);   // Spawn → its connection (now filled)
+    expect((r.variants[0].zones[1].roads as unknown[]).length).toBe(1);   // Hub → junction chains its two connections
+    expect((r.variants[0].zones[2].roads as unknown[]).length).toBe(1);   // copy re-derived from c2
   });
 
-  it("leaves a variant that already has roads completely untouched", () => {
-    const authored = [{ type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Crossroads" } }];
-    const a = zone({ name: "A", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: authored });
-    const b = zone({ name: "B", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: [] });
-    const r = root({ zones: [a, b], connections: [rc("c1", "A", "B")] } as unknown as Variant);
-    generateRoads(r);
-    expect(r.variants[0].zones[0].roads).toBe(authored);   // untouched (same reference)
-    expect(r.variants[0].zones[1].roads).toEqual([]);       // NOT filled — the variant already had roads
+  it("leaves a zone that exists in the loaded original untouched (lossless)", () => {
+    const loadedRoads = [{ type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Crossroads" } }];
+    const loaded = zone({ name: "L", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: [] }); // in original, empty
+    const withAuthored = zone({ name: "K", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: loadedRoads });
+    const added = zone({ name: "New", mainObjects: [{ type: "Spawn" }] as unknown as Zone["mainObjects"], roads: [] });
+    const r = root({ zones: [loaded, withAuthored, added], connections: [rc("c1", "L", "New"), rc("c2", "K", "New")] } as unknown as Variant);
+    const original = root({ zones: [zone({ name: "L", roads: [] }), zone({ name: "K", roads: loadedRoads })], connections: [] } as unknown as Variant);
+    generateRoads(r, original);
+    expect(r.variants[0].zones[0].roads).toEqual([]);       // "L" in original with empty roads → preserved
+    expect(r.variants[0].zones[1].roads).toBe(loadedRoads); // "K" in original with roads → preserved (same ref)
+    expect((r.variants[0].zones[2].roads as unknown[]).length).toBe(2); // "New" (added, 2 connections) → derived
   });
 });
