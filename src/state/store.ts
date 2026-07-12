@@ -76,6 +76,10 @@ interface EditorState {
   // original connection's properties (guard, type, road) copied to both halves.
   insertNodeOnConnection(nodeName: string, edgeId: string): void;
   updateZone(name: string, patch: Partial<Zone>): void;
+  // Push a player-spawn zone's settings onto every OTHER player-spawn zone (symmetry). Copies
+  // everything except each target's identity — its name, roads, and its Spawn main object's player
+  // slot & owner are preserved (so no duplicate-player errors).
+  applyToAllSpawns(sourceZoneName: string): void;
 
   // Multi-zone selection (from the canvas marquee) and an in-app clipboard for copy/paste of a
   // selected sub-graph. `selection` (single) still drives the inspector; these drive copy/paste.
@@ -300,6 +304,26 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const rest = { ...positions };
     if (rest[oldName]) { rest[newName] = rest[oldName]; delete rest[oldName]; }
     set({ dirty: true, selection: { kind: "zone", id: newName }, positions: rest }); get().refresh();
+  },
+
+  applyToAllSpawns(sourceZoneName) {
+    const { root, variantIndex } = get(); if (!root) return;
+    const v = root.variants[variantIndex]; if (!v) return;
+    const isSpawn = (z: Zone) => (z.mainObjects ?? []).some((m) => m.type === "Spawn");
+    const src = v.zones.find((z) => z.name === sourceZoneName);
+    if (!src || !isSpawn(src)) return;
+    v.zones = v.zones.map((z) => {
+      if (z.name === sourceZoneName || !isSpawn(z)) return z;      // skip the source and non-spawns
+      const clone = structuredClone(src) as Zone;
+      clone.name = z.name;                                         // keep the target's identity
+      clone.roads = z.roads;                                       // per-zone / auto-derived — leave as-is
+      // Restore the target's player slot & owner onto the cloned Spawn main object.
+      const tgtSpawn = (z.mainObjects ?? []).find((m) => m.type === "Spawn");
+      const newSpawn = (clone.mainObjects ?? []).find((m) => m.type === "Spawn");
+      if (newSpawn && tgtSpawn) { newSpawn.spawn = tgtSpawn.spawn; newSpawn.owner = tgtSpawn.owner; }
+      return clone;
+    });
+    set({ dirty: true }); get().refresh();
   },
 
   setSelectedZones(ids) { set({ selectedZoneIds: ids }); },

@@ -146,6 +146,25 @@ describe("store", () => {
     expect(pool.groups[0].includeLists).toEqual(["renamed_list"]);
   });
 
+  it("applies a spawn zone's settings to all other spawns, preserving each player slot", () => {
+    const st = useEditorStore.getState();
+    st.updateZone("Spawn-A", {
+      size: 5, guardMultiplier: 3, guardedContentValue: 12345,
+      mainObjects: [{ type: "Spawn", spawn: "Player1", buildingsConstructionSid: "rich_buildings_construction" }],
+    });
+    st.applyToAllSpawns("Spawn-A");
+    const zone = (n: string) => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === n)!;
+    const b = zone("Spawn-B");
+    expect(b.size).toBe(5);
+    expect(b.guardMultiplier).toBe(3);
+    expect(b.guardedContentValue).toBe(12345);
+    expect(b.name).toBe("Spawn-B");                                          // identity preserved
+    expect(b.mainObjects![0].buildingsConstructionSid).toBe("rich_buildings_construction"); // town config propagated
+    expect(b.mainObjects![0].spawn).toBe("Player2");                         // ...but the player slot preserved
+    expect(zone("Hub").size).not.toBe(5);                                    // non-spawn zone untouched
+    expect(useEditorStore.getState().dirty).toBe(true);
+  });
+
   it("copies and pastes a selected sub-graph (offset copy, deduped names, internal connection, fresh slot)", () => {
     const st = useEditorStore.getState();
     // minimal: Spawn-A(Player1) — Hub — Spawn-B(Player2); the Spawn-A↔Hub connection is internal to {Spawn-A, Hub}.

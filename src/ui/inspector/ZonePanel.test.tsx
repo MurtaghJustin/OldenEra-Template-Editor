@@ -43,6 +43,14 @@ describe("ZonePanel", () => {
     expect(zone().mainObjects![0].holdCityWinCon).toBe(true);
   });
 
+  it("shows 'Apply settings to all player spawns' only on a spawn zone (with >1 spawn)", () => {
+    const { unmount } = render(<ZonePanel zoneName="Spawn-A" />); // spawn zone, minimal has 2 spawns
+    expect(screen.getByText(/Apply settings to all player spawns/)).toBeInTheDocument();
+    unmount();
+    render(<ZonePanel zoneName="Hub" />); // Hub has no Spawn main object
+    expect(screen.queryByText(/Apply settings to all player spawns/)).toBeNull();
+  });
+
   it("crossroads is a main-object dropdown that sets crossroadsPosition (1-based)", () => {
     render(<ZonePanel zoneName="Spawn-A" />); // Spawn-A has a Spawn (Player1) main object
     const sel = screen.getByLabelText("Crossroads") as HTMLSelectElement;

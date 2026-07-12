@@ -12,11 +12,18 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
   const removeZoneById = useEditorStore((s) => s.removeZoneById);
   const duplicateZoneById = useEditorStore((s) => s.duplicateZoneById);
   const createTypeFromZone = useEditorStore((s) => s.createTypeFromZone);
+  const applyToAllSpawns = useEditorStore((s) => s.applyToAllSpawns);
   const select = useEditorStore((s) => s.select);
   const nodeTypes = useEditorStore((s) => s.nodeTypes);
   const zone = root?.variants[vi].zones.find((z) => z.name === zoneName);
   const [nameDraft, setNameDraft] = useState(zoneName);
   if (!zone) return null;
+
+  // A player-spawn zone has a Spawn main object. Offer "apply to all spawns" only for a spawn zone
+  // when there's more than one spawn to propagate to.
+  const isSpawn = (z: Zone) => (z.mainObjects ?? []).some((m) => m.type === "Spawn");
+  const spawnCount = (root?.variants[vi].zones ?? []).filter(isSpawn).length;
+  const showApplyToSpawns = isSpawn(zone) && spawnCount >= 2;
 
   // Append a reference to a zone's string[] field, reading the latest value so an async "+ New"
   // commit doesn't clobber concurrent edits.
@@ -40,6 +47,11 @@ export function ZonePanel({ zoneName }: { zoneName: string }) {
         }} />
 
       <ZoneFields zone={zone} onPatch={(patch) => updateZone(zoneName, patch)} onAddRef={addRef} />
+
+      {showApplyToSpawns && (
+        <button style={{ marginTop: 12 }} title="Copy this spawn's settings to every other player-spawn zone (each keeps its own player slot)"
+          onClick={() => applyToAllSpawns(zoneName)}>Apply settings to all player spawns</button>
+      )}
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
         <button onClick={() => duplicateZoneById(zoneName)}>Duplicate zone</button>
