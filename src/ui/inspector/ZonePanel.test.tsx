@@ -45,6 +45,7 @@ describe("ZonePanel", () => {
 
   it("'+ New' on a pool picker opens a draft that references back to the zone on Accept", () => {
     render(<ZonePanel zoneName="Hub" />);
+    fireEvent.click(screen.getByText(/Show advanced/)); // pickers live under the advanced disclosure
     // The guarded-pool picker's New button creates a draft and a referenceBack callback.
     const newButtons = screen.getAllByText("+ New");
     fireEvent.click(newButtons[0]); // first picker = Guarded content pool
@@ -60,6 +61,7 @@ describe("ZonePanel", () => {
 
   it("offers pools added to this template (not just the build-time catalog) in a pool picker search", () => {
     render(<ZonePanel zoneName="Hub" />);
+    fireEvent.click(screen.getByText(/Show advanced/)); // pickers live under the advanced disclosure
     const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
     // Author a brand-new pool in this template — it is NOT in the static build-time catalog.
     const fresh = "session_only_pool";
@@ -72,6 +74,7 @@ describe("ZonePanel", () => {
 
   it("adds and removes a mandatory content reference via the store", () => {
     render(<ZonePanel zoneName="Hub" />);
+    fireEvent.click(screen.getByText(/Show advanced/)); // pickers live under the advanced disclosure
     const zone = () => useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Hub")!;
     const name = (catalogs.mandatoryContentNames ?? [])[0];
     fireEvent.change(screen.getByLabelText("Add Mandatory content"), { target: { value: name } });

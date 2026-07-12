@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { NumberField, SelectField, TextField, VariantField } from "./fields";
+import { NumberField, SelectField, TextField, VariantField, SelectorField } from "./fields";
 
 describe("fields", () => {
   it("NumberField calls onChange with a number", () => {
@@ -32,5 +32,19 @@ describe("fields", () => {
     render(<TextField label="Name" value="x" onChange={onChange} />);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "y" } });
     expect(onChange).toHaveBeenCalledWith("y");
+  });
+
+  it("SelectorField offers biome suggestions only for FromList, and hints/omits them for Match", () => {
+    const { container, rerender } = render(
+      <SelectorField label="Zone biome" value={{ type: "FromList", args: [""] }} argOptions={["Sand", "Grass"]} onChange={() => {}} />);
+    // FromList: a datalist of biome names backs the arg input.
+    expect(container.querySelector("datalist")).not.toBeNull();
+    expect(screen.queryByText(/Args:/)).toBeNull(); // no arg hint for FromList
+
+    // Match: no biome datalist, and a hint that the first arg is an index, not a biome name.
+    rerender(<SelectorField label="Zone biome" value={{ type: "Match", args: ["Sand"] }} argOptions={["Sand", "Grass"]} onChange={() => {}} />);
+    expect(container.querySelector("datalist")).toBeNull();
+    expect(screen.getByText(/main-object index/i)).toBeInTheDocument();
+    expect(screen.getByText(/not a biome name/i)).toBeInTheDocument();
   });
 });

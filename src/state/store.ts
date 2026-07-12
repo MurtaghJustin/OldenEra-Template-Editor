@@ -15,6 +15,7 @@ import { autoLayout } from "../core/layout";
 import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from "../core/nodeTypes";
 import { validateTemplate, type Issue } from "../core/validate";
 import { CONTENT_ROOT_FIELD, defaultZoneLayout, renameContentReferences, type ContentKind, type ContentDef } from "../core/content";
+import { stripEmptySids } from "../core/normalize";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -326,8 +327,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   serializeForSave() {
     const { original, root } = get();
     if (!root) return "";
-    const merged = original ? mergeEdits(original, root) : root;
-    return serializeTemplate(merged);
+    // mergeEdits returns a fresh clone; when there's no original, clone `root` so the normalization
+    // pass never mutates the live working model. stripEmptySids drops invalid empty-string sids that
+    // would crash generation (see normalize.ts).
+    const merged = original ? mergeEdits(original, root) : cloneRaw(root);
+    return serializeTemplate(stripEmptySids(merged));
   },
 
   createCustomType(fromId) {

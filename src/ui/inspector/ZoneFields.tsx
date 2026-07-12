@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useEditorStore } from "../../state/store";
 import { catalogs } from "../../core/catalogs";
 import { NumberField, SelectField, ReferenceListField, SelectorField, ReactionDistributionField } from "./fields";
 import { MainObjectsEditor } from "./MainObjectsEditor";
+import { ZoneItemsPanel } from "../content/ZoneItemsPanel";
 import { contentDefs, type ContentKind } from "../../core/content";
 import type { Zone, MainObject, Selector } from "../../core/types";
 
@@ -16,6 +18,11 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
 }) {
   const openContentDrawer = useEditorStore((s) => s.openContentDrawer);
   const createContentDraft = useEditorStore((s) => s.createContentDraft);
+  // The item-centric list (and the advanced toggle) only make sense for a real, named zone. In
+  // node-type authoring ZoneFields edits a name-less template zone that isn't in the document, so
+  // there's nothing to project or write to — fall back to showing the pickers inline.
+  const isRealZone = !!zone.name;
+  const [showAdvanced, setShowAdvanced] = useState(false);
   // A zone's layout must be defined in this template's zoneLayouts (there are no usable built-in
   // layout defaults — referencing an undefined layout hangs the generator), so only offer those.
   const root = useEditorStore((s) => s.root);
@@ -94,14 +101,30 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
         hint="Biome theme for meta/decoration objects." />
 
       {head("Objects & content")}
+      {isRealZone && <div style={span}><ZoneItemsPanel zone={zone} /></div>}
       <div style={span}>
         <MainObjectsEditor objects={(zone.mainObjects as MainObject[] | undefined) ?? []} onChange={(next) => onPatch({ mainObjects: next })} />
       </div>
-      {/* Reference pickers each take a full row — long pool/group names overflow a narrow column. */}
-      <div style={span}>{refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the guarded objects (banks, dwellings, strong buildings) are drawn from.")}</div>
-      <div style={span}>{refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the freely-accessible objects are drawn from.")}</div>
-      <div style={span}>{refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [], "Pool(s) the resource pickups/mines are drawn from.")}</div>
-      <div style={span}>{refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [], "Mandatory-content groups guaranteed to spawn in this zone.")}</div>
+      {/* The raw pool/mandatory reference pickers. The friendly item list above covers the common
+          case; the pickers stay for power users (choosing which named pools/groups a zone uses) but
+          hide behind "Show advanced" for a real zone. Content count limits stays visible. */}
+      {isRealZone && (
+        <div style={{ ...span, margin: "8px 0 2px" }}>
+          <button type="button" onClick={() => setShowAdvanced((v) => !v)}
+            style={{ fontSize: 11, background: "none", border: "none", color: "#9bb", cursor: "pointer", padding: 0 }}>
+            {showAdvanced ? "▾" : "▸"} Show advanced — pool & mandatory references
+          </button>
+        </div>
+      )}
+      {(!isRealZone || showAdvanced) && (
+        <div style={span}>
+          {/* Reference pickers each take a full row — long pool/group names overflow a narrow column. */}
+          {refPicker("Guarded content pool", "guardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the guarded objects (banks, dwellings, strong buildings) are drawn from.")}
+          {refPicker("Unguarded content pool", "unguardedContentPool", "pools", catalogs.pools ?? [], "Pool(s) the freely-accessible objects are drawn from.")}
+          {refPicker("Resources content pool", "resourcesContentPool", "pools", catalogs.pools ?? [], "Pool(s) the resource pickups/mines are drawn from.")}
+          {refPicker("Mandatory content", "mandatoryContent", "mandatory", catalogs.mandatoryContentNames ?? [], "Mandatory-content groups guaranteed to spawn in this zone.")}
+        </div>
+      )}
       <div style={span}>{refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [], "Per-object cap-sets limiting how many of an object can appear here.")}</div>
     </div>
   );

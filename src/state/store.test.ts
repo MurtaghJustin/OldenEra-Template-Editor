@@ -152,4 +152,18 @@ describe("store", () => {
     expect(text).toContain("\"Z\"");
     expect(text.endsWith("\n")).toBe(true);
   });
+
+  it("serializeForSave strips empty-string sids (which would crash generation)", () => {
+    // A list-only mandatory item authored with sid:"" — the exact shape that broke the Warlords map.
+    useEditorStore.getState().upsertContentDef("mandatory", {
+      name: "mg", content: [{ sid: "", includeLists: ["some_list"], isGuarded: false }],
+    });
+    const out = JSON.parse(useEditorStore.getState().serializeForSave());
+    const item = (out.mandatoryContent as { name: string; content: Record<string, unknown>[] }[]).find((d) => d.name === "mg")!.content[0];
+    expect("sid" in item).toBe(false);                 // empty sid dropped
+    expect(item.includeLists).toEqual(["some_list"]);  // rest preserved
+    // The in-memory working model is untouched (normalization happens only on the serialized copy).
+    const live = (useEditorStore.getState().root!.mandatoryContent as { name: string; content: { sid?: string }[] }[]).find((d) => d.name === "mg")!;
+    expect(live.content[0].sid).toBe("");
+  });
 });

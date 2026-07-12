@@ -61,6 +61,33 @@ describe("validate", () => {
     expect(issues.some((i) => i.severity === "error" && /win condition/i.test(i.message))).toBe(true);
   });
 
+  it("errors on a biome selector using Match with a non-numeric first arg (the ungenerateable case)", () => {
+    const root = fresh();
+    // The exact Warlords bug: a biome name where Match expects a main-object index.
+    (root.variants[0].zones[0] as any).zoneBiome = { type: "Match", args: ["Sand"] };
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "error" && /Match/.test(i.message) && /index/.test(i.message))).toBe(true);
+  });
+
+  it("accepts Match/MatchMainObject with a numeric index (no false positive)", () => {
+    const root = fresh();
+    (root.variants[0].zones[0] as any).zoneBiome = { type: "Match", args: ["0", "Spawn-A"] };
+    (root.variants[0].zones[1] as any).contentBiome = { type: "MatchMainObject", args: ["0"] };
+    // minimal already uses MatchMainObject ["0"] for zoneBiome — all should be clean.
+    expect(validateTemplate(root).some((i) => /Match/.test(i.message))).toBe(false);
+  });
+
+  it("warns on a mandatory item with neither an object nor include-lists, but not on a list-only item", () => {
+    const root = fresh();
+    (root as any).mandatoryContent = [
+      { name: "good_list_only", content: [{ includeLists: ["some_list"], isGuarded: false }] },
+      { name: "blank", content: [{ isGuarded: false }] },
+    ];
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "warning" && /blank/.test(i.message))).toBe(true);
+    expect(issues.some((i) => /good_list_only/.test(i.message))).toBe(false);
+  });
+
   it("warns (not errors) on an unknown layout SID", () => {
     const root = fresh();
     root.variants[0].zones[0].layout = "zone_layout_made_up";

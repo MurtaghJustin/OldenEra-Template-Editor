@@ -98,13 +98,24 @@ export function EnumField({ label, value, options, onChange, allowNone, hint }:
   );
 }
 
-// A Selector ({type, args}) editor: a type dropdown plus a free, add/removable list of string args
-// (faction names, indices, zone names…). `argOptions` provides type-ahead suggestions for the args.
+// A Selector ({type, args}) editor: a type dropdown plus a free, add/removable list of string args.
+// Args are type-DEPENDENT, so suggestions and guidance follow the chosen type:
+//   FromList          → args are names from `argOptions` (biomes, factions, …) — suggestions offered.
+//   Match / MatchMainObject → args are a main-object INDEX (number), optionally a zone name.
+//   MatchZone         → args are zone name(s).
+// Offering the `argOptions` (e.g. biome names) for the Match variants was the bug behind an
+// ungenerateable template (a biome name where an index was required), so those suggestions are shown
+// ONLY for FromList; the Match variants get a hint instead.
 export function SelectorField({ label, value, onChange, argOptions, hint }:
   { label: string; value?: Selector; onChange: (s: Selector) => void; argOptions?: string[]; hint?: string; }) {
   const id = useId(); const listId = id + "-args";
   const sel: Selector = value ?? { type: "FromList", args: [] };
   const setArgs = (args: string[]) => onChange({ ...sel, args });
+  const isMatchObj = sel.type === "Match" || sel.type === "MatchMainObject";
+  const argHint = sel.type === "FromList" ? undefined
+    : isMatchObj ? "Args: a main-object index (e.g. 0), then optionally a zone name — not a biome name."
+    : "Args: zone name(s).";
+  const argPlaceholder = (i: number) => sel.type === "FromList" ? "" : isMatchObj ? (i === 0 ? "index e.g. 0" : "zone name") : "zone name";
   return (
     <div style={{ display: "grid", gap: 4, marginBottom: 6 }}>
       <FieldLabel label={label} hint={hint} />
@@ -114,14 +125,16 @@ export function SelectorField({ label, value, onChange, argOptions, hint }:
         </select>
         <button type="button" onClick={() => setArgs([...sel.args, ""])} style={{ flexShrink: 0 }}>+ arg</button>
       </div>
+      {argHint && <span style={{ fontSize: 10, opacity: 0.55 }}>{argHint}</span>}
       {sel.args.map((a, i) => (
         <div key={i} style={{ display: "flex", gap: 4, alignItems: "center" }}>
-          <input list={listId} value={a} style={{ flex: 1, minWidth: 0 }} onChange={(e) => setArgs(sel.args.map((x, j) => (j === i ? e.target.value : x)))} />
+          <input list={sel.type === "FromList" ? listId : undefined} value={a} placeholder={argPlaceholder(i)} style={{ flex: 1, minWidth: 0 }}
+            onChange={(e) => setArgs(sel.args.map((x, j) => (j === i ? e.target.value : x)))} />
           <button aria-label="Remove arg" onClick={() => setArgs(sel.args.filter((_, j) => j !== i))}
             style={{ border: "none", background: "transparent", color: "#e88", cursor: "pointer", padding: 0, flexShrink: 0 }}>✕</button>
         </div>
       ))}
-      <datalist id={listId}>{(argOptions ?? []).map((o) => <option key={o} value={o} />)}</datalist>
+      {sel.type === "FromList" && <datalist id={listId}>{(argOptions ?? []).map((o) => <option key={o} value={o} />)}</datalist>}
     </div>
   );
 }
