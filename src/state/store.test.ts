@@ -146,6 +146,28 @@ describe("store", () => {
     expect(pool.groups[0].includeLists).toEqual(["renamed_list"]);
   });
 
+  it("copies and pastes a selected sub-graph (offset copy, deduped names, internal connection, fresh slot)", () => {
+    const st = useEditorStore.getState();
+    // minimal: Spawn-A(Player1) — Hub — Spawn-B(Player2); the Spawn-A↔Hub connection is internal to {Spawn-A, Hub}.
+    st.setSelectedZones(["Spawn-A", "Hub"]);
+    st.copySelection();
+    expect(useEditorStore.getState().clipboard?.zones.map((z) => z.zone.name)).toEqual(["Spawn-A", "Hub"]);
+
+    st.paste();
+    const s = useEditorStore.getState();
+    const names = s.root!.variants[0].zones.map((z) => z.name);
+    expect(names).toContain("Spawn-A-copy");
+    expect(names).toContain("Hub-copy");
+    // the internal connection was copied between the copies
+    expect(s.root!.variants[0].connections.some((c) => c.from === "Spawn-A-copy" && c.to === "Hub-copy")).toBe(true);
+    // Spawn-A's copy got the next free player slot (1 and 2 are used → 3)
+    const copySpawn = s.root!.variants[0].zones.find((z) => z.name === "Spawn-A-copy")!;
+    expect((copySpawn.mainObjects![0]).spawn).toBe("Player3");
+    // the paste is now the selection and the document is dirty
+    expect(s.selectedZoneIds).toEqual(["Spawn-A-copy", "Hub-copy"]);
+    expect(s.dirty).toBe(true);
+  });
+
   it("serializeForSave applies round-trip merge", () => {
     useEditorStore.getState().addZoneOfType("Z", "side", {});
     const text = useEditorStore.getState().serializeForSave();

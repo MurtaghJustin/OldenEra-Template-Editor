@@ -17,6 +17,7 @@ import { validateTemplate, type Issue } from "../core/validate";
 import { CONTENT_ROOT_FIELD, defaultZoneLayout, renameContentReferences, type ContentKind, type ContentDef } from "../core/content";
 import { stripEmptySids } from "../core/normalize";
 import { generateRoads } from "../core/roads";
+import { internalConnections, buildPaste, type Clipboard } from "../core/subgraph";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -75,6 +76,16 @@ interface EditorState {
   // original connection's properties (guard, type, road) copied to both halves.
   insertNodeOnConnection(nodeName: string, edgeId: string): void;
   updateZone(name: string, patch: Partial<Zone>): void;
+
+  // Multi-zone selection (from the canvas marquee) and an in-app clipboard for copy/paste of a
+  // selected sub-graph. `selection` (single) still drives the inspector; these drive copy/paste.
+  selectedZoneIds: string[];
+  clipboard: Clipboard | null;
+  setSelectedZones(ids: string[]): void;
+  copySelection(): void;         // snapshot selected zones + their internal connections to the clipboard
+  paste(): void;                 // add an offset copy of the clipboard; selects the copy
+  duplicateSelection(): void;    // copy + paste in one step
+
   serializeForSave(): string;
   // Custom node-type authoring (persisted in localStorage; merged into nodeTypes alongside builtins).
   createCustomType(fromId?: string): string; // returns the new type's id
@@ -117,6 +128,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   original: null, root: null, fileName: "untitled.rmg.json",
   variantIndex: 0, graph: null, positions: {}, selection: null, dirty: false, issues: [],
   nodeTypes: withCustoms(BUILTIN_NODE_TYPES), connectMode: "none", contentDrawer: null,
+  selectedZoneIds: [], clipboard: null,
 
   setConnectMode(m) { if (get().connectMode !== m) set({ connectMode: m }); },
 
@@ -254,7 +266,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const { root, variantIndex, positions } = get(); if (!root) return;
     removeZone(root, variantIndex, name);
     const { [name]: _drop, ...rest } = positions;
-    set({ dirty: true, selection: null, positions: rest }); get().refresh();
+    set({ dirty: true, selection: null, positions: rest, selectedZoneIds: get().selectedZoneIds.filter((id) => id !== name) }); get().refresh();
   },
 
   duplicateZoneById(name) {
@@ -289,6 +301,45 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (rest[oldName]) { rest[newName] = rest[oldName]; delete rest[oldName]; }
     set({ dirty: true, selection: { kind: "zone", id: newName }, positions: rest }); get().refresh();
   },
+
+  setSelectedZones(ids) { set({ selectedZoneIds: ids }); },
+
+  copySelection() {
+    const { root, variantIndex, positions, selectedZoneIds } = get(); if (!root) return;
+    const v = root.variants[variantIndex]; if (!v) return;
+    const sel = new Set(selectedZoneIds);
+    const zones = v.zones.filter((z) => sel.has(z.name)).map((z) => ({ zone: structuredClone(z), position: positions[z.name] }));
+    if (zones.length === 0) return;
+    const connections = internalConnections(v.connections, sel).map((c) => structuredClone(c));
+    set({ clipboard: { zones, connections } });
+  },
+
+  paste() {
+    const { root, variantIndex, positions, clipboard } = get();
+    if (!root || !clipboard || clipboard.zones.length === 0) return;
+    const v = root.variants[variantIndex]; if (!v) return;
+    const usedSlots = new Set<number>();
+    for (const z of v.zones) for (const mo of z.mainObjects ?? []) {
+      const m = /^Player(\d+)$/.exec(typeof mo.spawn === "string" ? mo.spawn : ""); if (m) usedSlots.add(Number(m[1]));
+    }
+    const built = buildPaste(clipboard, {
+      takenZoneNames: new Set(v.zones.map((z) => z.name)),
+      takenConnNames: new Set(v.connections.map((c) => c.name).filter(Boolean) as string[]),
+      usedSlots,
+      offset: { x: 64, y: 64 },
+    });
+    for (const z of built.zones) addZone(root, variantIndex, z);
+    for (const c of built.connections) addConnection(root, variantIndex, c);
+    set({
+      dirty: true,
+      positions: { ...positions, ...built.positions },
+      selectedZoneIds: built.names,
+      selection: built.names.length === 1 ? { kind: "zone", id: built.names[0] } : null,
+    });
+    get().refresh();
+  },
+
+  duplicateSelection() { get().copySelection(); get().paste(); },
 
   addConn(conn) {
     const { root, variantIndex } = get(); if (!root) return;

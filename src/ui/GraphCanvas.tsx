@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import {
-  ReactFlow, ReactFlowProvider, Background, Controls, ConnectionMode, useNodesState, useReactFlow,
+  ReactFlow, ReactFlowProvider, Background, Controls, ConnectionMode, SelectionMode, useNodesState, useReactFlow,
   type Node, type Edge, type Connection as RfConn,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -33,8 +33,15 @@ function Flow() {
   const addConn = useEditorStore((s) => s.addConn);
   const setNodePosition = useEditorStore((s) => s.setNodePosition);
   const connectMode = useEditorStore((s) => s.connectMode);
+  const selectedZoneIds = useEditorStore((s) => s.selectedZoneIds);
+  const clipboardCount = useEditorStore((s) => s.clipboard?.zones.length ?? 0);
   const { screenToFlowPosition, getViewport, setViewport } = useReactFlow();
   const paneRef = useRef<HTMLDivElement>(null);
+  // After a programmatic selection change (paste/duplicate), React Flow briefly reports its OLD
+  // internal selection via onSelectionChange. Ignore those events until RF catches up to the store's
+  // selection — otherwise the stale event overwrites the store back to the source zones and you end
+  // up dragging the originals (old names) instead of the pasted copies.
+  const skipSelSync = useRef(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
 
@@ -70,6 +77,23 @@ function Flow() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Ctrl/Cmd + C/V/D: copy the selected zones, paste an offset copy, or duplicate (copy+paste).
+  // Ignored while typing in a field so it doesn't hijack text copy/paste.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+      const st = useEditorStore.getState();
+      const k = e.key.toLowerCase();
+      if (k === "c" && st.selectedZoneIds.length) { e.preventDefault(); st.copySelection(); }
+      else if (k === "v" && st.clipboard?.zones.length) { e.preventDefault(); skipSelSync.current = true; st.paste(); }
+      else if (k === "d" && st.selectedZoneIds.length) { e.preventDefault(); skipSelSync.current = true; st.duplicateSelection(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   // Track held modifiers globally to set the drag mode: default drags MOVE a node; Shift+drag draws
   // a Direct connection; Alt+drag draws a Portal. Any key change (or losing focus) refreshes it.
   useEffect(() => {
@@ -85,13 +109,14 @@ function Flow() {
   // live (onNodesChange) for smooth motion; the final position is persisted on drag stop, which
   // bumps the store graph and re-syncs here to the same coordinates.
   useEffect(() => {
-    setNodes((graph?.nodes ?? []).map((n) => ({
-      id: n.id, type: "zone", position: { x: n.x, y: n.y },
-      selected: selection?.kind === "zone" && selection.id === n.id,
-      data: { label: n.id, playerSlot: n.playerSlot, hasTown: n.hasTown, tier: n.tier,
-        selected: selection?.kind === "zone" && selection.id === n.id },
-    })));
-  }, [graph, selection, setNodes]);
+    setNodes((graph?.nodes ?? []).map((n) => {
+      const sel = selectedZoneIds.includes(n.id);
+      return {
+        id: n.id, type: "zone", position: { x: n.x, y: n.y }, selected: sel,
+        data: { label: n.id, playerSlot: n.playerSlot, hasTown: n.hasTown, tier: n.tier, selected: sel },
+      };
+    }));
+  }, [graph, selectedZoneIds, setNodes]);
 
   const edges: Edge[] = (graph ? displayEdges(graph) : []).map((e) => {
     const sel = selection?.kind === "connection" && selection.id === e.id;
@@ -126,12 +151,37 @@ function Flow() {
   };
 
   return (
-    <div ref={paneRef} style={{ height: "100%" }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }} onDrop={onDrop}>
+    <div ref={paneRef} style={{ height: "100%", position: "relative" }} onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }} onDrop={onDrop}>
+      {selectedZoneIds.length > 0 && (
+        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 5, display: "flex", gap: 6, alignItems: "center",
+          background: "#1e1e1e", border: "1px solid #3a3a3a", borderRadius: 6, padding: "4px 8px", fontSize: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+          <span style={{ opacity: 0.7 }}>{selectedZoneIds.length} zone{selectedZoneIds.length === 1 ? "" : "s"} selected</span>
+          <button onClick={() => useEditorStore.getState().copySelection()} title="Copy (Ctrl+C)">Copy</button>
+          <button onClick={() => { skipSelSync.current = true; useEditorStore.getState().duplicateSelection(); }} title="Duplicate (Ctrl+D)">Duplicate</button>
+          {clipboardCount > 0 && <button onClick={() => { skipSelSync.current = true; useEditorStore.getState().paste(); }} title="Paste (Ctrl+V)">Paste ({clipboardCount})</button>}
+        </div>
+      )}
       <ReactFlow
         nodes={nodes} edges={edges} nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         deleteKeyCode={null}                 // we handle Delete ourselves (see effect above)
         selectionKeyCode={null}              // Shift is our connect modifier, not RF's selection key
+        multiSelectionKeyCode={null}         // Shift is taken; marquee is the way to multi-select
+        selectionOnDrag                      // left-drag on empty canvas draws a selection box...
+        panOnDrag={[1, 2]}                   // ...so panning moves to middle/right-drag (+ scroll/Controls)
+        selectionMode={SelectionMode.Partial} // a zone touching the box is selected (forgiving)
+        onSelectionChange={({ nodes: sel }) => {
+          const ids = sel.map((n) => n.id);
+          const cur = useEditorStore.getState().selectedZoneIds;
+          const same = ids.length === cur.length && ids.every((x) => cur.includes(x));
+          // While a paste's programmatic selection settles, ignore RF's stale events; clear the guard
+          // once RF reports the same selection the store already holds.
+          if (skipSelSync.current) { if (same) skipSelSync.current = false; return; }
+          if (same) return;                     // no change → avoid a render loop
+          useEditorStore.getState().setSelectedZones(ids);
+          if (ids.length >= 2) select(null);    // multi-select: close the single-zone inspector
+        }}
+        onSelectionDragStop={(_, sel) => { for (const n of sel) setNodePosition(n.id, n.position.x, n.position.y); }}
         connectOnClick={false}               // connections require a drag; click-then-click must not wire
         nodesDraggable={connectMode === "none"}    // default: drag moves a node...
         nodesConnectable={connectMode !== "none"}  // ...Shift/Alt: drag draws a connection
@@ -154,7 +204,8 @@ function Flow() {
           }
           if (best) useEditorStore.getState().insertNodeOnConnection(n.id, best);
         }}
-        onNodeClick={(_, n) => select({ kind: "zone", id: n.id })}
+        onSelectionStart={() => { skipSelSync.current = false; }} // a fresh user box-select always registers
+        onNodeClick={(_, n) => { skipSelSync.current = false; select({ kind: "zone", id: n.id }); }}
         onEdgeClick={(_, e) => select({ kind: "connection", id: e.id })}
         onConnect={(c: RfConn) => {
           if (!c.source || !c.target || c.source === c.target) return;
