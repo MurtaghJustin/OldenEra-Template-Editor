@@ -43,6 +43,22 @@ describe("ZonePanel", () => {
     expect(zone().mainObjects![0].holdCityWinCon).toBe(true);
   });
 
+  it("crossroads is a main-object dropdown that sets crossroadsPosition (1-based)", () => {
+    render(<ZonePanel zoneName="Spawn-A" />); // Spawn-A has a Spawn (Player1) main object
+    const sel = screen.getByLabelText("Crossroads") as HTMLSelectElement;
+    const opts = [...sel.querySelectorAll("option")].map((o) => ({ v: o.value, t: o.textContent ?? "" }));
+    expect(opts[0]).toMatchObject({ v: "0", t: "None" });
+    expect(opts.some((o) => o.v === "1" && /Spawn/.test(o.t))).toBe(true);
+    fireEvent.change(sel, { target: { value: "1" } });
+    expect(useEditorStore.getState().root!.variants[0].zones.find((z) => z.name === "Spawn-A")!.crossroadsPosition).toBe(1);
+  });
+
+  it("crossroads dropdown offers only None when the zone has no main objects", () => {
+    render(<ZonePanel zoneName="Hub" />); // Hub has no main objects
+    const sel = screen.getByLabelText("Crossroads") as HTMLSelectElement;
+    expect([...sel.querySelectorAll("option")].map((o) => o.textContent)).toEqual(["None"]);
+  });
+
   it("'+ New' on a pool picker opens a draft that references back to the zone on Accept", () => {
     render(<ZonePanel zoneName="Hub" />);
     fireEvent.click(screen.getByText(/Show advanced/)); // pickers live under the advanced disclosure

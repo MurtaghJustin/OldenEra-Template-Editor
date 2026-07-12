@@ -16,6 +16,7 @@ import { BUILTIN_NODE_TYPES, resolveZone, deriveNodeTypes, type NodeType } from 
 import { validateTemplate, type Issue } from "../core/validate";
 import { CONTENT_ROOT_FIELD, defaultZoneLayout, renameContentReferences, type ContentKind, type ContentDef } from "../core/content";
 import { stripEmptySids } from "../core/normalize";
+import { generateRoads } from "../core/roads";
 import type { Connection } from "../core/types";
 
 export type Selection =
@@ -331,6 +332,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // pass never mutates the live working model. stripEmptySids drops invalid empty-string sids that
     // would crash generation (see normalize.ts).
     const merged = original ? mergeEdits(original, root) : cloneRaw(root);
+    generateRoads(merged);        // fill in road paths for editor-made (unrouted) templates
     return serializeTemplate(stripEmptySids(merged));
   },
 

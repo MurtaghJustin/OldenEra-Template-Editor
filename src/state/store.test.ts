@@ -153,6 +153,16 @@ describe("store", () => {
     expect(text.endsWith("\n")).toBe(true);
   });
 
+  it("serializeForSave auto-authors roads for an unrouted (editor-made) template", () => {
+    // minimal's zones all have roads: [] and its connections are road:true — so it's "unrouted".
+    const out = JSON.parse(useEditorStore.getState().serializeForSave());
+    const spawnA = out.variants[0].zones.find((z: { name: string }) => z.name === "Spawn-A");
+    // Spawn-A has a Spawn main object and the road-connection "Spawn-A-Hub" → MainObject 0 → that connection.
+    expect(spawnA.roads).toEqual([
+      { type: "Stone", from: { type: "MainObject", args: ["0"] }, to: { type: "Connection", args: ["Spawn-A-Hub"] } },
+    ]);
+  });
+
   it("serializeForSave strips empty-string sids (which would crash generation)", () => {
     // A list-only mandatory item authored with sid:"" — the exact shape that broke the Warlords map.
     useEditorStore.getState().upsertContentDef("mandatory", {

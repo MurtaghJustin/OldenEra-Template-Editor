@@ -57,6 +57,14 @@ export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] 
         issues.push({ severity: "error", message: `Zone "${z.name}" has no ${label} content pool — the map can't generate. Every zone needs guarded, unguarded and resources pools.`, path: `${p}.${field}` });
     }
 
+    // A crossroads converges the zone's roads at a main object: crossroadsPosition is 1-based
+    // (1 = main object #0). If it exceeds the main-object count, the generator reports "crossroads
+    // main object index is out of range" and the map fails. (The editor's Crossroads dropdown can't
+    // produce this, but a hand-edited or imported template can.)
+    if (z.crossroadsPosition && z.crossroadsPosition > ((z.mainObjects as unknown[] | undefined)?.length ?? 0))
+      issues.push({ severity: "error", path: `${p}.crossroadsPosition`,
+        message: `Zone "${z.name}" has crossroadsPosition ${z.crossroadsPosition} but only ${((z.mainObjects as unknown[] | undefined)?.length ?? 0)} main object(s) — the crossroads anchors to a missing object (index out of range) and the map won't generate. Pick an existing main object, or set it to None.` });
+
     checkSelector(z.zoneBiome, `Zone "${z.name}"`, "zone biome", `${p}.zoneBiome`);
     checkSelector(z.contentBiome, `Zone "${z.name}"`, "content biome", `${p}.contentBiome`);
     checkSelector(z.metaObjectsBiome, `Zone "${z.name}"`, "meta-objects biome", `${p}.metaObjectsBiome`);

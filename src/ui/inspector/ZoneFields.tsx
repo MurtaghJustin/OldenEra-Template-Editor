@@ -63,8 +63,7 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
         <button type="button" style={{ fontSize: 11, marginTop: 2 }} disabled={!zone.layout}
           onClick={() => zone.layout && openContentDrawer("layouts", zone.layout)}>Edit layout definition</button>
       </div>
-      <NumberField label="Crossroads position" value={zone.crossroadsPosition ?? 0} onChange={(n) => onPatch({ crossroadsPosition: n })}
-        hint="0 = no crossroads; 1 = the zone has a central road junction." />
+      <CrossroadsField zone={zone} onChange={(v) => onPatch({ crossroadsPosition: v })} />
       <NumberField label="Diplomacy modifier" value={zone.diplomacyModifier ?? 0} onChange={(n) => onPatch({ diplomacyModifier: n })}
         hint="Adjusts neutral-creature join odds; negative makes recruiting harder." />
 
@@ -131,6 +130,28 @@ export function ZoneFields({ zone, onPatch, onAddRef }: {
         </div>
       )}
       <div style={span}>{refPicker("Content count limits", "contentCountLimits", "countLimits", catalogs.countLimitNames ?? [], "Per-object cap-sets limiting how many of an object can appear here.")}</div>
+    </div>
+  );
+}
+
+// The crossroads (where a zone's roads converge) is anchored to one of the zone's main objects — its
+// town. The stored `crossroadsPosition` is 1-based: 0 = none, 1 = main object #0, 2 = #1, … Rather
+// than a raw number the user must decode (and can set out of range → generation crash), pick the
+// object directly, or None.
+function CrossroadsField({ zone, onChange }: { zone: Zone; onChange: (v: number) => void }) {
+  const objs = (zone.mainObjects as MainObject[] | undefined) ?? [];
+  const cp = zone.crossroadsPosition ?? 0;
+  const label = (mo: MainObject, i: number) => `#${i} · ${mo.type}${typeof mo.spawn === "string" ? ` (${mo.spawn})` : ""}`;
+  return (
+    <div style={{ display: "grid", gap: 2, marginBottom: 6 }}>
+      <span style={{ fontSize: 12, opacity: 0.7 }}>Crossroads
+        <span aria-hidden title="Roads converge at the chosen main object (the zone's town); needs a main object." style={{ marginLeft: 4, opacity: 0.65, cursor: "help" }}>ⓘ</span></span>
+      <select aria-label="Crossroads" value={cp} onChange={(e) => onChange(Number(e.target.value))}>
+        <option value={0}>None</option>
+        {objs.map((mo, i) => <option key={i} value={i + 1}>{label(mo, i)}</option>)}
+        {cp > objs.length && <option value={cp}>(invalid — object #{cp - 1} missing)</option>}
+      </select>
+      {objs.length === 0 && <span style={{ fontSize: 10, opacity: 0.5 }}>Add a main object to enable a crossroads.</span>}
     </div>
   );
 }

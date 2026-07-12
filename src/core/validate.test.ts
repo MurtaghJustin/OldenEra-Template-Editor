@@ -102,6 +102,17 @@ describe("validate", () => {
     expect(issues.some((i) => /good_list_only/.test(i.message))).toBe(false);
   });
 
+  it("errors when a zone sets crossroadsPosition but has no main object (out-of-range crash)", () => {
+    const root = fresh();
+    const hub = root.variants[0].zones.find((z) => z.name === "Hub")!; // Hub has no main objects
+    hub.crossroadsPosition = 1;
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "error" && /crossroadsPosition/.test(i.message) && /Hub/.test(i.message))).toBe(true);
+    // A spawn zone (has a main object) with crossroadsPosition is fine.
+    root.variants[0].zones.find((z) => z.name === "Spawn-A")!.crossroadsPosition = 1;
+    expect(validateTemplate(root).some((i) => /Spawn-A.*crossroadsPosition|crossroadsPosition.*Spawn-A/.test(i.message))).toBe(false);
+  });
+
   it("warns (not errors) on an unknown layout SID", () => {
     const root = fresh();
     root.variants[0].zones[0].layout = "zone_layout_made_up";
