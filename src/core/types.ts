@@ -4,7 +4,7 @@ export const CONNECTION_TYPES = ["Direct", "Default", "Portal", "Proximity", "Gl
 export const MAIN_OBJECT_TYPES = ["Spawn", "City", "AbandonedOutpost", "GladiatorArena"] as const;
 export const PLACEMENTS = ["Uniform", "Center", "Connection", "NearZone"] as const;
 export const ORIENTATION_MODES = ["MinimalBoundingSquare", "BoundingCircle"] as const;
-export const SELECTOR_TYPES = ["FromList", "Match", "MatchMainObject", "MatchZone"] as const;
+export const SELECTOR_TYPES = ["FromList", "Match", "MatchMainObject", "MatchZone", "Random"] as const;
 export const PLAYER_SLOTS = ["Player1","Player2","Player3","Player4","Player5","Player6","Player7","Player8"] as const;
 
 export type GameMode = (typeof GAME_MODES)[number];

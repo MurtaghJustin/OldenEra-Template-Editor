@@ -19,19 +19,19 @@ export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] 
   const v = root.variants[variantIndex];
   if (!v) return issues;
 
-  // A biome selector of type Match/MatchMainObject resolves against a main-object INDEX (a number),
+  // A selector of type Match/MatchMainObject resolves against a main-object INDEX (a number),
   // optionally a zone name — e.g. args ["0"] or ["0","Spawn-A"]. A non-numeric first arg (e.g. a
-  // biome name like "Sand") is unparseable: the generator logs `Couldn't parse rule type 'Match'`,
-  // leaves the zone with an empty biome config, and crashes when it places an object there. To pick a
-  // biome by NAME, the selector type must be FromList. This guards the exact editor mistake where the
-  // biome-name arg suggestions were offered for every selector type.
-  const checkBiomeSelector = (sel: unknown, zoneName: string, label: string, path: string) => {
+  // biome/faction name) is unparseable: the generator logs `Couldn't parse rule type 'Match'`, leaves
+  // an empty config, and crashes when it places an object (NullReferenceException in MapObjectDesc).
+  // To pick a value by NAME, the selector type must be FromList. Applies to every selector the editor
+  // exposes — zone biomes AND main-object factions — since the arg-suggestion mistake affected both.
+  const checkSelector = (sel: unknown, owner: string, label: string, path: string) => {
     const s = sel as { type?: string; args?: unknown[] } | undefined;
     if (!s || (s.type !== "Match" && s.type !== "MatchMainObject")) return;
     const first = (s.args ?? [])[0];
     if (first !== undefined && !/^\d+$/.test(String(first)))
       issues.push({ severity: "error", path,
-        message: `Zone "${zoneName}" ${label} uses ${s.type} with a non-numeric first argument "${String(first)}" — it must be a main-object index (e.g. 0), so the map won't generate. To choose a biome by name, set the selector type to FromList.` });
+        message: `${owner} ${label} uses ${s.type} with a non-numeric first argument "${String(first)}" — it must be a main-object index (e.g. 0), so the map won't generate. To choose a value by name, set the selector type to FromList.` });
   };
 
   const names = new Set<string>();
@@ -57,9 +57,11 @@ export function validateTemplate(root: TemplateRoot, variantIndex = 0): Issue[] 
         issues.push({ severity: "error", message: `Zone "${z.name}" has no ${label} content pool — the map can't generate. Every zone needs guarded, unguarded and resources pools.`, path: `${p}.${field}` });
     }
 
-    checkBiomeSelector(z.zoneBiome, z.name, "zone biome", `${p}.zoneBiome`);
-    checkBiomeSelector(z.contentBiome, z.name, "content biome", `${p}.contentBiome`);
-    checkBiomeSelector(z.metaObjectsBiome, z.name, "meta-objects biome", `${p}.metaObjectsBiome`);
+    checkSelector(z.zoneBiome, `Zone "${z.name}"`, "zone biome", `${p}.zoneBiome`);
+    checkSelector(z.contentBiome, `Zone "${z.name}"`, "content biome", `${p}.contentBiome`);
+    checkSelector(z.metaObjectsBiome, `Zone "${z.name}"`, "meta-objects biome", `${p}.metaObjectsBiome`);
+
+    (z.mainObjects || []).forEach((mo, mi) => checkSelector(mo.faction, `Zone "${z.name}"`, `main object #${mi} faction`, `${p}.mainObjects[${mi}].faction`));
 
     for (const mo of z.mainObjects || []) {
       if (mo.type === "Spawn" && mo.spawn) {

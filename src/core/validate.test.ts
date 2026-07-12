@@ -69,6 +69,20 @@ describe("validate", () => {
     expect(issues.some((i) => i.severity === "error" && /Match/.test(i.message) && /index/.test(i.message))).toBe(true);
   });
 
+  it("errors on a main-object FACTION selector using Match with a non-numeric first arg", () => {
+    const root = fresh();
+    const spawn = root.variants[0].zones[0].mainObjects![0];
+    (spawn as any).faction = { type: "Match", args: ["human"] }; // faction name where an index is required
+    const issues = validateTemplate(root);
+    expect(issues.some((i) => i.severity === "error" && /faction/.test(i.message) && /index/.test(i.message))).toBe(true);
+  });
+
+  it("does not flag a Random faction selector (valid, no index needed)", () => {
+    const root = fresh();
+    (root.variants[0].zones[0].mainObjects![0] as any).faction = { type: "Random", args: [] };
+    expect(validateTemplate(root).some((i) => /faction/.test(i.message))).toBe(false);
+  });
+
   it("accepts Match/MatchMainObject with a numeric index (no false positive)", () => {
     const root = fresh();
     (root.variants[0].zones[0] as any).zoneBiome = { type: "Match", args: ["0", "Spawn-A"] };
